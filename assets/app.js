@@ -501,7 +501,7 @@ const App = {
         if (this.modelTarget === 'interrogator') this.selectedInterrogatorId = modelId;
         else this.selectedModelId = modelId;
         this.renderSelectedModelSummary();
-        this.renderSelectedModelSummary();
+        this.renderInterrogatorSummary();
         this.closeModelModal();
     },
 
@@ -665,6 +665,14 @@ const App = {
             this.renderHumanPerformer(document.getElementById(role+'-human-card'));
         }
         this.renderSelectedModelSummary();
+        this.renderInterrogatorSummary();
+        document.getElementById('swap-roles-btn').title=mode==='ai'?'تبديل نموذجَي الذكاء الاصطناعي بين الدورين':'تبديل دورك ونقل نموذج الذكاء الاصطناعي إلى الدور المقابل';
+    },
+    swapRoles() {
+        if(this.busy || this.generating)return;
+        [this.selectedModelId,this.selectedInterrogatorId]=[this.selectedInterrogatorId,this.selectedModelId];
+        this.setInterrogationMode(this.interrogationMode==='ai'?'ai':this.interrogationMode==='human'?'reverse':'human');
+        this.updateControls();
     },
     renderHumanPerformer(container) {
         container.innerHTML='<span class="participant-avatar participant-placeholder" aria-hidden="true">👤</span><span class="participant-info"><strong>أنت · المشارك البشري</strong><small>نسخة مستقلة · السجلات مرتبطة بهذا المتصفح</small></span>';
@@ -684,7 +692,7 @@ const App = {
             const card=document.createElement('article');card.className='investigator-card';
             card.innerHTML=`${LabView.investigatorAvatar(p,'profile-portrait')}<div class="investigator-file"><span class="investigator-rank">${String(p.number).padStart(2,'0')} · المستوى ${p.level}/10 · ${this.escapeHtml(p.level_ar)}</span><h3 dir="ltr">${this.escapeHtml(p.name)}</h3><p>${p.age} عامًا · ${p.years_experience} سنة خبرة</p><strong>${this.escapeHtml(p.specialty)}</strong><p>${this.escapeHtml(p.bio)}</p><p>${this.escapeHtml(p.style)}</p><div class="investigator-skills">${p.skills.map(s=>`<span>${this.escapeHtml(s)}</span>`).join('')}</div><details><summary>حدود المستوى وتعليمات الشخصية</summary><p>${this.escapeHtml(p.limits)}</p><p>${this.escapeHtml(p.instructions)}</p><small>التفكير المطلوب: ${this.escapeHtml(({none:'معدوم إن أمكن',low:'قليل',medium:'متوسط',high:'مرتفع',highest:'أعلى مستوى متاح'})[p.thinking])} · حسب دعم النموذج.</small></details><button type="button" class="btn btn-secondary" data-investigator-id="${p.id}">${p.id===this.selectedInvestigatorPersona?'✓ المحدد حاليًا':'اختيار المحقق'}</button></div>`;
             const faces=document.createElement('details');faces.innerHTML='<summary>معاينة التعابير الستة</summary><div class="investigator-expressions">'+Object.entries(LabView.investigatorExpressions).map(([id,name])=>`<figure>${LabView.investigatorAvatar(p,'',id)}<figcaption>${name}</figcaption></figure>`).join('')+'</div>';card.querySelector('.investigator-file').insertBefore(faces,card.querySelector('button'));
-            card.querySelector('button').addEventListener('click',()=>{this.selectedInvestigatorPersona=p.id;this.renderSelectedModelSummary();document.getElementById('investigator-profile-modal').classList.remove('active');});
+            card.querySelector('button').addEventListener('click',()=>{this.selectedInvestigatorPersona=p.id;this.renderInterrogatorSummary();document.getElementById('investigator-profile-modal').classList.remove('active');});
             box.appendChild(card);
         }
         document.getElementById('investigator-profile-modal').classList.add('active');
@@ -736,6 +744,7 @@ const App = {
     updateControls() {
         const s=this.currentSession, ai=s?.interrogator_type==='ai', reverse=s?.interrogator_type==='reverse', ended=s?.is_ended, ro=s?.read_only;
         document.getElementById('start-session-btn').disabled=this.busy || this.generating;
+        document.getElementById('swap-roles-btn').disabled=this.busy || this.generating;
         const logout=document.getElementById('logout-btn');if(logout)logout.disabled=this.busy || this.generating;
         document.getElementById('start-session-btn').textContent='بدء تجربة جديدة';
         document.getElementById('human-input-bar').style.display=ai?'none':'';
