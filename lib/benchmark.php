@@ -7,7 +7,7 @@ function labActorModels(array $s):array {
     if($s['interrogator_type']!=='human' && !empty($s['interrogator_model']))$out['interrogator']=$s['interrogator_model'];
     return $out;
 }
-function labIncidentTypes():array {return ['hallucination'=>'إشارة هلوسة','off_role'=>'خروج عن الدور','manipulated'=>'استدراج أو تلاعب ناجح','loop'=>'حلقة تكرار','verbose'=>'الثرثار'];}
+function labIncidentTypes():array {return ['hallucination'=>'إشارة هلوسة','off_role'=>'خروج عن الدور','manipulated'=>'استدراج أو تلاعب ناجح','loop'=>'حلقة تكرار','verbose'=>'الثرثار','premature_exit'=>'انسحاب تكتيكي مبكر','prolonged_interrogation'=>'إطالة التحقيق'];}
 
 /** Similarity is a lead for the jury, never a verdict or an automatic rewrite. */
 function labRepetitionSignals(array $s):array {
@@ -56,6 +56,11 @@ function labValidateIncidents(array $incidents,array $s):array {
         }
         if($type==='verbose' && !$eventOwn)throw new RuntimeException('شارة الثرثار تحتاج سجل تجاوز موثق من الخادم؛ لا تطبق حدودًا جديدة بأثر رجعي');
         if((!$own && !$eventOwn) || ($type==='loop' && $own<2))throw new RuntimeException('إشارة الخلل بلا استشهاد كاف من الطرف المسؤول');
+        if($type==='premature_exit') {
+            $event=$s['termination'] ?? [];
+            if(empty($s['closure_policy']) || ($event['role'] ?? '')!==$role || !in_array($event['message_id'] ?? '',$ids,true) || ($role==='prisoner' && labProtectedExit($s)))throw new RuntimeException('إشارة انسحاب بلا طلب إنهاء موثق أو تطال استثناء الصمت والرعاية بعد 15');
+        }
+        if($type==='prolonged_interrogation' && ($role!=='interrogator' || empty($s['closure_policy']) || labTurns($s)<=15 || !array_filter($evidence,fn($e)=>$e['role']==='user' && $e['turn']>15)))throw new RuntimeException('إشارة إطالة بلا كلام محقق بعد الجولة 15');
         if($type==='loop') {
             $position=fn($e)=>2*$e['turn']+($e['role']==='assistant'?1:0);
             $ownEvidence=array_filter($evidence,fn($e)=>$e['role']===($role==='interrogator'?'user':'assistant'));
@@ -99,6 +104,7 @@ function labBenchmarkSave(array $s,?array $review=null):void {
             $key=$s['session_id'].':'.$role;$old=$data[$key] ?? [];
             $entry=['session_id'=>$s['session_id'],'role'=>$role,'model'=>$model,'case_file'=>$s['case_file'],
                 'level'=>$s[$role==='prisoner'?'prisoner_character':'interrogator_character']['level'] ?? null,
+                'closure_assessment'=>$s['evaluation']['closure_adjustments'][$role] ?? null,
                 'reasoning'=>$s[$role.'_reasoning'] ?? null,'opponent_reasoning'=>$s[($role==='prisoner'?'interrogator':'prisoner').'_reasoning'] ?? null,
                 'opponent_model'=>$role==='prisoner'?($s['interrogator_model'] ?: null):($s['model'] ?: null),
                 'providers'=>array_values(array_unique(array_filter(array_column(array_filter($s['usage'] ?? [],fn($u)=>$u['purpose']===$role),'provider'),'is_string'))),

@@ -52,4 +52,5 @@ function labSessionLevels(array &$s,array $models):void {
         $s['interrogator_output_budget']=labActorOutputBudget($m);
     }
     $s['level_policy_version']=1;
+    labEnsureClosurePolicy($s);
 }

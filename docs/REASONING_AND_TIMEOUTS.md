@@ -2,7 +2,7 @@
 
 A production GPT-6.1 Sol versus Gemini Argon session on 2026-10-23 recorded four GPT transport failures at 65.002–65.003 seconds. Gemini completed its calls in approximately 15 and 43 seconds. No measured output-limit events were present. This establishes an application watchdog failure, not proof of invalid output or an intrinsically unreliable model. Existing telemetry and historical grades are preserved.
 
-Actor chat calls now have a 300-second wall-clock watchdog, independent of the jury deadlines (50/80/180 seconds). JEV/compaction retain their existing individual deadlines. The API has a 900-second execution cap; this domain's FPM worker cap is 950 seconds, fronting proxies 1000 seconds, and browser POST deadline 1020 seconds. Connection establishment stays bounded at 15 seconds. These are finite limits, not a promise that every provider will finish.
+Actor chat calls now have a 300-second wall-clock watchdog, independent of the jury deadlines (50/80/180 seconds). JEV/compaction retain their existing individual deadlines. The API has a 1200-second execution cap; this domain's FPM worker cap is 1250 seconds, fronting proxies 1300 seconds, and browser POST deadline 1320 seconds. Connection establishment stays bounded at 15 seconds. These are finite limits, not a promise that every provider will finish.
 
 A structured session-busy response makes the browser poll owner-authorized lock state, then replay the identical request ID after release. It does not launch competing calls while the existing worker holds its lock. Successful stages, including an investigator question and JEV directive awaiting a prisoner answer, remain checkpointed. The wait is bounded and other 409 responses retain their existing behavior.
 

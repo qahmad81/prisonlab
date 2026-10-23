@@ -16,13 +16,19 @@ Alternatively run start.bat. Open http://127.0.0.1:8488/. Always use router.php:
 
 ## Conversation lifecycle
 
-- Models and characters are fixed per session. A round is one investigator question followed by one prisoner reply; at most 30 prisoner replies are accepted. A user can end a completed round manually, or JEV can confirm a substantive confession. Fear alone cannot end a session.
+- Models and characters are fixed per session. A round is one investigator question followed by one prisoner reply; at most 30 prisoner replies are accepted. A user can end a completed round manually. Under closure policy 1, JEV records a substantive confession without forcing an immediate victory; either actor can then request a contextual end. A verified investigator closing statement can follow a completed round without inventing a prisoner reply. Fear alone cannot end a session.
 - AI-versus-AI generates consecutive rounds while the page is open and displays each saved pair automatically. Evaluation appears automatically when available. Closing the page stops new requests; load the session and resume later. There is no durable background worker.
 - Every prisoner reply stores its expression, four independent emotion readings and the actual JEV directive. Historical messages retain their own state.
 - In AI-versus-AI, brief fictional spectator notes may be displayed for both actors. They are never sent to either opponent, JEV, the jury or compaction. Raw provider reasoning is never displayed. A missing optional note does not invalidate valid spoken content.
 - Transient failures receive three attempts total: the original call, then retries after 10 and 20 seconds. Successful stages and request IDs survive. Resume investigation continues a paused AI session without regenerating completed rounds. Invalid input or credential errors are not blindly retried.
 - Compaction changes only the request-memory view; the complete archive stays intact. Stable identity, full case files, original directives and both character levels are passed outside compaction. Accumulated evidence notes retain source turns and quotes. Automatic compaction is deferred until near the smaller actor context limit, using a conservative UTF-8 estimate and output reserve. Manual compaction remains available.
 - Usage displays only provider-reported input, output, cache tokens and cost. Cache hits are not assumed.
+
+## Actor-controlled closure
+
+Both AI prompts target a natural resolution in 5–15 rounds, retaining the hard 30-round limit and character difficulty. Spoken phrases such as “أنهي التحقيق هنا بعد اعترافك” or “أطالب بمحامٍ وأوقف التحقيق هنا” lead to a semantic JEV check. A keyword, quotation, negation or hypothetical statement alone never ends the test. Confirmed requests stop the simulation even when tactically poor; they do not establish a confession, valid agreement or winner. Requests and source messages are saved for independent judging. Missing decisions pause and retry from saved stages.
+
+Rubric 2.6 adds evidence-based closure reviews. When judges and final JEV verify an attributable decision, timing contributes 20% to that actor's overall grade. Earlier prisoner exits before round 15 receive a progressively lower timing cap; continued investigation beyond 15 progressively limits investigator timing scores. Silence or medical-care exits after round 15 are exempt from early-exit penalties. Tactical premature exits and unjustified prolongation can earn independently verified incidents and the existing major/minor overall caps. These are fictional benchmark rules, not restrictions on real people's rights. See [closure protocol](docs/CLOSURE_PROTOCOL.md).
 
 ## Jury and final evaluation
 

@@ -619,13 +619,13 @@ const App = {
         const canRetry=['send_message','ai_vs_ai_step','reverse_question','reverse_answer','retry_confession','evaluate_session','compact_now'].includes(action);
         if(action==='compact_now' && !payload.request_id)payload={...payload,request_id:this.requestId()};
         const body=JSON.stringify({action,...payload});
-        const busyDeadline=Date.now()+1020000;
+        const busyDeadline=Date.now()+1320000;
         const firstAttempt=retryContext.priorFailure?1:0;
-        if(firstAttempt) {this.notify('تعذر فحص الاعتراف بعد حفظ الرد. المحاولة الثانية بعد 10 ثوانٍ.',true);await this.retryWait(10000);}
+        if(firstAttempt) {this.notify('تعذر فحص الإنهاء أو الاعتراف بعد حفظ الرد. المحاولة الثانية بعد 10 ثوانٍ.',true);await this.retryWait(10000);}
         for(let attempt=firstAttempt;attempt<3;attempt++) {
             try {
                 let res;
-                try {res=await fetch('api.php',{method:'POST',signal:AbortSignal.timeout(1020000),headers:{'Content-Type':'application/json','X-CSRF-Token':this.csrfToken,...(this.userApiKey?{'X-User-OpenRouter-Key':this.userApiKey}:{})},body});}
+                try {res=await fetch('api.php',{method:'POST',signal:AbortSignal.timeout(1320000),headers:{'Content-Type':'application/json','X-CSRF-Token':this.csrfToken,...(this.userApiKey?{'X-User-OpenRouter-Key':this.userApiKey}:{})},body});}
                 catch(e) {throw Object.assign(new Error('تعذر الاتصال بالخادم.'),{retryable:true});}
                 let data;
                 try {data=await res.json();}catch {throw Object.assign(new Error('تعذر قراءة استجابة الخادم.'),{retryable:res.status>=500});}
@@ -766,6 +766,7 @@ const App = {
         try {this.currentSession=(await this.api('reverse_question',{session_id:this.currentSession.session_id})).session;this.renderActiveSession();this.notify('دورك: أجب بصفتك المتهم في القضية.');}
         catch(e){this.notify(e.message+' يمكنك إعادة طلب السؤال من الزر أسفل الحوار.',true);}
         finally{this.busy=false;this.renderActiveSession();}
+        if(this.currentSession?.is_ended && this.currentSession.evaluation_status==='pending')await this.endAndEvaluateSession();
     },
     async startNewSession() {
         if(!this.participantProfile){location.href='auth.php?action=login';return;}
@@ -842,7 +843,7 @@ const App = {
         document.getElementById('active-session-id').textContent=`الجولات ${s.turns_count} / 30`;
         this.updatePortrait(s.character_slug,last?.visual_state || s.initial_state,'');
         document.getElementById('chat-messages').replaceChildren();
-        const levels=document.createElement('div');levels.className='session-levels';levels.innerHTML=LabView.levels(s);document.getElementById('chat-messages').appendChild(levels);
+        const levels=document.createElement('div');levels.className='session-levels';levels.innerHTML=LabView.levels(s)+(s.closure_policy?'<span>الإنهاء متاح للطرفين · الهدف 5–15 جولة · يراجع JEV الطلب وتقيّم اللجنة توقيته.</span>':'');document.getElementById('chat-messages').appendChild(levels);
         if(!s.is_ended)document.getElementById('chat-messages').appendChild(LabCommunity.result(s));
         for(const m of visible)this.appendMessageDOM(m);
         if(s.interrogator_type==='reverse' && s.awaiting_question && !s.is_ended) {

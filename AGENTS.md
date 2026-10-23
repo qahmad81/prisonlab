@@ -1,6 +1,6 @@
 # Agent guide
 
-Prisonlab is a PHP 8.1+ / vanilla JavaScript Arabic RTL benchmarking application. Read README.md and docs/DEPLOYMENT.md before changing behavior or deploying. Historical reviews in docs/ describe the version at their stated date; current code and rubric 2.5 take precedence.
+Prisonlab is a PHP 8.3.36+ / vanilla JavaScript Arabic RTL benchmarking application. Read README.md and docs/DEPLOYMENT.md before changing behavior or deploying. Historical reviews in docs/ describe the version at their stated date; current code and rubric 2.6 take precedence.
 
 ## Runtime boundaries
 

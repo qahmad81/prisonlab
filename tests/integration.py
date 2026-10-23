@@ -177,7 +177,54 @@ def run(storage):
             model=next(m for m in a.init()['models'] if m['id']==bounded['model'])
             assert model['performance']['prisoner']['badges']['verbose']>=1
     confession=a.start();status,d=a.step(confession,0,headers={'X-Test-Confession':'1'});assert status==200,d
-    assert d['session']['is_ended'] and d['session']['end_reason']=='confession'
+    assert not d['session']['is_ended'] and d['session']['confession_check']['admission_kind']=='substantive'
+    status,d=a.post('send_message',session_id=confession['session_id'],message='أنهي التحقيق هنا بعد اعترافك المحدد.',request_id='confirmed_closure_0001',expected_turns=1)
+    assert status==200 and d['session']['end_reason']=='actor_stop' and d['session']['termination']['kind']=='confession',d
+    assert d['session']['turns_count']==1 and len(d['session']['messages'])==3,'Investigator closure invented an extra prisoner reply'
+    # Actor-controlled termination is contextual, checkpointed, role-attributed and independently graded.
+    closing=a.start('ai');assert a.step(closing,0)[0]==200
+    before=json.loads((storage/'test-calls.json').read_text())
+    status,d=a.step(closing,1,request_id='ai_close_after_one',headers={'X-Test-Investigator-Stop':'1','X-Test-Fail-Model':closing['model']})
+    assert status==200 and d['session']['is_ended'],d
+    closed=d['session'];assert closed['turns_count']==1 and len(closed['messages'])==3 and closed['messages'][-1]['closing_statement']
+    assert closed['termination']['message_id']=='u2' and closed['termination']['role']=='interrogator'
+    after=json.loads((storage/'test-calls.json').read_text());assert sum(c['model']==closing['model'] and not c['decisions'] for c in before)==sum(c['model']==closing['model'] and not c['decisions'] for c in after),'Closing statement repurchased a prisoner answer'
+    status,d=a.step(closing,1,request_id='ai_close_after_one');assert status==200 and d['duplicate']
+    status,d=a.post('evaluate_session',session_id=closing['session_id']);assert status==200 and d['session']['evaluation_status']=='complete',d
+    assert d['session']['evaluation']['rubric_version']=='2.6' and 'interrogator' in d['session']['evaluation']['closure_adjustments']
+    # A failed semantic stop check preserves the generated question; retry does not buy it again.
+    pending=a.start('ai');assert a.step(pending,0)[0]==200
+    status,d=a.step(pending,1,request_id='pending_stop_123',headers={'X-Test-Investigator-Stop':'1','X-Test-Fail-Stop':'1'});assert status==503,d
+    before=json.loads((storage/'test-calls.json').read_text())
+    status,d=a.step(pending,1,request_id='pending_stop_123');assert status==200 and d['session']['is_ended'],d
+    after=json.loads((storage/'test-calls.json').read_text());assert sum(c['model']==pending['interrogator_model'] and not c['decisions'] for c in before)==sum(c['model']==pending['interrogator_model'] and not c['decisions'] for c in after)
+    # A cue in a hypothetical/denied statement is not an instruction to end the session.
+    contextual=a.start();assert a.step(contextual,0)[0]==200
+    status,d=a.post('send_message',session_id=contextual['session_id'],message='لماذا قلت «أطالب بمحام»؟ لا أنهي التحقيق هنا، بل أطلب تفسيرك.',request_id='contextual_stop_123',expected_turns=1,headers={'X-Test-Stop-None':'1'})
+    assert status==200 and not d['session']['is_ended'] and d['session']['turns_count']==2,d
+    # Early prisoner exits are graded and reflected in the model's overall score and badge record.
+    early=a.start('ai');status,d=a.step(early,0,headers={'X-Test-Prisoner-Stop':'counsel'});assert status==200 and d['session']['is_ended'],d
+    assert d['session']['termination']['kind']=='counsel'
+    status,d=a.post('evaluate_session',session_id=early['session_id'],headers={'X-Test-Exit-Incident':'1'});ev=d['session']['evaluation']
+    assert d['session']['evaluation_status']=='complete',d
+    assert ev['prisoner_score']<=50 and ev['closure_adjustments']['prisoner']['timing_cap']==7
+    assert any(i['type']=='premature_exit' and i['confirmed_by']=='JEV' for i in ev['incidents'])
+    performance=next(m for m in a.init()['models'] if m['id']==early['model'])['performance']['prisoner'];assert performance['badges']['premature_exit']>=1
+    # The exemption starts AFTER round 15; later silence/medical requests get no exit penalty.
+    for kind in ['silence','medical']:
+        protected=a.start('ai')
+        for n in range(15):assert a.step(protected,n)[0]==200
+        status,d=a.step(protected,15,headers={'X-Test-Prisoner-Stop':kind});assert status==200 and d['session']['is_ended'],d
+        assert d['session']['termination']['turn']==16 and d['session']['turns_count']==16
+        status,d=a.post('evaluate_session',session_id=protected['session_id']);ev=d['session']['evaluation'];assert d['session']['evaluation_status']=='complete',d
+        assert ev['closure_protected'] and 'prisoner' not in ev['closure_adjustments']
+        assert 'interrogator' in ev['closure_adjustments'] and ev['closure_adjustments']['interrogator']['timing_cap']==70
+        assert all(i['type']!='premature_exit' or i['role']!='prisoner' for i in ev['incidents'])
+    # Reverse mode honors the AI's closing statement without requiring an extra human response.
+    reverse_exit=a.start('reverse');assert a.post('reverse_question',session_id=reverse_exit['session_id'])[0]==200
+    assert a.step(reverse_exit,0)[0]==200
+    status,d=a.post('reverse_question',session_id=reverse_exit['session_id'],headers={'X-Test-Investigator-Stop':'1'})
+    assert status==200 and d['session']['is_ended'] and d['session']['turns_count']==1 and len(d['session']['messages'])==3,d
     failed_check=a.start();status,d=a.step(failed_check,0,headers={'X-Test-Fail-Confession':'1'});assert status==200,d
     assert d['session']['confession_error'] and d['session']['turns_count']==1
     status,d=a.post('retry_confession',session_id=failed_check['session_id'],headers={'X-Test-Fail-Confession':'1'});assert status==503 and d['retryable']

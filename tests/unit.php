@@ -158,3 +158,23 @@ labChat($session,'prisoner',$gpt['id'],[],'test');labChat($session,'interrogator
 check($timed===[300,300,180],'actor watchdog not independent from judge watchdog');
 unset($GLOBALS['lab_transport']);
 echo "PASS reasoning: declared choices, strict validation, immutable manual settings and 300-second actor timeouts.\n";
+
+// Termination rules are simulation scoring rules, independent of real-world rights.
+$exit=['closure_policy'=>['protected_after'=>15,'score_weight'=>.2],'termination'=>['role'=>'prisoner','kind'=>'medical','turn'=>16],'messages'=>[]];
+check(labProtectedExit($exit),'late medical exit lost exemption');$exit['termination']['kind']='silence';check(labProtectedExit($exit),'late silence lost exemption');
+$exit['termination']['turn']=15;check(!labProtectedExit($exit),'round-15 boundary must not count as AFTER round 15');
+$a=labClosureAdjustment($exit,'prisoner',80,100);$exit['termination']['turn']=1;$b=labClosureAdjustment($exit,'prisoner',80,100);
+check($b['adjusted_score']<$a['adjusted_score'] && $b['timing_cap']===7,'earlier prisoner exit was not graded more severely');
+check(labStopCue('أطالب بمحامٍ وأوقف التحقيق هنا'),'Arabic explicit stop not detected');
+check(!labStopCue('لأنه كان يعمل معي ولا أعرف ماذا فعل'),'ordinary Arabic pronoun creates a stop check');
+$closing=$incidentSession;$closing['closure_policy']=['version'=>1,'score_weight'=>.2];
+$closing['messages'][]=['role'=>'user','content'=>'أنهي التحقيق هنا بعد اعترافك.','turn'=>labTurns($closing)+1,'closing_statement'=>true];
+$closing['termination']=['role'=>'interrogator','kind'=>'confession','turn'=>labTurns($closing)+1,'message_id'=>'u'.(labTurns($closing)+1)];
+$lastId=$closing['termination']['message_id'];check(labEvidenceMessage($closing,$lastId)['quote']==='أنهي التحقيق هنا بعد اعترافك.','closing statement not valid original evidence');
+$premature=['role'=>'interrogator','type'=>'premature_exit','severity'=>'major','message_ids'=>[$lastId],'explanation'=>'Unfounded closure'];
+check(count(labValidateIncidents([$premature],$closing))===1,'closing statement cannot be cited for exit abuse');
+$protected=$incidentSession;$protected['closure_policy']=['version'=>1,'protected_after'=>15];$protected['termination']=['role'=>'prisoner','kind'=>'silence','turn'=>16,'message_id'=>'a1'];
+$premature['role']='prisoner';$premature['message_ids']=['a1'];$rejected=false;
+try{labValidateIncidents([$premature],$protected);}catch(RuntimeException){$rejected=true;}
+check($rejected,'protected prisoner exit received a premature_exit incident');
+echo "PASS closure: contextual cues, strict evidence references, early timing caps, late protected rights and closing statements.\n";
