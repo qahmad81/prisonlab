@@ -66,6 +66,17 @@ header.top-bar {
     letter-spacing: 0.3px;
 }
 
+.brand-logo {flex:0 0 auto;display:block;border:1px solid rgba(251,191,36,.28);border-radius:12px;box-shadow:0 4px 16px #0003;}
+.brand-copy {display:flex;flex-direction:column;gap:3px;}
+.brand-name {font-size:1.35rem;font-weight:800;color:#fbbf24;line-height:1.15;align-self:flex-start;letter-spacing:.2px;}
+.brand-copy h1 {font-size:.82rem;font-weight:500;color:#cbd5e1;letter-spacing:0;}
+.brand-links {display:flex;gap:14px;align-items:center;font-size:.8rem;white-space:nowrap;}
+.brand-links a {color:var(--text-muted);text-decoration:none;}
+.brand-links a:hover {color:#fbbf24;}
+.brand-links a:focus-visible {outline:2px solid #fbbf24;outline-offset:5px;}
+@media(max-width:1100px){.header-actions{flex-wrap:wrap;justify-content:flex-end;}.brand{min-width:210px;}}
+@media(max-width:600px){header.top-bar{flex-wrap:wrap;gap:14px;padding:12px 16px;}.header-actions{justify-content:flex-start;width:100%;}.brand-logo{width:42px;height:42px;}.brand-name{font-size:1.2rem;}.brand-copy h1{font-size:.75rem;}.brand-links{gap:12px;}}
+
 .header-actions {
     display: flex;
     align-items: center;

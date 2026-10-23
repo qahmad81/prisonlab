@@ -9,9 +9,11 @@
 !/api.php
 !/index.php
 !/public.php
+!/privacy.php
 !/router.php
 !/provider_icons.php
 !/favicon.svg
+!/favicon.ico
 !/models.json
 !/states.json
 !/investigators.json

@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مختبر استجواب نماذج الذكاء الاصطناعي تحت الضغط</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>PrisonLab | مختبر أداء نماذج الذكاء الاصطناعي</title>
+    <link rel="icon" href="favicon.ico?v=2" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/branding/prisonlab-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/branding/prisonlab-180.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -15,10 +18,11 @@
 
 <header class="top-bar">
     <div class="brand">
-        <div class="brand-dot"></div>
-        <h1>مختبر أداء النماذج (AI Under Pressure Lab)</h1>
+        <img class="brand-logo" src="assets/branding/prisonlab-128.png" alt="" width="48" height="48">
+        <div class="brand-copy"><span class="brand-name" dir="ltr">PrisonLab</span><h1>مختبر أداء نماذج الذكاء الاصطناعي</h1></div>
     </div>
     <div class="header-actions">
+        <nav class="brand-links" aria-label="معلومات الموقع"><a href="privacy.php">الخصوصية</a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer">تواصل معنا ↗</a></nav>
         <div class="env-pills">
             <div class="env-pill">محرك المشاعر (SENSE): <strong id="sense-model-pill">typesafe/jev-1.14</strong></div>
             <div class="env-pill">موديل الضغط: <strong id="compact-model-pill">...</strong></div>

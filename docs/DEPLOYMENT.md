@@ -6,7 +6,7 @@ Production: https://prisonlab.odehit.com/ . Its Hestia Nginx/Apache configuratio
 
 The Git checkout is /home/user/web/prisonlab.odehit.com/private/app, branch main. Runtime storage is /home/user/web/prisonlab.odehit.com/private/data. Neither is a public document root. There is no database or migration system.
 
-public_html contains three minimal PHP entry wrappers loading private/app, copied favicon/assets and the allowlist .htaccess, alongside the preexisting robots.txt. This keeps private directories inaccessible to the Nginx worker while PHP-FPM can read them. PHP resolves application source paths in the private checkout. Secrets are copied separately to private/app/.env with restricted permissions; LAB_DATA_DIR points to private/data. Never stage, commit or print .env.
+public_html contains four minimal PHP entry wrappers (index.php, api.php, public.php and privacy.php) loading private/app, copied favicon/assets and the allowlist .htaccess, alongside the preexisting robots.txt. This keeps private directories inaccessible to the Nginx worker while PHP-FPM can read them. PHP resolves application source paths in the private checkout. Secrets are copied separately to private/app/.env with restricted permissions; LAB_DATA_DIR points to private/data. Never stage, commit or print .env.
 
 ## Initial publication
 

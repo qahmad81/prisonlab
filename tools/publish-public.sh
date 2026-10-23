@@ -8,12 +8,13 @@ if [[ "$app" != "$domain/private/app" || "$public" != "$domain/public_html" || !
     echo 'Refusing an unexpected source/public path' >&2
     exit 1
 fi
-for entry in index.php api.php public.php; do
+for entry in index.php api.php public.php privacy.php; do
     printf "<?php\nrequire dirname(__DIR__) . '/private/app/%s';\n" "$entry" > "$public/.$entry.deploy"
     chmod 0644 "$public/.$entry.deploy"
     mv -- "$public/.$entry.deploy" "$public/$entry"
 done
 install -m 0644 "$app/favicon.svg" "$public/favicon.svg"
+install -m 0644 "$app/favicon.ico" "$public/favicon.ico"
 install -m 0644 "$app/.htaccess" "$public/.htaccess"
 mkdir -p -- "$public/assets"
 rsync -a --chmod=D755,F644 --include='*/' --include='*.js' --include='*.css' \

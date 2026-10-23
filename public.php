@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>معرض استجوابات التحقيق المنشورة | مختبر الذكاء الاصطناعي</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" href="favicon.ico?v=2" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/branding/prisonlab-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/branding/prisonlab-180.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -65,10 +68,11 @@
 
 <header class="top-bar">
     <div class="brand">
-        <div class="brand-dot"></div>
-        <h1>معرض استجوابات التحقيق المنشورة (Public Showcase)</h1>
+        <img class="brand-logo" src="assets/branding/prisonlab-128.png" alt="" width="48" height="48">
+        <div class="brand-copy"><span class="brand-name" dir="ltr">PrisonLab</span><h1>التجارب المنشورة · نتائج يشاركها المجتمع</h1></div>
     </div>
     <div class="header-actions">
+        <nav class="brand-links" aria-label="معلومات الموقع"><a href="privacy.php">الخصوصية</a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer">تواصل معنا ↗</a></nav>
         <a href="index.php" class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
             ⬅ العودة لمختبر الاستجواب الرئيسي
         </a>
