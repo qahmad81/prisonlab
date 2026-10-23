@@ -499,7 +499,7 @@ select option.model-unlocked {
 .investigator-expressions figure { margin:0; text-align:center; }
 .investigator-expressions .investigator-avatar { width:100%; }
 .investigator-expressions figcaption { font-size:.7rem; margin-top:4px; color:#b5c8d8; }
-.msg-investigator-avatar { float:right; margin:0 0 8px 12px; width:58px; }
+.msg-investigator-avatar { float:right; margin:0 0 8px 12px; width:87px; height:auto; }
 .msg-user:has(.msg-investigator-avatar) { display:flow-root; }
 .reverse-prompt { font-size:.8rem; line-height:1.7; padding:12px; border-inline-start:2px solid #b48d52; background:#b48d520d; color:#d2c5ac; }
 .session-levels {display:flex;flex-wrap:wrap;gap:8px 18px;padding:9px 12px;border-bottom:1px solid var(--border);font-size:.73rem;color:#b5c8d8;line-height:1.7;flex-shrink:0;}
@@ -1234,8 +1234,8 @@ select option.model-unlocked {
 }
 
 .msg-face-portrait {
-    width: 58px;
-    height: 58px;
+    width: 120px;
+    height: 120px;
     border-radius: 10px;
     object-fit: cover;
     border: 2px solid #ef4444;
@@ -1656,7 +1656,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible { outline: 2px solid 
     .archive-cards-grid { grid-template-columns: 1fr; }
     .duel-scores { grid-template-columns: 1fr; }
     .msg-assistant-grid { grid-template-columns: 62px minmax(0,1fr); gap: 10px; }
-    .msg-face-portrait { width: 60px; height: 78px; }
+    .msg-face-portrait { width: 120px; height: 156px; }
     .msg-emotion-meters { grid-template-columns: repeat(2,minmax(0,1fr)); }
     .panel-header { flex-wrap: wrap; gap: 8px; }
 }
