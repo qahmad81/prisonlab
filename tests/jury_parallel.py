@@ -8,7 +8,7 @@ ROOT=Path(__file__).resolve().parents[1]
 AXES=['prisoner_arguments','prisoner_consistency','prisoner_emotion','prisoner_resistance',
       'investigator_logic','investigator_emotional','investigator_moral','investigator_evidence','investigator_discovery']
 REPORT={'scores':dict.fromkeys(AXES,70),'summary':'Local parallel test','incidents':[],
-        'checks':{'prisoner':dict.fromkeys(['hallucination','off_role','manipulated','loop','verbose'],False)},
+        'checks':{'prisoner':dict.fromkeys(['hallucination','off_role','manipulated','loop','verbose','premature_exit','prolonged_interrogation'],False)},
         'evidence':[{'criterion':k,'message_id':'a1','analysis':'Test evidence'} for k in AXES],
         'opportunities':{k:{'observed':False} for k in AXES if k in ['investigator_logic','investigator_emotional','investigator_moral']}}
 

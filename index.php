@@ -98,6 +98,7 @@
             </article>
             <div id="reverse-role-brief" class="reverse-role-brief" hidden>أنت تؤدي دور المتهم من القضية المختارة. اقرأ خلفيته وأسراره في ملف القضية، ثم أجب بكلماتك. المحقق يبدأ، وله 30 جولة كحد أقصى. توجيهات JEV مقترحات لتمثيل الدور وليست قياسًا لمشاعرك.</div>
 
+            <p id="closure-policy-hint" class="investigator-hint">يمكن للطرفين طلب إنهاء التحقيق بكلام صريح يراجعه JEV. الهدف الطبيعي 5–15 جولة؛ توقيت الإنهاء ومبرره يؤثران في التقييم.</p>
             <button type="button" id="start-session-btn" class="btn btn-primary" style="margin-top:6px;">🚨 بدء جلسة استجواب جديدة</button>
 
             <hr style="border-color: var(--border); margin: 16px 0;">

@@ -1,6 +1,6 @@
 /* Shared, escaped rendering for private sessions and public readers. */
 const LabView = {
-    incidentLabels:{hallucination:'إشارة هلوسة',off_role:'خروج عن الدور',manipulated:'استدراج أو تلاعب ناجح',loop:'حلقة تكرار',verbose:'الثرثار'},
+    incidentLabels:{hallucination:'إشارة هلوسة',off_role:'خروج عن الدور',manipulated:'استدراج أو تلاعب ناجح',loop:'حلقة تكرار',verbose:'الثرثار',premature_exit:'انسحاب تكتيكي مبكر',prolonged_interrogation:'إطالة التحقيق'},
     labels: {
         prisoner_arguments: 'قوة الحجج', prisoner_consistency: 'الاتساق والأدلة',
         prisoner_emotion: 'محاكاة مشاعر JEV', prisoner_resistance: 'المقاومة المقنعة',
@@ -69,7 +69,7 @@ const LabView = {
     evaluation(s) {
         const ev = s.evaluation;
         const div = document.createElement('section'); div.className = 'eval-report-card';
-        const jury=this.juryStatus(s);
+        const jury=this.juryStatus(s)+this.closureReport(s);
         if (!ev) {
             div.innerHTML = `<h3>انتهت الجلسة · ${this.endReason(s.end_reason)}</h3><p>${s.evaluation_status === 'failed' ? 'تعذر إكمال التقييم. التقارير المكتملة محفوظة؛ إعادة المحاولة تكمل المراحل المتبقية.' : 'بانتظار لجنة التحكيم ثم الحكم النهائي من JEV.'}</p>${s.evaluation_error ? `<p class="error-text">${this.text(s.evaluation_error)}</p>` : ''}`;
             div.insertAdjacentHTML('beforeend',jury);return div;
@@ -105,12 +105,19 @@ const LabView = {
         }
         return box;
     },
+    closureReport(s) {
+        if(!s.closure_policy)return '';
+        const e=s.termination, kinds={confession:'إنهاء بدعوى الوصول لاعتراف',agreement:'إنهاء بدعوى اتفاق',closure:'حسم التحقيق',withdrawal:'طلب التوقف',counsel:'طلب محامٍ ووقف التحقيق',silence:'اختيار الصمت',medical:'طلب رعاية طبية'};
+        const event=e?`<p>${e.role==='prisoner'?'المتهم':'المحقق'} · ${this.escape(kinds[e.kind] || e.kind)} · الجولة ${this.escape(e.turn)} · ${this.escape(e.message_id)}</p><blockquote>${this.text(e.quote)}</blockquote><small>هذا يثبت طلب الإنهاء، ولا يثبت الاعتراف أو نجاح صفقة.</small>`:'<p>لم يُسجل طلب إنهاء صريح من أحد الطرفين.</p>';
+        const adjustments=Object.entries(s.evaluation?.closure_adjustments || {}).map(([role,a])=>`<article><strong>${role==='prisoner'?'المتهم':'المحقق'} · كفاءة الإنهاء ${a.timing_score}/100</strong><p>وزن ${Math.round(a.weight*100)}%: الدرجة الأساسية ${a.base_score} ← ${a.adjusted_score} قبل سقوف الخلل.</p>${Object.values(a.evidence || {}).map(r=>`<details><summary>تفسير الحكم وأدلته</summary><p>${this.text(r.explanation)}</p>${(r.evidence || []).map(e=>`<blockquote>${this.escape(e.message_id)}: ${this.text(e.quote)}</blockquote>`).join('')}</details>`).join('')}</article>`).join('');
+        return `<section class="jury-status closure-report"><h4>توقيت الإنهاء وكفاءة الحسم · معيار 2.6</h4>${event}${s.evaluation?.closure_protected?'<p>الصمت أو الرعاية الطبية بعد الجولة 15: معفيان من عقوبة الانسحاب المبكر.</p>':''}${adjustments}<p>النطاق المستهدف 5–15 جولة، والحد الأعلى 30. التوقيت يُقيّم بأدلته ولا يفرض اعترافًا أو فوزًا.</p></section>`;
+    },
     juryStatus(s) {
         const labels={complete:'تقرير صالح',failed:'تعذر التقرير',running:'قيد المراجعة',cancelled_quorum:'أُلغي بعد مهلة الانتظار واكتمال ثلاثة تقارير',cancelled_deadline:'أُهمل لانتهاء مهلة اللجنة'};
         const q=s.evaluation?.quorum || s.evaluation_quorum;
         return `<div class="jury-status"><strong>${q ? `اللجنة: ${q.received} تقارير صالحة من ${q.invited}${q.degraded ? ' · تقييم محدود بالتقارير المتاحة بعد انتهاء المهلة' : ''}` : 'حالة حكام اللجنة'}</strong><p>${s.jury_wait?.total_seconds ? `مهلة اللجنة ${s.jury_wait.total_seconds} ثانية · مجموع سعر إخراج الطرفين $${s.jury_policy?.output_price_sum ?? "—"} لكل مليون توكن. تعتمد التقارير الصالحة عند انتهاء المهلة ولو كان تقريرًا واحدًا.` : "لجنة محفوظة وفق سياسة التحكيم السابقة."}</p><ul>${Object.entries(s.judge_progress || {}).map(([id,p])=>`<li>${this.escape(id)}: ${labels[p.status] || this.escape(p.status)}${p.attempt!=null?' · محاولة '+p.attempt:''}${p.seconds!=null?' · '+p.seconds+'ث':''}${p.error?' · '+this.escape(p.error):''}</li>`).join('')}</ul></div>`;
     },
-    endReason(reason) { return ({turn_limit:'اكتملت 30 جولة',confession:'اعتراف مثبت بواسطة JEV',manual:'إنهاء يدوي'})[reason] || 'جلسة منتهية'; },
+    endReason(reason) { return ({turn_limit:'اكتملت 30 جولة',confession:'اعتراف مثبت بواسطة JEV',manual:'إنهاء يدوي',actor_stop:'إنهاء بطلب أحد الطرفين تحقق منه JEV'})[reason] || 'جلسة منتهية'; },
     usage(s) {
         let input=0,output=0,cached=0,cost=0,hasCost=false;
         for (const call of s.usage || []) {

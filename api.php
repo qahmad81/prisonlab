@@ -6,7 +6,7 @@ require_once __DIR__ . '/provider_icons.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
-set_time_limit(900);
+set_time_limit(1200);
 ini_set('display_errors', '0');
 $env=labRuntimeBootstrap();labBrowserSession();$visitor=labBrowserIdentity();
 $_SESSION['guest_id'] ??= bin2hex(random_bytes(24));
@@ -45,7 +45,7 @@ function publicSession(array $s, string $owner): array {
 }
 function summary(array $s): array {
     $keys = ['session_id','created_at','updated_at','model','gender','character_slug','case_file','case_title',
-        'prisoner_reasoning','interrogator_reasoning','current_state','interrogator_type','interrogator_model','interrogator_character','prisoner_character','is_ended','is_published','published_at','evaluation','evaluation_status','end_reason'];
+        'closure_policy','termination','prisoner_reasoning','interrogator_reasoning','current_state','interrogator_type','interrogator_model','interrogator_character','prisoner_character','is_ended','is_published','published_at','evaluation','evaluation_status','end_reason'];
     return array_intersect_key($s, array_flip($keys)) + ['operator_profile'=>$s['operator_profile'] ?? null,
         'cost'=>labSessionCost($s),'user_reviews'=>labSessionReviews($s),'turns_count' => labTurns($s), 'breaking_point' => $s['confession_check']['probability'] ?? 0];
 }
@@ -277,8 +277,9 @@ try {
         } elseif ($action === 'retry_confession') {
             if (labTurns($s)<1 || empty($s['confession_error'])) throw new RuntimeException('لا يوجد فحص اعتراف معلق');
             try {
-                if (labConfession($s,$key)) {$s['is_ended']=true;$s['end_reason']='confession';$s['evaluation_status']='pending';}
-                unset($s['confession_error'],$s['confession_retryable']);$save($s);
+                labFinishRound($s,$key);
+                $save($s);
+                if(!empty($s['confession_error']))throw new LabProviderException($s['confession_error'],!empty($s['confession_retryable']));
             } catch (Throwable $e) {$save($s);throw $e;}
         } elseif ($action === 'evaluate_session') {
             labEvaluate($s,$key,$models,$save);

@@ -247,6 +247,24 @@ if(!chrome && process.platform==='win32') {
         await pub.waitForSelector('#session-reader-modal.active');
         assert((await pub.locator('.msg-assistant .msg-meta').textContent()).includes('أنت'));
         assert.equal(await pub.locator('.msg-thought').count(),0);
+        // Semantic investigator closure ends reverse mode without an extra human answer.
+        await page.unroute('**/api.php');
+        await page.locator('#start-session-btn').click();
+        await page.waitForFunction(()=>App.currentSession.interrogator_type==='reverse' && App.currentSession.awaiting_question?.sense && !App.busy);
+        await page.route('**/api.php',async route=>{
+            const data=route.request().postDataJSON();
+            if(data?.action==='reverse_question')return route.continue({headers:{...route.request().headers(),'X-Test-Investigator-Stop':'1'}});
+            return route.fallback();
+        });
+        await page.locator('#user-input').fill('لا أقر بهذه التهمة، وأطلب توضيح الدليل.');
+        await page.locator('#send-btn').click();
+        await page.waitForFunction(()=>App.currentSession.is_ended && App.currentSession.evaluation_status==='complete' && !App.busy);
+        assert.equal(await page.evaluate(()=>App.currentSession.turns_count),1);
+        assert.equal(await page.locator('.msg-user').count(),2);
+        assert.equal(await page.locator('.msg-assistant').count(),1);
+        assert((await page.locator('.closure-report').textContent()).includes('u2'));
+        assert((await page.locator('.closure-report').textContent()).includes('كفاءة الإنهاء'));
+        await page.screenshot({path:'test-results/closure-verdict.png',fullPage:true});
         assert.deepEqual(errors,[]);
         console.log('PASS browser: startup, model selection, human reply/portrait/4 metrics/JEV directive, panel and split scores, publish, archive, public reader, AI 30 rounds with automatic live reveal, mobile width. No JavaScript errors.');
     } finally {await browser.close();}
