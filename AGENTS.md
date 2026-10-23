@@ -18,7 +18,8 @@ Prisonlab is a PHP 8.1+ / vanilla JavaScript Arabic RTL benchmarking application
 - Never commit .env, API keys, private sessions, health/benchmark records, backups, screenshots or original generated art sheets. Use the root allowlist and inspect git diff --cached before pushing.
 - Runtime data must be outside the source/document roots. Do not copy local conversations to production.
 - Preserve session ownership, CSRF, file locks, idempotence and published read-only behavior.
-- LinkedIn is a future integration. participant_profile is currently null; never treat client-supplied names as authenticated identity.
+- All new conversations require server-authenticated LinkedIn accounts. Never trust client-supplied identity or add HTTP authentication bypasses. OAuth scopes are openid profile only; sharing opens LinkedIn's composer for an already-public session, never posts automatically.
+- Preserve atomic 3/day site-funded quotas, session funding-source/key binding, public-only profiles/leaderboards and private review isolation. Conversation deletion removes its transcript, benchmark reviews and publication; do not copy account/session data into code-deployment backups.
 - Production code lives outside public_html. Expose only the reviewed public entry files, favicon and runtime assets. Apache rules alone cannot protect JSON that Nginx serves directly.
 - Check domain ownership and configured roots before any deployment. Back up the domain's previous files/configuration; use fast-forward-only pulls. Do not change unrelated sites or disable TLS verification.
 - No database or migration system is used. Do not run migrations.

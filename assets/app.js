@@ -4,6 +4,8 @@ const App = {
     cases: [],
     investigators: [],
     participantProfile: null,
+    quota: null,
+    keyBalance: null,
     selectedInvestigatorPersona: 'ethan_cole',
     logs: [],
     env: {},
@@ -29,6 +31,14 @@ const App = {
     generating: false,
     stopRequested: false,
 
+    async fetchData(url,options={},timeoutMs=30000) {
+        const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
+        try{const response=await fetch(url,{...options,signal:controller.signal});const data=await response.json();
+            if(!data.ok)throw new Error(data.error || 'تعذر تحميل البيانات؛ أعد المحاولة.');return data;
+        }catch(e){if(e.name==='AbortError')throw new Error('انتهت مهلة الاتصال بالخادم. أعد تحميل الصفحة أو حاول الدخول مجددًا.');throw e;}
+        finally{clearTimeout(timer);}
+    },
+
     async init() {
         // Load user API key from sessionStorage
         this.userApiKey = sessionStorage.getItem('user_openrouter_api_key') || '';
@@ -39,16 +49,15 @@ const App = {
             headers['X-User-OpenRouter-Key'] = this.userApiKey;
         }
 
-        const res = await fetch('api.php?action=init_data', { headers });
-        const data = await res.json();
-        if (!data.ok) return;
+        const data = await this.fetchData('api.php?action=init_data', { headers });
 
         this.models = data.models || [];
         this.states = data.states || [];
         this.cases = data.cases || [];
         this.investigators = data.investigators || [];
-        // Future server-authenticated LinkedIn profile; never taken from local storage or form input.
+        // Only the server's authenticated LinkedIn identity is accepted.
         this.participantProfile = data.participant_profile || null;
+        this.quota=data.quota;this.authReady=data.auth_ready;
         this.logs = data.logs || [];
         this.env = data.env || {};
         this.csrfToken = data.csrf_token;
@@ -91,6 +100,7 @@ const App = {
         this.renderLogsList();
         this.bindEvents();
         this.updateControls();
+        this.renderAccount();if(this.participantProfile && this.userApiKey)this.refreshKeyBalance();
         document.getElementById('archive-modal-search').addEventListener('input', () => this.renderArchive());
         document.getElementById('model-sort').addEventListener('change',e=>{this.modelSort=e.target.value;this.renderModalModels();});
         document.querySelectorAll('.modal-overlay').forEach(el => el.addEventListener('click', e => {if(e.target === el) el.classList.remove('active');}));
@@ -497,32 +507,36 @@ const App = {
         document.getElementById('key-modal').classList.remove('active');
     },
 
-    saveUserKey() {
+    async saveUserKey() {
         const val = document.getElementById('custom-api-key-input').value.trim();
         if (val && !val.startsWith('sk-or-')) {
             alert('يرجى التأكد من إدخال مفتاح OpenRouter صالح (يبدأ عادة بـ sk-or-v1-).');
             return;
         }
-        this.userApiKey = val;
+        if(!this.participantProfile)return this.notify('سجّل الدخول عبر LinkedIn قبل تفعيل مفتاحك.',true);
+        const old=this.userApiKey;this.userApiKey = val;
+        if(val){try{this.keyBalance=(await this.api('key_balance')).balance;}catch(e){this.userApiKey=old;return this.notify('تعذر التحقق من المفتاح: '+e.message,true);}}
         if (val) {
             sessionStorage.setItem('user_openrouter_api_key', val);
-            alert('تم حفظ مفتاحك الخاص في جلسة المتصفح بنجاح! جميع طلبات الموديولات المتقدمة والضغط ستستخدم مفتاحك الآن.');
+            this.notify('تم التحقق من مفتاحك. التجارب الجديدة ستكون على نفقتك؛ كل تجربة تحتفظ بمصدر تمويلها عند إنشائها.');
         } else {
             sessionStorage.removeItem('user_openrouter_api_key');
         }
         this.updateKeyButtonState();
         this.closeKeyModal();
         this.renderSelectedModelSummary();
+        this.renderAccount();
     },
 
     clearUserKey() {
         this.userApiKey = '';
+        this.keyBalance=null;
         sessionStorage.removeItem('user_openrouter_api_key');
         document.getElementById('custom-api-key-input').value = '';
         this.updateKeyButtonState();
         this.closeKeyModal();
         this.renderSelectedModelSummary();
-        alert('تمت إزالة المفتاح الخاص والرجوع للمفتاح الافتراضي.');
+        this.renderAccount();this.notify('أُزيل المفتاح. التجارب الجديدة تستخدم حصة الموقع؛ التجارب الشخصية السابقة تحتاج مفتاحها نفسه لمتابعتها.');
     },
 
     updateKeyButtonState() {
@@ -595,7 +609,7 @@ const App = {
         for(let attempt=firstAttempt;attempt<3;attempt++) {
             try {
                 let res;
-                try {res=await fetch('api.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':this.csrfToken,...(this.userApiKey?{'X-User-OpenRouter-Key':this.userApiKey}:{})},body});}
+                try {res=await fetch('api.php',{method:'POST',signal:AbortSignal.timeout(650000),headers:{'Content-Type':'application/json','X-CSRF-Token':this.csrfToken,...(this.userApiKey?{'X-User-OpenRouter-Key':this.userApiKey}:{})},body});}
                 catch(e) {throw Object.assign(new Error('تعذر الاتصال بالخادم.'),{retryable:true});}
                 let data;
                 try {data=await res.json();}catch {throw Object.assign(new Error('تعذر قراءة استجابة الخادم.'),{retryable:res.status>=500});}
@@ -646,7 +660,7 @@ const App = {
         const safeUrl=value=>{try {const url=new URL(value);return url.protocol==='https:'?url.href:'';}catch{return '';}};
         const avatar=profile?.provider==='linkedin'?safeUrl(profile.avatar_url):'';
         const name=profile?.provider==='linkedin' && typeof profile.display_name==='string'?profile.display_name:'أنت · المشارك البشري';
-        container.innerHTML=`${avatar?`<img class="participant-avatar" src="${this.escapeHtml(avatar)}" alt="" referrerpolicy="no-referrer" width="42" height="42">`:'<span class="participant-avatar participant-placeholder" aria-hidden="true">👤</span>'}<span class="participant-info"><strong>${this.escapeHtml(name)}</strong><small>${profile?.provider==='linkedin'?'هوية المشارك عبر LinkedIn':'سيظهر اسمك وصورتك بعد ربط LinkedIn'}</small></span><span class="linkedin-mark" title="${profile?.provider==='linkedin'?'LinkedIn':'ربط LinkedIn سيتاح لاحقًا'}" aria-label="LinkedIn">in</span>`;
+        container.innerHTML=`${avatar?`<img class="participant-avatar" src="${this.escapeHtml(avatar)}" alt="" referrerpolicy="no-referrer" width="42" height="42">`:'<span class="participant-avatar participant-placeholder" aria-hidden="true">👤</span>'}<span class="participant-info"><strong>${this.escapeHtml(name)}</strong><small>${profile?.provider==='linkedin'?'حساب المشارك عبر LinkedIn':'سجّل الدخول ليظهر اسمك وصورتك'}</small></span><span class="linkedin-mark" title="LinkedIn" aria-label="LinkedIn">in</span>`;
         container.querySelector('img')?.addEventListener('error',event=>{const fallback=document.createElement('span');fallback.className='participant-avatar participant-placeholder';fallback.textContent='👤';event.target.replaceWith(fallback);});
     },
     renderInterrogatorSummary() {
@@ -677,13 +691,16 @@ const App = {
         finally{this.busy=false;this.renderActiveSession();}
     },
     async startNewSession() {
+        if(!this.participantProfile){location.href='auth.php?action=login';return;}
         if (this.busy || this.generating) return;
         this.busy=true; this.updateControls();
         try {
             const c=this.getSelectedCase();
-            const data=await this.api('start_session',{case_file:c.filename,model:this.selectedModelId,
+            this.startRequestId ||= this.requestId();
+            const data=await this.api('start_session',{request_id:this.startRequestId,case_file:c.filename,model:this.selectedModelId,
                 interrogator_type:this.interrogationMode,interrogator_model:this.selectedInterrogatorId,interrogator_character:this.selectedInvestigatorPersona});
             this.generation++; this.currentSession=data.session; this.stopRequested=false;this.aiPaused=false;
+            this.startRequestId=null;this.quota=data.quota;this.renderAccount();
             this.renderActiveSession(); await this.reloadLogsOnly(); this.notify('بدأت الجلسة. حد الاستجواب 30 ردًا للسجين.');
         } catch(e) {this.notify(e.message,true);}
         finally {this.busy=false;this.updateControls();}
@@ -691,8 +708,8 @@ const App = {
         if(this.currentSession?.interrogator_type==='reverse')await this.requestReverseQuestion();
     },
     async reloadLogsOnly() {
-        const d=await (await fetch('api.php?action=init_data')).json();
-        if(d.ok) {this.logs=d.logs;this.publishedLogs=d.published_logs;this.csrfToken=d.csrf_token;this.models=d.models;this.renderLogsList();}
+        const d=await this.fetchData('api.php?action=init_data');
+        if(d.ok) {this.logs=d.logs;this.publishedLogs=d.published_logs;this.csrfToken=d.csrf_token;this.models=d.models;this.participantProfile=d.participant_profile;this.quota=d.quota;this.renderAccount();this.renderLogsList();}
     },
     async loadSession(id) {
         if(this.busy || this.generating) return this.notify('انتظر انتهاء الجولة أو أنهِ التشغيل قبل فتح سجل آخر.',true);
@@ -714,12 +731,14 @@ const App = {
     updateControls() {
         const s=this.currentSession, ai=s?.interrogator_type==='ai', reverse=s?.interrogator_type==='reverse', ended=s?.is_ended, ro=s?.read_only;
         document.getElementById('start-session-btn').disabled=this.busy || this.generating;
+        const logout=document.getElementById('logout-btn');if(logout)logout.disabled=this.busy || this.generating;
+        document.getElementById('start-session-btn').textContent=this.participantProfile?'بدء تجربة جديدة':'تسجيل الدخول عبر LinkedIn لبدء التجربة';
         document.getElementById('human-input-bar').style.display=ai?'none':'';
         document.getElementById('human-tactics-bar').style.display=ai || reverse?'none':'';
         document.getElementById('ai-vs-ai-controls').style.display=ai?'':'none';
         const waiting=reverse && !s?.awaiting_question?.sense;
-        document.getElementById('send-btn').disabled=this.busy || !!ended || !!ro || !!waiting;
-        document.getElementById('user-input').disabled=this.busy || !!ended || !!ro || !!waiting;
+        document.getElementById('send-btn').disabled=!this.participantProfile || this.busy || !!ended || !!ro || !!waiting;
+        document.getElementById('user-input').disabled=!this.participantProfile || this.busy || !!ended || !!ro || !!waiting;
         document.getElementById('send-btn').textContent=reverse?'إرسال إجابتي ⬅':'إرسال وممارسة الضغط ⬅';
         document.getElementById('user-input').placeholder=reverse?'أجب عن سؤال المحقق بصفتك المتهم في القضية…':'اكتب كلامك للسجين هنا…';
         document.getElementById('reverse-resume-btn').hidden=!reverse || !!ended || !!ro || !!s?.awaiting_question?.sense;
@@ -746,6 +765,7 @@ const App = {
         this.updatePortrait(s.character_slug,last?.visual_state || s.initial_state,'');
         document.getElementById('chat-messages').replaceChildren();
         const levels=document.createElement('div');levels.className='session-levels';levels.innerHTML=LabView.levels(s);document.getElementById('chat-messages').appendChild(levels);
+        if(!s.is_ended)document.getElementById('chat-messages').appendChild(LabCommunity.result(s));
         for(const m of visible)this.appendMessageDOM(m);
         if(s.interrogator_type==='reverse' && s.awaiting_question && !s.is_ended) {
             this.appendMessageDOM({role:'user',content:s.awaiting_question.text,interrogator_expression:s.awaiting_question.expression,turn:s.awaiting_question.turn,timestamp:s.awaiting_question.timestamp});
@@ -765,14 +785,14 @@ const App = {
         if(s.is_ended) {
             const card=LabView.evaluation(s);
             if(!s.read_only && s.evaluation_status==='complete') {
-                const b=document.createElement('button');b.className='btn btn-primary';b.textContent='إظهار في الصفحة العامة';
-                b.disabled=this.busy;b.addEventListener('click',()=>this.publishSession());card.appendChild(b);
+                // Publication controls, provisional ranking and privacy confirmation are shown together above.
             }
             if(!s.read_only && s.evaluation_status!=='complete') {
                 const b=document.createElement('button');b.className='btn btn-secondary';b.textContent=this.busy?'اللجنة تراجع الحوار…':'إكمال التقييم';b.disabled=this.busy;
                 b.addEventListener('click',()=>this.endAndEvaluateSession());card.appendChild(b);
             }
             document.getElementById('chat-messages').appendChild(card);
+            document.getElementById('chat-messages').appendChild(LabCommunity.result(s));
             document.getElementById('chat-messages').appendChild(LabView.benchmark(s));
         }
         document.getElementById('usage-summary').textContent=LabView.usage(s);
@@ -859,6 +879,7 @@ const App = {
     },
     async publishSession() {
         if(this.busy || !this.currentSession)return;
+        if(!confirm('نشر هذه المحادثة ونتائجها ومراجعاتك واسمك وصورتك للزوار؟ يمكنك حذفها من المختبر لاحقًا.'))return;
         this.busy=true;this.updateControls();
         try{this.currentSession=(await this.api('publish_session',{session_id:this.currentSession.session_id})).session;await this.reloadLogsOnly();this.notify('نُشرت الجلسة ويمكن مشاركتها من الصفحة العامة.');}
         catch(e){this.notify(e.message,true);}finally{this.busy=false;this.renderActiveSession();}
@@ -879,10 +900,46 @@ const App = {
         const logs=(this.archiveMode==='public'?this.publishedLogs:this.logs).filter(s=>[s.case_title,s.model,s.interrogator_model].join(' ').toLowerCase().includes(q));
         if(!logs.length){box.textContent='لا توجد جلسات مطابقة.';return;}
         for(const s of logs){
-            const card=document.createElement('button');card.type='button';card.className='archive-card';
+            const card=document.createElement('div');card.className='archive-card';card.tabIndex=0;card.setAttribute('role','button');
             card.innerHTML=`<div class="archive-card-top"><img class="archive-card-avatar" src="${LabView.face(s.character_slug,s.current_state)}" alt=""><div class="archive-card-header-info"><div class="archive-card-name">${this.escapeHtml(s.case_title)}</div><div class="archive-card-roles">المحقق: ${this.escapeHtml(s.interrogator_type!=='human'?(s.interrogator_character?.name || '')+' · '+s.interrogator_model:'بشري')}</div><div class="archive-card-roles">السجين: ${this.escapeHtml(s.interrogator_type==='reverse'?'أنت · متهم بشري':s.model)}</div></div></div><div class="archive-card-body"><span>${s.turns_count} / 30 جولة · ${s.is_ended?'منتهية':'قيد التحقيق'}</span><progress max="30" value="${s.turns_count}"></progress>${s.evaluation?`<strong>السجين ${s.evaluation.prisoner_score ?? s.evaluation.overall_score} · المحقق ${s.evaluation.investigator_score ?? '—'}</strong>`:''}</div>`;
-            card.addEventListener('click',()=>this.loadSession(s.session_id));box.appendChild(card);
+            const cost=document.createElement('p');cost.className='archive-cost';cost.textContent=LabCommunity.cost(s);card.appendChild(cost);
+            const open=()=>this.loadSession(s.session_id);card.addEventListener('click',open);card.addEventListener('keydown',e=>{if(e.target===card && (e.key==='Enter' || e.key===' ')){e.preventDefault();open();}});
+            if(this.archiveMode!=='public') {const remove=document.createElement('button');remove.className='btn danger-outline archive-delete';remove.textContent='حذف نهائي';remove.addEventListener('click',e=>{e.stopPropagation();this.deleteSession(s.session_id);});card.appendChild(remove);}
+            box.appendChild(card);
         }
+    },
+    renderAccount() {
+        const controls=document.getElementById('account-controls'),notice=document.getElementById('account-notice');controls.replaceChildren();notice.replaceChildren();
+        if(!this.participantProfile){
+            const a=document.createElement('a');a.href='auth.php?action=login';a.className='btn linkedin-share';a.textContent='الدخول عبر LinkedIn';controls.appendChild(a);
+            notice.textContent='مجتمع يختبر النماذج بنفسه. سجّل الدخول لحفظ تجاربك في حسابك؛ لا يرى الزوار إلا ما تختار نشره. ثلاث تجارب يوميًا على نفقة الموقع.';return;
+        }
+        const a=document.createElement('a');a.href='public.php?profile='+encodeURIComponent(this.participantProfile.public_id);a.textContent=this.participantProfile.display_name;a.className='account-name';controls.appendChild(a);
+        const out=document.createElement('button');out.id='logout-btn';out.className='text-button';out.textContent='خروج';out.disabled=this.busy || this.generating;out.addEventListener('click',()=>this.logout());controls.appendChild(out);
+        const p=document.createElement('p');p.textContent=`تجارب الموقع اليوم: ${this.quota?.remaining ?? 0} من 3 متبقية · تتجدد منتصف الليل بتوقيت القدس.`;notice.appendChild(p);
+        if(this.quota?.remaining===0){const p=document.createElement('p');p.textContent='شكرًا لمساهمتك! ميزانية الموقع محدودة؛ ننتظرك غدًا، أو استخدم مفتاحك الخاص لتجارب غير محدودة على نفقتك.';notice.appendChild(p);}
+        if(this.userApiKey){const balance=document.createElement('p');balance.id='personal-key-balance';
+            const b=this.keyBalance;balance.textContent=b?(b.balance_available?`رصيد حساب OpenRouter: ${LabCommunity.money(b.balance)}`:b.key_remaining!=null?`المتبقي ضمن حد المفتاح: ${LabCommunity.money(b.key_remaining)} (رصيد الحساب غير متاح)`:'رصيد الحساب غير متاح لهذا المفتاح؛ عدم وجود سقف للمفتاح لا يعني رصيدًا غير محدود.'):'جارٍ التحقق من رصيد مفتاحك…';notice.appendChild(balance);
+            const refresh=document.createElement('button');refresh.className='text-button';refresh.textContent='تحديث الرصيد';refresh.addEventListener('click',()=>this.refreshKeyBalance());notice.appendChild(refresh);
+        }
+    },
+    async refreshKeyBalance() {
+        if(!this.participantProfile || !this.userApiKey)return;
+        try{this.keyBalance=(await this.api('key_balance')).balance;this.renderAccount();}
+        catch(e){const el=document.getElementById('personal-key-balance');if(el)el.textContent='تعذر تحديث الرصيد: '+e.message;}
+    },
+    async logout() {
+        if(this.busy || this.generating)return this.notify('انتظر حفظ الجولة قبل تسجيل الخروج.',true);
+        try{await this.api('logout');sessionStorage.removeItem('user_openrouter_api_key');location.href='index.php';}catch(e){this.notify(e.message,true);}
+    },
+    async deleteSession(id) {
+        if(this.busy || this.generating)return this.notify('انتظر حفظ الجولة قبل الحذف.',true);
+        if(!confirm('حذف المحادثة نهائيًا من حسابك والمعرض والترتيب، مع تقييماتك المرتبطة بها؟ لا يمكن التراجع عن الحذف.'))return;
+        this.busy=true;this.updateControls();
+        try{await this.api('delete_session',{session_id:id,confirm:id});
+            if(this.currentSession?.session_id===id){this.currentSession=null;this.generation++;document.getElementById('chat-messages').replaceChildren();document.getElementById('user-input').value='';document.getElementById('usage-summary').textContent='';}
+            await this.reloadLogsOnly();this.notify('حُذفت المحادثة ومراجعاتها من المختبر نهائيًا. حذفها لا يعيد الحصة اليومية.');
+        }catch(e){this.notify(e.message,true);}finally{this.busy=false;this.updateControls();}
     },
     escapeHtml(str) {return LabView.text(str);}
 };

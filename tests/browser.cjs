@@ -15,6 +15,8 @@ if(!chrome && process.platform==='win32') {
     const browser=await chromium.launch({headless:true,...(chrome ? {executablePath:chrome} : {})});
     try {
         const page=await browser.newPage({viewport:{width:1560,height:1024}});
+        await page.addInitScript(()=>sessionStorage.setItem('user_openrouter_api_key','sk-or-test'));
+        page.on('dialog',dialog=>dialog.accept());
         const errors=[];page.on('pageerror',e=>errors.push(e.message));
         const base=process.env.TEST_BASE_URL || 'http://127.0.0.1:8492';
         await page.goto(base);await page.waitForFunction(()=>App.models.length>0);
@@ -69,7 +71,7 @@ if(!chrome && process.platform==='win32') {
         await page.setViewportSize({width:1560,height:1024});
         await page.locator('#model-modal .modal-close-btn').click();
         await page.screenshot({path:'test-results/evaluation.png',fullPage:true});
-        await page.getByRole('button',{name:'إظهار في الصفحة العامة',exact:true}).click();
+        await page.getByRole('button',{name:'نشر التجربة',exact:true}).click();
         await page.waitForFunction(()=>App.currentSession.is_published && !App.busy);
         const sid=await page.evaluate(()=>App.currentSession.session_id);
         assert(await page.locator('#send-btn').isDisabled());
@@ -169,7 +171,7 @@ if(!chrome && process.platform==='win32') {
         assert.equal(await page.evaluate(()=>App.currentSession.evaluation.investigator_score),50);
         await page.screenshot({path:'test-results/benchmark-feedback.png',fullPage:true});
         assert.equal(await page.locator('.msg-user').count(),1,'Unanswered question must not enter evaluated transcript');
-        await page.getByRole('button',{name:'إظهار في الصفحة العامة',exact:true}).click();
+        await page.getByRole('button',{name:'نشر التجربة',exact:true}).click();
         await page.waitForFunction(()=>App.currentSession.is_published && !App.busy);
         await pub.goto(base+'/public.php?session_id='+reverseId);
         await pub.waitForSelector('#session-reader-modal.active');

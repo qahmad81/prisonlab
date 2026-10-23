@@ -1,9 +1,32 @@
+<?php
+require_once __DIR__.'/lib/lab.php';require_once __DIR__.'/lib/accounts.php';
+header('Cache-Control: no-store');header('X-Content-Type-Options: nosniff');
+$metaTitle='PrisonLab | تجارب مجتمع الذكاء الاصطناعي';$metaDescription='تجارب منشورة لمقارنة النماذج مع نتائج التحكيم والمراجعات والتكلفة.';$metaUrl='';$metaImage='';
+try{$publicEnv=labAccountBootstrap();$metaBase=labBaseUrl($publicEnv);$metaUrl=$metaBase.'/public.php';$metaImage=$metaBase.'/assets/branding/prisonlab-512.png';
+    $metaSid=$_GET['session_id'] ?? '';
+    if($metaSid!==''){
+        if(!is_string($metaSid) || !preg_match('/^session_[a-zA-Z0-9_]+$/D',$metaSid))throw new RuntimeException('private');
+        $metaPath=$GLOBALS['lab_storage'].'/'.$metaSid.'.json';$metaSession=is_file($metaPath)?labRead($metaPath):[];
+        if(empty($metaSession['is_published']) || empty($metaSession['evaluation']) || ($metaSession['evaluation_status'] ?? '')!=='complete')throw new RuntimeException('private');
+        $metaTitle='PrisonLab | '.mb_substr($metaSession['case_title'],0,120);
+        $metaDescription='تجربة منشورة · '.($metaSession['operator_profile']['display_name'] ?? 'المجتمع').' · السجين '.($metaSession['evaluation']['prisoner_score'] ?? '—').'/100 · المحقق '.($metaSession['evaluation']['investigator_score'] ?? '—').'/100 · التكلفة المبلغ عنها $'.labSessionCost($metaSession)['total_usd'];
+        $metaUrl=$metaBase.'/public.php?session_id='.rawurlencode($metaSid);
+    }
+}catch(Throwable $e){if(!empty($_GET['session_id'])){http_response_code(404);$metaTitle='PrisonLab | المحادثة غير متاحة';$metaDescription='هذه المحادثة غير منشورة أو حُذفت.';$metaUrl='';}}
+$metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>معرض استجوابات التحقيق المنشورة | مختبر الذكاء الاصطناعي</title>
+    <title><?= $metaEscape($metaTitle) ?></title>
+    <meta name="description" content="<?= $metaEscape($metaDescription) ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="<?= $metaEscape($metaTitle) ?>">
+    <meta property="og:description" content="<?= $metaEscape($metaDescription) ?>">
+    <?php if($metaUrl!==''): ?><meta property="og:url" content="<?= $metaEscape($metaUrl) ?>"><link rel="canonical" href="<?= $metaEscape($metaUrl) ?>"><?php endif; ?>
+    <?php if($metaImage!==''): ?><meta property="og:image" content="<?= $metaEscape($metaImage) ?>"><meta property="og:image:alt" content="PrisonLab"><?php endif; ?>
     <link rel="icon" href="favicon.ico?v=2" sizes="any">
     <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/branding/prisonlab-32.png">
@@ -97,6 +120,20 @@
         </div>
     </section>
 
+    <section id="public-profile-heading" hidden></section>
+    <div class="public-toolbar"><button class="btn btn-secondary" id="show-gallery">المحادثات المنشورة</button><button class="btn btn-secondary" id="show-leaderboard">ترتيب النماذج · Leaderboard</button><a href="public.php" id="all-profiles-link" hidden>جميع المشاركين</a></div>
+    <section id="community-leaderboard" class="community-board" hidden>
+        <h2>التجارب الأعلى تقييمًا مع كل موديل</h2><p class="community-notice">المحادثات المنشورة فقط. الدرجة تخص أداء الموديل في دوره، وليست تقييمًا للشخص. استخدم المرشحات لمقارنة نفس القضية والمستوى والمعيار؛ اختلاف هذه العوامل يؤثر في النتائج.</p>
+        <div class="community-filters">
+            <label>الموديل<select id="board-model"><option value="">جميع النماذج</option></select></label>
+            <label>الدور<select id="board-role"><option value="prisoner">المتهم</option><option value="interrogator">المحقق</option></select></label>
+            <label>القضية<select id="board-case"><option value="">جميع القضايا</option></select></label>
+            <label>مستوى الشخصية<select id="board-level"><option value="">كل المستويات</option><?php for($i=1;$i<=10;$i++): ?><option value="<?= $i ?>"><?= $i ?>/10</option><?php endfor; ?></select></label>
+            <label>مستوى الطرف المقابل<select id="board-opponent-level"><option value="">كل المستويات</option><option value="human">محقق بشري</option><?php for($i=1;$i<=10;$i++): ?><option value="<?= $i ?>"><?= $i ?>/10</option><?php endfor; ?></select></label>
+            <label>معيار التحكيم<select id="board-rubric"><option value="">كل الإصدارات</option></select></label>
+        </div><p id="board-status" class="community-notice" role="status"></p><div class="leaderboard-scroll"><table class="leaderboard-table"><thead><tr><th>المرتبة</th><th>الموديل / الدرجة</th><th>المشارك</th><th>التجربة والسياق</th><th>التكلفة</th></tr></thead><tbody id="board-rows"></tbody></table></div>
+    </section>
+
     <div class="case-filter-bar" style="margin-bottom:18px;">
         <input type="text" id="public-search" placeholder="ابحث باسم المتهم، أو المحقق، أو القضية المنشورة...">
     </div>
@@ -126,6 +163,8 @@
 </div>
 
 <script src="assets/session-view.js?v=<?= (int)filemtime(__DIR__ . "/assets/session-view.js") ?>"></script>
+<script src="assets/community.js?v=<?= (int)filemtime(__DIR__ . '/assets/community.js') ?>"></script>
+<script src="assets/public-community.js?v=<?= (int)filemtime(__DIR__ . '/assets/public-community.js') ?>"></script>
 <script>
 let publishedSessions = [];
 
@@ -135,6 +174,12 @@ async function loadPublicData() {
     if (!data.ok) return;
 
     publishedSessions = (data.logs || []).filter(l => l.is_published);
+    PublicCommunity.setup(publishedSessions);
+    const requestedProfile=new URLSearchParams(location.search).get('profile');
+    if(requestedProfile){
+        const p=await (await fetch('api.php?action=public_profile&profile_id='+encodeURIComponent(requestedProfile))).json();
+        PublicCommunity.profile(p);publishedSessions=p.ok?p.logs:[];
+    }
     document.getElementById('stat-published-count').textContent = publishedSessions.length;
 
     let totalScore = 0;
@@ -218,7 +263,9 @@ function renderPublicGrid(q) {
             </div>
         `;
 
-        card.addEventListener('click', () => openSessionReader(s.session_id));
+        card.appendChild(LabCommunity.operator(s));const cost=document.createElement('p');cost.className='archive-cost';cost.textContent=LabCommunity.cost(s);card.appendChild(cost);
+        for(const [role,review] of Object.entries(s.user_reviews || {})){const p=document.createElement('p');p.className='archive-cost';p.textContent=`مراجعته للموديل ${role==='prisoner'?'المتهم':'المحقق'} · ${review.rating}/5: ${review.text}`;card.appendChild(p);}
+        card.addEventListener('click',e=>{if(!e.target.closest('a'))openSessionReader(s.session_id);});
         container.appendChild(card);
     });
 }
@@ -243,6 +290,7 @@ async function openSessionReader(sessionId) {
     chatBox.replaceChildren();
     for (const m of s.messages || []) chatBox.appendChild(LabView.message(m,s));
     if(s.evaluation) chatBox.appendChild(LabView.evaluation(s));
+    chatBox.appendChild(LabCommunity.result({...s,can_delete:false}));
     if(s.evaluation)chatBox.appendChild(LabView.benchmark({...s,can_review:false}));
     const link=document.createElement('a');link.href='public.php?session_id='+encodeURIComponent(s.session_id);link.textContent='رابط مشاركة هذه الجلسة';link.className='btn btn-secondary';chatBox.appendChild(link);
     document.getElementById('session-reader-modal').classList.add('active');

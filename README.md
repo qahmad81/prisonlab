@@ -6,7 +6,7 @@ Open source under the [MIT license](LICENSE). Third-party assets retain their re
 
 ## Local development
 
-Requires PHP 8.1+ with curl, mbstring and OpenSSL. Copy .env.example to .env and set OPENROUTER_API_KEY, or use the visitor-key control. Never commit credentials.
+Requires PHP 8.1+ with curl, mbstring and OpenSSL. Copy .env.example to .env, configure the LinkedIn client credentials and exact APP_BASE_URL/redirect URI, and set OPENROUTER_API_KEY or use a visitor key after signing in. Never commit credentials. See [LinkedIn setup](docs/LINKEDIN_SETUP.md).
 
 ```powershell
 php -S 127.0.0.1:8488 router.php
@@ -67,17 +67,21 @@ Curated economy, medium and premium tabs focus on current official releases with
 
 Reliability colors use completed measured calls: green below 10% failure, yellow from 10% to below 30%, orange at least 30%; unmeasured models remain neutral. Counts include cumulative uses, successes, failures and neutral cancellations. Timing is first-byte latency and whole-request throughput, not network ping or token-to-token streaming speed. Invalid model output and transport failures are separate. Failure may also reflect key quotas or provider configuration. Performance colors are separate: below 40 orange, 40–under 65 yellow, at least 65 green. The stronger performance/connection warning determines card emphasis, with separate explanations. Samples below five are labeled limited.
 
-Owners may review each actual AI role after ending a test, including after publication: 1–5 stars and 3–2000 characters. Updating a review replaces its session/role record rather than adding votes. Jury and user averages stay separate. No human performance is assigned to an unrelated model. There is no LinkedIn authentication or leaderboard yet.
+Owners may review each actual AI role after ending a test, including after publication: 1–5 stars and 3–2000 characters. Updating a review replaces its session/role record rather than adding votes. Jury and user averages stay separate. No human performance is assigned to an unrelated model. Public model information includes published tests; signed-in owners additionally see their own private assessments. Other accounts' private review text is never exposed.
 
 ## Identity, storage and publication
 
 Default private storage is ../.ai_prison_game-data. LAB_DATA_DIR may override it via server environment or .env, but must remain outside source and public roots. API keys are not stored in sessions. Visitor keys stay in sessionStorage and travel in a request header.
 
-Private ownership currently uses an HttpOnly, SameSite=Strict visit cookie, with server-side authorization, CSRF, atomic writes, per-session locks and idempotent request IDs. This is not an account/recovery system: losing the cookie loses access to private ownership. Historical ownerless logs are retained privately, not reassigned to new visitors. Local backup paths and raw sessions are not repository material.
+All new conversations require LinkedIn sign-in. The authorization-code flow exchanges credentials on the server and authenticates the member through LinkedIn's HTTPS userinfo endpoint. Only openid/profile scopes are requested. ID-token claims and browser-supplied identity are never trusted; access tokens and email are not stored. Sessions use HttpOnly, SameSite=Lax cookies (Secure on HTTPS), strict session IDs, CSRF and ID rotation on login/logout. Accounts recover their private sessions on another browser by signing in with the same LinkedIn account. Historical visit-cookie/ownerless logs remain private and are not automatically assigned to an account.
 
 Publication is explicit and allowed only after a completed evaluation. A published session becomes read-only and is listed at public.php, with shareable public.php?session_id=... URLs. Nothing is published automatically.
 
-participant_profile is currently null. A future server-verified LinkedIn integration may return {provider: "linkedin", display_name, avatar_url}. The UI then displays the name and optional HTTPS avatar safely; it never uses a browser-supplied name as authentication. No local-storage identity or OAuth integration is implemented by the placeholder.
+Accounts receive three new site-funded conversations per day, resetting at midnight Asia/Jerusalem. Reservations are serialized per account, starts are idempotent, and deletion does not restore quota. A verified visitor OpenRouter key permits unlimited personal-funded starts subject to provider limits. Each session retains its original funding source; personal sessions require the same key to resume, with no site-key fallback. Only a SHA-256 fingerprint is persisted; raw keys remain in sessionStorage and request headers. Key/account balances are sanitized, owner-only and explicitly unavailable when the provider does not expose them. Costs always show provider-reported amounts and funding source, including on published sessions.
+
+Before publication, results show a provisional shared rank among published sessions with the same model, role, case, both character levels and rubric. Public leaderboards sort by descending model-role score and offer model/role/case/level/rubric filters; mixed contexts are disclosed. Clicking an operator opens only their published tests and reviews, including AI-versus-AI simulations. Owners can permanently delete private or published conversations with confirmation, removing the transcript and its benchmark/review entries. Quota counters and empty lock files contain no conversation content. Code-deployment backups must exclude account/session/benchmark data.
+
+Sharing is separate from publishing: the LinkedIn button opens LinkedIn's share composer for an already-published URL. The member reviews and sends the post there. No post is sent automatically, no posting token is retained, and w_member_social/email are not requested during sign-in even if those products are provisioned for the app. Public URLs have server-rendered Open Graph metadata. A deleted/private session returns HTTP404 without leaking its metadata; external copies/previews and LinkedIn posts must be managed separately.
 
 ## Verification and maintenance
 
@@ -86,6 +90,8 @@ php tests/unit.php
 python -X utf8 tests/integration.py
 python -X utf8 tests/browser.py
 python -X utf8 tests/jury_parallel.py
+python -X utf8 tests/accounts.py
+python -X utf8 tests/community_browser.py
 ```
 
 Integration/browser tests use an isolated local server, temporary storage and mock providers, without spending API credit or changing visitors' sessions. Browser tests require Playwright and Chromium; PLAYWRIGHT_MODULE and CHROME_PATH override local discovery. Screenshots and live outputs under test-results are excluded from Git.

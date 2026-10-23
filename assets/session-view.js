@@ -108,6 +108,6 @@ const LabView = {
             cached+=Number(u.prompt_tokens_details?.cached_tokens ?? u.input_tokens_details?.cached_tokens ?? 0);
             if (u.cost != null) {cost+=Number(u.cost);hasCost=true;}
         }
-        return `إدخال ${input.toLocaleString()} · إخراج ${output.toLocaleString()} · من الكاش ${cached.toLocaleString()}${hasCost ? ' · تكلفة مسجلة $'+cost.toFixed(5) : ''}`;
+        return `إدخال ${input.toLocaleString()} · إخراج ${output.toLocaleString()} · من الكاش ${cached.toLocaleString()} · ${typeof LabCommunity!=='undefined'?LabCommunity.cost(s):hasCost?'تكلفة مسجلة $'+cost.toFixed(5):'التكلفة غير متاحة'}`;
     }
 };

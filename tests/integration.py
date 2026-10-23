@@ -8,6 +8,7 @@ import tempfile
 import time
 import urllib.error
 import urllib.request
+import uuid
 
 ROOT=Path(__file__).resolve().parents[1]
 PORT=8490
@@ -24,7 +25,8 @@ class Client:
     def init(self):
         status,d=self.get('/api.php?action=init_data');assert status==200 and d['ok'];self.csrf=d['csrf_token'];return d
     def post(self,action,headers=None,**data):
-        req=urllib.request.Request(BASE+'/api.php',data=json.dumps(dict(action=action,**data)).encode(),headers={'Content-Type':'application/json','X-CSRF-Token':self.csrf,**(headers or {})})
+        if action=='start_session': data.setdefault('request_id',uuid.uuid4().hex)
+        req=urllib.request.Request(BASE+'/api.php',data=json.dumps(dict(action=action,**data)).encode(),headers={'Content-Type':'application/json','X-CSRF-Token':self.csrf,'X-User-OpenRouter-Key':'sk-or-test',**(headers or {})})
         try:
             with self.opener.open(req) as r:return r.status,json.load(r)
         except urllib.error.HTTPError as e:return e.code,json.load(e)
@@ -227,7 +229,7 @@ def run(storage):
 
 if __name__=='__main__':
     with tempfile.TemporaryDirectory(prefix='ai-prison-tests-') as tmp:
-        storage=Path(tmp);env={**os.environ,'LAB_DATA_DIR':tmp}
+        storage=Path(tmp);env={**os.environ,'LAB_DATA_DIR':tmp,'LAB_TEST_LEGACY_IDENTITY':'1'}
         flags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0
         with (storage/'server.log').open('w') as log:
             proc=subprocess.Popen(['php','-d','auto_prepend_file='+str(ROOT/'tests/mock-provider.php'),'-S',f'127.0.0.1:{PORT}','router.php'],cwd=ROOT,env=env,stdout=log,stderr=log,creationflags=flags)

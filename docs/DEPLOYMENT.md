@@ -6,7 +6,7 @@ Production: https://prisonlab.odehit.com/ . Its Hestia Nginx/Apache configuratio
 
 The Git checkout is /home/user/web/prisonlab.odehit.com/private/app, branch main. Runtime storage is /home/user/web/prisonlab.odehit.com/private/data. Neither is a public document root. There is no database or migration system.
 
-public_html contains four minimal PHP entry wrappers (index.php, api.php, public.php and privacy.php) loading private/app, copied favicon/assets and the allowlist .htaccess, alongside the preexisting robots.txt. This keeps private directories inaccessible to the Nginx worker while PHP-FPM can read them. PHP resolves application source paths in the private checkout. Secrets are copied separately to private/app/.env with restricted permissions; LAB_DATA_DIR points to private/data. Never stage, commit or print .env.
+public_html contains five minimal PHP entry wrappers (index.php, api.php, public.php, privacy.php and auth.php) loading private/app, copied favicon/assets and the allowlist .htaccess, alongside the preexisting robots.txt. This keeps private directories inaccessible to the Nginx worker while PHP-FPM can read them. PHP resolves application source paths in the private checkout. Secrets are copied separately to private/app/.env with restricted permissions; LAB_DATA_DIR points to private/data. Never stage, commit or print .env.
 
 ## Initial publication
 
@@ -26,7 +26,9 @@ Nginx may serve static JSON without consulting .htaccess. Source must stay outsi
 
 ## Checks and limits
 
-Run php tests/unit.php, python -X utf8 tests/integration.py, python -X utf8 tests/browser.py and python -X utf8 tests/jury_parallel.py with isolated storage/mock providers. A production functional check must be bounded and must not publish fixtures or copy user history. Live calls consume the configured key. Ownership is currently an anonymous visit cookie, without LinkedIn login or durable workers.
+Run php tests/unit.php, python -X utf8 tests/integration.py, python -X utf8 tests/browser.py, python -X utf8 tests/jury_parallel.py, python -X utf8 tests/accounts.py and python -X utf8 tests/community_browser.py with isolated storage/mock providers. A production functional check must be bounded and must not publish fixtures or copy user history. Live calls consume the configured key. New conversation ownership requires LinkedIn accounts; no durable background worker is used.
+
+Before enabling account login, set APP_BASE_URL=https://prisonlab.odehit.com and LINKEDIN_REDIRECT_URI=https://prisonlab.odehit.com/auth.php?action=callback, with the matching client ID/secret in the private server .env. Authorize exactly that redirect in LinkedIn; the loopback redirect is for local development only. Complete isolated mock OAuth tests before deployment, then verify real OAuth on production with the owner's browser (owner's explicit preference after the interrupted local check). Preserve quota/account/session data and exclude it from routine code-deployment backups so deleting a conversation removes the application's stored content rather than leaving untracked archive copies. Do not transfer local account records to production.
 
 ## Rollback
 

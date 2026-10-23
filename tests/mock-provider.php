@@ -1,5 +1,24 @@
 <?php
 // Used only by the isolated test server through auto_prepend_file; production never includes this file.
+$GLOBALS['lab_test_env']=['APP_BASE_URL'=>'http://127.0.0.1:8494','LINKEDIN_CLIENT_ID'=>'test-client','LINKEDIN_CLIENT_SECRET'=>'test-secret',
+    'LINKEDIN_REDIRECT_URI'=>'http://127.0.0.1:8494/auth.php?action=callback','OPENROUTER_API_KEY'=>'site-test-key'];
+$GLOBALS['lab_identity_http']=function(string $url,array $headers,?array $form):array {
+    if(str_ends_with($url,'/accessToken')) {
+        if(($form['code'] ?? '')==='bad')throw new RuntimeException('Mock OAuth failure');
+        return ['access_token'=>'mock-token:'.($form['code'] ?? 'alice'),'token_type'=>'Bearer'];
+    }
+    if(str_ends_with($url,'/userinfo')){
+        $token=$headers[0] ?? '';if(!str_starts_with($token,'Authorization: Bearer mock-token:'))throw new RuntimeException('Mock token rejected');
+        return ['sub'=>substr($token,strlen('Authorization: Bearer mock-token:')),'name'=>'Test Operator <safe>','picture'=>'https://example.com/test-avatar.jpg','email'=>'must-not-store@example.com'];
+    }
+    $key=str_replace('Authorization: Bearer ','',$headers[0] ?? '');
+    if($key==='invalid-key' || $key==='')throw new RuntimeException('Mock invalid key');
+    if(str_ends_with($url,'/credits')){if($key==='sk-or-uncapped')throw new RuntimeException('Credits unavailable');return ['data'=>['total_credits'=>10,'total_usage'=>2.5]];}
+    return ['data'=>['usage'=>2.5,'limit'=>str_contains($key,'uncapped')?null:5,'limit_remaining'=>str_contains($key,'uncapped')?null:2.5]];
+};
+if(getenv('LAB_TEST_LEGACY_IDENTITY')==='1')$GLOBALS['lab_test_account_bootstrap']=function():void {
+    if(empty($_SESSION['account_id'])){$a=labAccountUpsert(['sub'=>bin2hex(random_bytes(12)),'name'=>'Test Operator'],'test-client');$_SESSION['account_id']=$a['id'];}
+};
 $GLOBALS['lab_test_jury_time']=0.0;
 $GLOBALS['lab_jury_clock']=fn()=>$GLOBALS['lab_test_jury_time'];
 $GLOBALS['lab_jury_wait']=function(float $seconds):void {$GLOBALS['lab_test_jury_time']+=$seconds;};

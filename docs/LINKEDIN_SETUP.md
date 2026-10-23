@@ -4,11 +4,13 @@ Application display name: **PrisonLab**. The owner selected this capitalization.
 
 ## Current readiness
 
-The existing application still uses private browser-session ownership. LinkedIn
-login, account quotas, profile deletion and public-only leaderboards are not yet
-implemented or enabled. The initial privacy page explicitly states this status;
-update it alongside the account implementation before enabling sign-in. Never
-advertise account access or deletion controls that are not available.
+LinkedIn account login, per-account quotas, conversation deletion, public-only
+profiles/leaderboards, funding binding, cost display and composer sharing are
+implemented. Deployment requires configured credentials and registered callbacks.
+The owner provisioned OpenID Connect and Share on LinkedIn in the developer app.
+Sign-in requests only openid/profile. Do not advertise real-world identity
+verification or automatic posting. Account deletion requests use the operator
+contact; conversation deletion is available directly in the application.
 
 Developer application form:
 
@@ -23,13 +25,22 @@ Developer application form:
   once saved.
 - API legal agreement: the owner must review and accept it in their browser.
 
-After creation, request **Sign in with LinkedIn using OpenID Connect** under
-Products. Request only `openid profile`; do not request email, posting, contacts
-or organization permissions. The intended production callback is
-`https://prisonlab.odehit.com/auth.php?action=callback`; it must be implemented
-and tested before being used. Do not add a callback placeholder to the public
-publisher. Keep the client secret in the ignored server `.env`, never in Git,
-chat, screenshots or browser JavaScript.
+Enable **Sign in with LinkedIn using OpenID Connect** under Products. Request only
+`openid profile`; do not request email, posting, contacts or organization permissions.
+Authorize these exact redirects:
+
+- `http://127.0.0.1:8488/auth.php?action=callback` (local development)
+- `https://prisonlab.odehit.com/auth.php?action=callback` (production)
+
+Set APP_BASE_URL, LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET and LINKEDIN_REDIRECT_URI
+in each environment's ignored `.env`. The redirect must exactly equal its base
+URL plus `/auth.php?action=callback`. Keep the secret out of Git, chat, screenshots
+and browser JavaScript. Transfer production settings separately over SCP.
+
+Sharing opens `https://www.linkedin.com/sharing/share-offsite/?url=...` only for an
+already-public session. Publication itself requires a separate user confirmation.
+No automatic UGC API call is made and no posting token/scope is required by this
+composer flow, even though the app's Share on LinkedIn product is enabled.
 
 Use the server's authorization-code exchange and authenticated userinfo endpoint,
 short-lived single-use state, fixed redirect URI, secure cookies and session ID
