@@ -48,6 +48,21 @@ def run(storage):
         assert a.get(path)[0]==404,path
     status,_=a.post('start_session',headers={'X-CSRF-Token':'bad'});assert status==403
     status,_=a.post('start_session',model='unknown/model',case_file='char_1_victor_vance.md');assert status==400
+    # Invalid selections are rejected before session creation; saved overrides survive every turn.
+    before=len(a.init()['logs'])
+    for bad in ['none','minimal','invented']:
+        status,d=a.post('start_session',model='openai/gpt-6.1-sol',case_file='char_1_victor_vance.md',prisoner_effort=bad)
+        assert status==400 and not d['ok'],d
+    assert len(a.init()['logs'])==before
+    status,d=a.post('start_session',model='openai/gpt-6.1-sol',interrogator_type='ai',interrogator_model='google/gemini-4-argon',case_file='char_1_victor_vance.md',prisoner_effort='low',interrogator_effort='high')
+    assert status==200,d
+    manual=d['session'];assert manual['prisoner_reasoning']['effort']=='low' and manual['interrogator_reasoning']['effort']=='high'
+    status,d=a.step(manual,0);assert status==200,d
+    assert d['session']['prisoner_reasoning']==manual['prisoner_reasoning'] and d['session']['interrogator_reasoning']==manual['interrogator_reasoning']
+    saved=next(x for x in a.init()['logs'] if x['session_id']==manual['session_id'])
+    assert saved['prisoner_reasoning']['effort']=='low' and saved['interrogator_reasoning']['effort']=='high'
+    assert b.get('/api.php?action=load_session&session_id='+manual['session_id'])[0]==404
+    assert a.post('delete_session',session_id=manual['session_id'],confirm=manual['session_id'])[0]==200
     s=a.start();sid=s['session_id'];assert not s['read_only']
     assert b.get('/api.php?action=load_session&session_id='+sid)[0]==404
     assert len(b.init()['logs'])==0

@@ -1,0 +1,15 @@
+# Actor reasoning and long-call recovery
+
+A production GPT-6.1 Sol versus Gemini Argon session on 2026-10-23 recorded four GPT transport failures at 65.002–65.003 seconds. Gemini completed its calls in approximately 15 and 43 seconds. No measured output-limit events were present. This establishes an application watchdog failure, not proof of invalid output or an intrinsically unreliable model. Existing telemetry and historical grades are preserved.
+
+Actor chat calls now have a 300-second wall-clock watchdog, independent of the jury deadlines (50/80/180 seconds). JEV/compaction retain their existing individual deadlines. The API has a 900-second execution cap; this domain's FPM worker cap is 950 seconds, fronting proxies 1000 seconds, and browser POST deadline 1020 seconds. Connection establishment stays bounded at 15 seconds. These are finite limits, not a promise that every provider will finish.
+
+A structured session-busy response makes the browser poll owner-authorized lock state, then replay the identical request ID after release. It does not launch competing calls while the existing worker holds its lock. Successful stages, including an investigator question and JEV directive awaiting a prisoner answer, remain checkpointed. The wait is bounded and other 409 responses retain their existing behavior.
+
+Each AI role offers an automatic character-based effort or an explicitly catalog-declared effort. Mandatory reasoning excludes `none`. An explicit null `supported_efforts` means all gateway levels; an absent property means no declared effort control. Reasoning-capable models without effort controls use the provider default and are distinguished from models without declared reasoning. See [OpenRouter reasoning metadata](https://openrouter.ai/docs/guides/best-practices/reasoning-tokens).
+
+The server validates selections before creating or charging a session. Each new session freezes both policies; subsequent rounds cannot recompute over a user's choice. Existing saved policies stay intact. Setup changes affect only the next test, and swapping roles transfers model-specific choices. Character difficulty and role instructions remain independent. Raw provider reasoning stays excluded and is never sent to the opponent, JEV, judges or compaction. Reasoning and visible output share the provider token budget, but visible transcript limits remain independently enforced.
+
+Saved effort appears in participant/message summaries, archives, public readers and individual model assessment records. Historical sessions without recorded settings are labeled unknown instead of inferring a setting from today's catalog. Aggregated model scores may combine efforts; effort-specific ranking is not claimed.
+
+Deterministic unit, HTTP and browser regressions cover declared choices, forbidden effort rejection, immutable per-round policies, isolation, swap behavior, modal selection, busy polling with unchanged request IDs and the actor timeout argument. No paid production conversation is replayed by these tests.

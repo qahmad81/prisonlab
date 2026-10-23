@@ -1735,3 +1735,12 @@ body:has(.modal-overlay.active) { overflow:hidden; }
 .role-swap-button:hover { border-color:#f3cb66; background:#20334a; }
 .role-swap-button:focus-visible { outline:2px solid #f3cb66; outline-offset:4px; }
 .role-swap-button:disabled { opacity:.45; cursor:wait; }
+
+/* Reasoning controls are siblings of model-picker buttons, never nested controls. */
+.reasoning-control{width:100%;margin-top:8px;padding:9px 12px;border:1px solid var(--border-color,#334155);border-radius:8px;background:#14263a;color:#7dd3fc;text-align:right;font:inherit;font-size:.78rem;cursor:pointer}
+.reasoning-control:disabled{color:#94a3b8;background:transparent;cursor:default}
+.reasoning-dialog{width:min(360px,calc(100vw - 32px));max-height:85vh;overflow-y:auto;overscroll-behavior:contain;background:#101c2b;border:1px solid #36516c;border-radius:14px;padding:20px;box-shadow:0 24px 80px #0008}
+.reasoning-dialog header{display:flex;align-items:center;justify-content:space-between;gap:16px}.reasoning-dialog h3{margin:0;color:#e2e8f0;font-size:1rem}
+#reasoning-model-name{font-size:.8rem;color:#94a3b8;overflow-wrap:anywhere}.reasoning-option{display:block;width:100%;text-align:right;padding:10px 12px;border:0;border-radius:6px;background:transparent;color:#cbd5e1;font:inherit;font-size:.85rem;cursor:pointer}
+.reasoning-option:hover,.reasoning-option[aria-pressed=true]{color:#7dd3fc;background:#1e3a52}.reasoning-option[aria-pressed=true]::before{content:'✓ ';color:#34d399}.reasoning-help{font-size:.75rem;line-height:1.8;color:#94a3b8;border-top:1px solid #334155;padding-top:12px}
+.reasoning-badge{display:inline-block;font-size:.72rem;color:#7dd3fc;line-height:1.7;white-space:normal}.session-reasoning{display:flex;flex-wrap:wrap;gap:6px 14px;padding:6px 0}.reasoning-control:focus-visible,.reasoning-option:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
