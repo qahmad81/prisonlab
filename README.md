@@ -2,6 +2,8 @@
 
 An Arabic RTL laboratory for comparing AI models through character-based interrogation, psychological simulation, evidence-based judging and role-specific model reviews. It supports a human investigator, AI versus AI, and a human playing the accused.
 
+Open source under the [MIT license](LICENSE). Third-party assets retain their respective terms; see [notices](docs/THIRD_PARTY_NOTICES.md).
+
 ## Local development
 
 Requires PHP 8.1+ with curl, mbstring and OpenSSL. Copy .env.example to .env and set OPENROUTER_API_KEY, or use the visitor-key control. Never commit credentials.

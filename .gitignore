@@ -5,6 +5,7 @@
 !/.htaccess
 !/AGENTS.md
 !/README.md
+!/LICENSE
 !/api.php
 !/index.php
 !/public.php

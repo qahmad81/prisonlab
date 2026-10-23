@@ -12,7 +12,7 @@ public_html contains three minimal PHP entry wrappers loading private/app, copie
 
 1. Verify the domain's HTTP/HTTPS configuration and resolve its exact root; never infer a path from another site.
 2. Back up existing public files and relevant domain/pool configuration under private/backups.
-3. Push only the inspected allowlist to a private repository after a staged secret/asset audit.
+3. Push only the inspected allowlist to the public MIT-licensed repository after a staged secret/asset audit.
 4. Clone into private/app and run git pull --ff-only origin main. Verify its commit against the reviewed local commit.
 5. Transfer .env directly over SCP and set production LAB_DATA_DIR. Restrict source/secret/data permissions. Do not transfer developer sessions, telemetry, benchmark votes, verification artifacts or screenshots.
 6. Run bash tools/publish-public.sh with the verified public_html path to publish only reviewed wrappers/assets, preserving robots.txt and backing up the old placeholder. Scope proxy/PHP timeout changes to this domain so long jury calls finish.
