@@ -4,7 +4,6 @@ const App = {
     cases: [],
     investigators: [],
     participantProfile: null,
-    quota: null,
     keyBalance: null,
     selectedInvestigatorPersona: 'ethan_cole',
     logs: [],
@@ -55,9 +54,9 @@ const App = {
         this.states = data.states || [];
         this.cases = data.cases || [];
         this.investigators = data.investigators || [];
-        // Only the server's authenticated LinkedIn identity is accepted.
+        // The server owns the standalone browser identity and CSRF protection.
         this.participantProfile = data.participant_profile || null;
-        this.quota=data.quota;this.authReady=data.auth_ready;
+
         this.logs = data.logs || [];
         this.env = data.env || {};
         this.csrfToken = data.csrf_token;
@@ -100,7 +99,7 @@ const App = {
         this.renderLogsList();
         this.bindEvents();
         this.updateControls();
-        this.renderAccount();if(this.participantProfile && this.userApiKey)this.refreshKeyBalance();
+        this.renderAccount();if(this.userApiKey)this.refreshKeyBalance();
         document.getElementById('archive-modal-search').addEventListener('input', () => this.renderArchive());
         document.getElementById('model-sort').addEventListener('change',e=>{this.modelSort=e.target.value;this.renderModalModels();});
         document.querySelectorAll('.modal-overlay').forEach(el => el.addEventListener('click', e => {if(e.target === el) el.classList.remove('active');}));
@@ -524,12 +523,11 @@ const App = {
             alert('يرجى التأكد من إدخال مفتاح OpenRouter صالح (يبدأ عادة بـ sk-or-v1-).');
             return;
         }
-        if(!this.participantProfile)return this.notify('سجّل الدخول عبر LinkedIn قبل تفعيل مفتاحك.',true);
         const old=this.userApiKey;this.userApiKey = val;
         if(val){try{this.keyBalance=(await this.api('key_balance')).balance;}catch(e){this.userApiKey=old;return this.notify('تعذر التحقق من المفتاح: '+e.message,true);}}
         if (val) {
             sessionStorage.setItem('user_openrouter_api_key', val);
-            this.notify('تم التحقق من مفتاحك. التجارب الجديدة ستكون على نفقتك؛ كل تجربة تحتفظ بمصدر تمويلها عند إنشائها.');
+            this.notify('تم التحقق من مفتاحك. التجارب الجديدة ستكون على نفقتك؛ لا يوجد حد يومي للتجارب.');
         } else {
             this.keyBalance=null;sessionStorage.removeItem('user_openrouter_api_key');
         }
@@ -547,7 +545,7 @@ const App = {
         this.updateKeyButtonState();
         this.closeKeyModal();
         this.renderSelectedModelSummary();
-        this.renderAccount();this.renderInterrogatorSummary();this.renderModalModels();this.notify('أُزيل المفتاح. التجارب الجديدة تستخدم حصة الموقع؛ التجارب الشخصية السابقة تحتاج مفتاحها نفسه لمتابعتها.');
+        this.renderAccount();this.renderInterrogatorSummary();this.renderModalModels();this.notify('أُزيل المفتاح. التجارب الجديدة تستخدم مفتاح المشغّل؛ التجارب الشخصية السابقة تحتاج مفتاحها نفسه لمتابعتها.');
     },
 
     updateKeyButtonState() {
@@ -669,12 +667,7 @@ const App = {
         this.renderSelectedModelSummary();
     },
     renderHumanPerformer(container) {
-        const profile=this.participantProfile;
-        const safeUrl=value=>{try {const url=new URL(value);return url.protocol==='https:'?url.href:'';}catch{return '';}};
-        const avatar=profile?.provider==='linkedin'?safeUrl(profile.avatar_url):'';
-        const name=profile?.provider==='linkedin' && typeof profile.display_name==='string'?profile.display_name:'أنت · المشارك البشري';
-        container.innerHTML=`${avatar?`<img class="participant-avatar" src="${this.escapeHtml(avatar)}" alt="" referrerpolicy="no-referrer" width="42" height="42">`:'<span class="participant-avatar participant-placeholder" aria-hidden="true">👤</span>'}<span class="participant-info"><strong>${this.escapeHtml(name)}</strong><small>${profile?.provider==='linkedin'?'حساب المشارك عبر LinkedIn':'سجّل الدخول ليظهر اسمك وصورتك'}</small></span><span class="linkedin-mark" title="LinkedIn" aria-label="LinkedIn">in</span>`;
-        container.querySelector('img')?.addEventListener('error',event=>{const fallback=document.createElement('span');fallback.className='participant-avatar participant-placeholder';fallback.textContent='👤';event.target.replaceWith(fallback);});
+        container.innerHTML='<span class="participant-avatar participant-placeholder" aria-hidden="true">👤</span><span class="participant-info"><strong>أنت · المشارك البشري</strong><small>نسخة مستقلة · السجلات مرتبطة بهذا المتصفح</small></span>';
     },
     renderInterrogatorSummary() {
         const m=this.models.find(m=>m.id===this.selectedInterrogatorId);
@@ -704,7 +697,6 @@ const App = {
         finally{this.busy=false;this.renderActiveSession();}
     },
     async startNewSession() {
-        if(!this.participantProfile){location.href='auth.php?action=login';return;}
         if (this.busy || this.generating) return;
         this.busy=true; this.updateControls();
         try {
@@ -713,7 +705,7 @@ const App = {
             const data=await this.api('start_session',{request_id:this.startRequestId,case_file:c.filename,model:this.selectedModelId,
                 interrogator_type:this.interrogationMode,interrogator_model:this.selectedInterrogatorId,interrogator_character:this.selectedInvestigatorPersona});
             this.generation++; this.currentSession=data.session; this.stopRequested=false;this.aiPaused=false;
-            this.startRequestId=null;this.quota=data.quota;this.renderAccount();
+            this.startRequestId=null;this.renderAccount();
             this.renderActiveSession(); await this.reloadLogsOnly(); this.notify('بدأت الجلسة. حد الاستجواب 30 ردًا للسجين.');
         } catch(e) {this.notify(e.message,true);}
         finally {this.busy=false;this.updateControls();}
@@ -722,7 +714,7 @@ const App = {
     },
     async reloadLogsOnly() {
         const d=await this.fetchData('api.php?action=init_data');
-        if(d.ok) {this.logs=d.logs;this.publishedLogs=d.published_logs;this.csrfToken=d.csrf_token;this.models=d.models;this.participantProfile=d.participant_profile;this.quota=d.quota;this.renderAccount();this.renderLogsList();}
+        if(d.ok) {this.logs=d.logs;this.publishedLogs=d.published_logs;this.csrfToken=d.csrf_token;this.models=d.models;this.participantProfile=d.participant_profile;this.renderAccount();this.renderLogsList();}
     },
     async loadSession(id) {
         if(this.busy || this.generating) return this.notify('انتظر انتهاء الجولة أو أنهِ التشغيل قبل فتح سجل آخر.',true);
@@ -745,13 +737,13 @@ const App = {
         const s=this.currentSession, ai=s?.interrogator_type==='ai', reverse=s?.interrogator_type==='reverse', ended=s?.is_ended, ro=s?.read_only;
         document.getElementById('start-session-btn').disabled=this.busy || this.generating;
         const logout=document.getElementById('logout-btn');if(logout)logout.disabled=this.busy || this.generating;
-        document.getElementById('start-session-btn').textContent=this.participantProfile?'بدء تجربة جديدة':'تسجيل الدخول عبر LinkedIn لبدء التجربة';
+        document.getElementById('start-session-btn').textContent='بدء تجربة جديدة';
         document.getElementById('human-input-bar').style.display=ai?'none':'';
         document.getElementById('human-tactics-bar').style.display=ai || reverse?'none':'';
         document.getElementById('ai-vs-ai-controls').style.display=ai?'':'none';
         const waiting=reverse && !s?.awaiting_question?.sense;
-        document.getElementById('send-btn').disabled=!this.participantProfile || this.busy || !!ended || !!ro || !!waiting;
-        document.getElementById('user-input').disabled=!this.participantProfile || this.busy || !!ended || !!ro || !!waiting;
+        document.getElementById('send-btn').disabled=this.busy || !!ended || !!ro || !!waiting;
+        document.getElementById('user-input').disabled=this.busy || !!ended || !!ro || !!waiting;
         document.getElementById('send-btn').textContent=reverse?'إرسال إجابتي ⬅':'إرسال وممارسة الضغط ⬅';
         document.getElementById('user-input').placeholder=reverse?'أجب عن سؤال المحقق بصفتك المتهم في القضية…':'اكتب كلامك للسجين هنا…';
         document.getElementById('reverse-resume-btn').hidden=!reverse || !!ended || !!ro || !!s?.awaiting_question?.sense;
@@ -948,36 +940,26 @@ const App = {
     },
     renderAccount() {
         const controls=document.getElementById('account-controls'),notice=document.getElementById('account-notice');controls.replaceChildren();notice.replaceChildren();
-        if(!this.participantProfile){
-            const a=document.createElement('a');a.href='auth.php?action=login';a.className='btn linkedin-share';a.textContent='الدخول عبر LinkedIn';controls.appendChild(a);
-            notice.textContent='مجتمع يختبر النماذج بنفسه. سجّل الدخول لحفظ تجاربك في حسابك؛ لا يرى الزوار إلا ما تختار نشره. ثلاث تجارب يوميًا على نفقة الموقع.';return;
-        }
-        const a=document.createElement('a');a.href='public.php?profile='+encodeURIComponent(this.participantProfile.public_id);a.textContent=this.participantProfile.display_name;a.className='account-name';controls.appendChild(a);
-        const out=document.createElement('button');out.id='logout-btn';out.className='text-button';out.textContent='خروج';out.disabled=this.busy || this.generating;out.addEventListener('click',()=>this.logout());controls.appendChild(out);
-        const p=document.createElement('p');p.textContent=this.userApiKey?'مفتاحك مفعل: تجارب غير محدودة على نفقتك، ضمن رصيد المفتاح وحدود مزوده.':`تجارب الموقع اليوم: ${this.quota?.remaining ?? 0} من 3 متبقية · تتجدد منتصف الليل بتوقيت القدس.`;notice.appendChild(p);
-        if(!this.userApiKey && this.quota?.remaining===0){const p=document.createElement('p');p.textContent='شكرًا لمساهمتك! ميزانية الموقع محدودة؛ ننتظرك غدًا، أو استخدم مفتاحك الخاص لتجارب غير محدودة على نفقتك.';notice.appendChild(p);}
+        controls.textContent='النسخة المستقلة';
+        const p=document.createElement('p');p.textContent='بلا تسجيل دخول وبلا حد يومي للتجارب. سجلاتك الخاصة مرتبطة بهذا المتصفح؛ النشر اختياري.';notice.appendChild(p);
         if(this.userApiKey){const balance=document.createElement('p');balance.id='personal-key-balance';
             const b=this.keyBalance;balance.textContent=b?(b.available_to_spend!=null?`المتاح للإنفاق بهذا المفتاح: ${Number(b.available_to_spend).toFixed(2)}$${b.key_limit!=null?' · سقف المفتاح '+Number(b.key_limit).toFixed(2)+'$':''}`:'الرصيد غير متاح لهذا المفتاح؛ تحقق من حدوده لدى OpenRouter.'):'جارٍ التحقق من رصيد مفتاحك…';notice.appendChild(balance);
             const refresh=document.createElement('button');refresh.className='text-button';refresh.textContent='تحديث الرصيد';refresh.addEventListener('click',()=>this.refreshKeyBalance());notice.appendChild(refresh);
         }
     },
     async refreshKeyBalance() {
-        if(!this.participantProfile || !this.userApiKey)return;
+        if(!this.userApiKey)return;
         const checkedKey=this.userApiKey;
         try{const balance=(await this.api('key_balance')).balance;if(this.userApiKey!==checkedKey)return;this.keyBalance=balance;this.updateKeyButtonState();this.renderAccount();}
         catch(e){const el=document.getElementById('personal-key-balance');if(el)el.textContent='تعذر تحديث الرصيد: '+e.message;}
     },
-    async logout() {
-        if(this.busy || this.generating)return this.notify('انتظر حفظ الجولة قبل تسجيل الخروج.',true);
-        try{await this.api('logout');sessionStorage.removeItem('user_openrouter_api_key');location.href='index.php';}catch(e){this.notify(e.message,true);}
-    },
     async deleteSession(id) {
         if(this.busy || this.generating)return this.notify('انتظر حفظ الجولة قبل الحذف.',true);
-        if(!confirm('حذف المحادثة نهائيًا من حسابك والمعرض والترتيب، مع تقييماتك المرتبطة بها؟ لا يمكن التراجع عن الحذف.'))return;
+        if(!confirm('حذف المحادثة نهائيًا من أرشيف هذا المتصفح والمعرض، مع تقييماتك المرتبطة بها؟ لا يمكن التراجع عن الحذف.'))return;
         this.busy=true;this.updateControls();
         try{await this.api('delete_session',{session_id:id,confirm:id});
             if(this.currentSession?.session_id===id){this.currentSession=null;this.generation++;document.getElementById('chat-messages').replaceChildren();document.getElementById('user-input').value='';document.getElementById('usage-summary').textContent='';}
-            await this.reloadLogsOnly();this.notify('حُذفت المحادثة ومراجعاتها من المختبر نهائيًا. حذفها لا يعيد الحصة اليومية.');
+            await this.reloadLogsOnly();this.notify('حُذفت المحادثة ومراجعاتها من المختبر نهائيًا.');
         }catch(e){this.notify(e.message,true);}finally{this.busy=false;this.updateControls();}
     },
     escapeHtml(str) {return LabView.text(str);}

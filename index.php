@@ -22,8 +22,8 @@
         <div class="brand-copy"><span class="brand-name" dir="ltr">PrisonLab</span><h1>مختبر أداء نماذج الذكاء الاصطناعي</h1></div>
     </div>
     <div class="header-actions">
-        <div id="account-controls" class="account-controls"><a href="auth.php?action=login" class="btn linkedin-share">الدخول عبر LinkedIn</a></div>
-        <nav class="brand-links" aria-label="معلومات الموقع"><a href="public.php?view=leaderboard">الترتيب والتجارب</a><a href="privacy.php">الخصوصية</a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer">تواصل معنا ↗</a></nav>
+        <div id="account-controls" class="account-controls">النسخة المستقلة</div>
+        <nav class="brand-links" aria-label="معلومات الموقع"><a href="public.php">التجارب المنشورة</a><a href="privacy.php">الخصوصية</a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer">تواصل معنا ↗</a></nav>
         <div class="env-pills">
             <div class="env-pill">محرك المشاعر (SENSE): <strong id="sense-model-pill">typesafe/jev-1.14</strong></div>
             <div class="env-pill">موديل الضغط: <strong id="compact-model-pill">...</strong></div>

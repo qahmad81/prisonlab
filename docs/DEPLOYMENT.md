@@ -1,35 +1,19 @@
-# Deployment and rollback
+# Standalone deployment
 
-## Verified domain layout
+The main branch is a complete standalone application: no external account setup, daily test quota, account leaderboard, public profiles or social sharing integration. The live community website https://prisonlab.odehit.com/ uses the separate linkedin branch. See EDITIONS.md; do not deploy main over that account-enabled site by mistake.
 
-Production: https://prisonlab.odehit.com/ . Its Hestia Nginx/Apache configuration declares /home/user/web/prisonlab.odehit.com/public_html as the document root. PHP 8.3-FPM has curl/mbstring/OpenSSL and permits the domain private directory through open_basedir.
+## Runtime
 
-The Git checkout is /home/user/web/prisonlab.odehit.com/private/app, branch main. Runtime storage is /home/user/web/prisonlab.odehit.com/private/data. Neither is a public document root. There is no database or migration system.
+Use patched PHP with curl, mbstring and OpenSSL (8.3.36 or newer). Copy .env.example to a private .env and set an operator OpenRouter key, or use a visitor's key through the interface. The operator-funded model price cap remains; there is no daily test quota. There is no database and no migration system.
 
-public_html contains five minimal PHP entry wrappers (index.php, api.php, public.php, privacy.php and auth.php) loading private/app, copied favicon/assets and the allowlist .htaccess, alongside the preexisting robots.txt. This keeps private directories inaccessible to the Nginx worker while PHP-FPM can read them. PHP resolves application source paths in the private checkout. Secrets are copied separately to private/app/.env with restricted permissions; LAB_DATA_DIR points to private/data. Never stage, commit or print .env.
+For local use, run php -S 127.0.0.1:8488 router.php from the repository. The router enforces a public allowlist. Do not expose PHP's development server to the Internet. Visitor keys stay in browser sessionStorage and request headers. Private history belongs to an unguessable HttpOnly cookie; there is no cross-browser account recovery.
 
-## Initial publication
+## Production layout
 
-1. Verify the domain's HTTP/HTTPS configuration and resolve its exact root; never infer a path from another site.
-2. Back up existing public files and relevant domain/pool configuration under private/backups.
-3. Push only the inspected allowlist to the public MIT-licensed repository after a staged secret/asset audit.
-4. Clone into private/app and run git pull --ff-only origin main. Verify its commit against the reviewed local commit.
-5. Transfer .env directly over SCP and set production LAB_DATA_DIR. Restrict source/secret/data permissions. Do not transfer developer sessions, telemetry, benchmark votes, verification artifacts or screenshots.
-6. Run bash tools/publish-public.sh with the verified public_html path to publish only reviewed wrappers/assets, preserving robots.txt and backing up the old placeholder. Scope proxy/PHP timeout changes to this domain so long jury calls finish.
-7. Validate server configuration before graceful reload. Verify HTTPS, init_data, assets, cookie/CSRF behavior and denial of private paths.
+Place source and .env outside the public document root, for example domain/private/app, with LAB_DATA_DIR at domain/private/data. Restrict source to the application group and secrets to the operator/application user; runtime data is mode 0700. The public directory exposes only index.php, api.php, public.php, privacy.php, favicon and reviewed runtime assets. Do not rely on Apache rules when a fronting Nginx can serve JSON directly.
 
-## Subsequent deployment
+The reviewed tools/publish-public.sh validates the private/app and public_html relationship before writing four PHP wrappers and copying runtime assets. Verify domain ownership/roots before invoking it. Never publish lib, cases, models.json, states.json, tests, docs, tools, .git, .env, private histories, health records or candidate reports. A visitor may explicitly publish a completed session through the application; the source publisher must not copy runtime sessions.
 
-SSH to the registered server, cd to the exact private/app path, inspect git status, then git pull --ff-only origin main and bash tools/publish-public.sh /home/user/web/prisonlab.odehit.com/public_html. Do not force-reset remote changes or run migrations. Keep .env/private data out of Git and preserve permissions. Source is root-owned and readable by the domain application user; mutable data is owned by that application user.
+Before updating a standalone installation, record its commit, inspect local changes and back up source/public/configuration without conversation/account/benchmark data. Pull main using fast-forward-only Git. Preserve .env, application ownership and data. Lint PHP and JavaScript, then run the unit, integration, browser, standalone identity and parallel-jury tests against isolated mock providers. No migrations or test fixtures belong on production.
 
-Nginx may serve static JSON without consulting .htaccess. Source must stay outside public_html. The public publisher refuses unexpected source/target directory layouts and never copies source directories or private files. Never expose models.json, cases, lib, tests, tools, docs, .git, .env, backups or data directly.
-
-## Checks and limits
-
-Run php tests/unit.php, python -X utf8 tests/integration.py, python -X utf8 tests/browser.py, python -X utf8 tests/jury_parallel.py, python -X utf8 tests/accounts.py and python -X utf8 tests/community_browser.py with isolated storage/mock providers. A production functional check must be bounded and must not publish fixtures or copy user history. Live calls consume the configured key. New conversation ownership requires LinkedIn accounts; no durable background worker is used.
-
-Before enabling account login, set APP_BASE_URL=https://prisonlab.odehit.com and LINKEDIN_REDIRECT_URI=https://prisonlab.odehit.com/auth.php?action=callback, with the matching client ID/secret in the private server .env. Authorize exactly that redirect in LinkedIn; the loopback redirect is for local development only. Complete isolated mock OAuth tests before deployment, then verify real OAuth on production with the owner's browser (owner's explicit preference after the interrupted local check). Preserve quota/account/session data and exclude it from routine code-deployment backups so deleting a conversation removes the application's stored content rather than leaving untracked archive copies. Do not transfer local account records to production.
-
-## Rollback
-
-Record the previous commit and backup directory. On initial-deployment failure restore only this domain's prior public files and backed-up configuration. For a regression deploy an explicitly reviewed prior commit while preserving .env/private data. Test configuration before reload; do not modify unrelated domains.
+Use valid HTTPS, secure cookies, correct PHP-FPM permissions and timeouts sufficient for the professional panel's 180-second deadline plus JEV verification. Check home, init_data, private-path denial and public gallery after deployment. For rollback, restore the reviewed previous source/public/configuration and recheck runtime configuration; do not replace private user histories with test or developer data.

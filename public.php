@@ -1,8 +1,8 @@
 <?php
-require_once __DIR__.'/lib/lab.php';require_once __DIR__.'/lib/accounts.php';
+require_once __DIR__.'/lib/lab.php';require_once __DIR__.'/lib/access.php';
 header('Cache-Control: no-store');header('X-Content-Type-Options: nosniff');
 $metaTitle='PrisonLab | تجارب مجتمع الذكاء الاصطناعي';$metaDescription='تجارب منشورة لمقارنة النماذج مع نتائج التحكيم والمراجعات والتكلفة.';$metaUrl='';$metaImage='';
-try{$publicEnv=labAccountBootstrap();$metaBase=labBaseUrl($publicEnv);$metaUrl=$metaBase.'/public.php';$metaImage=$metaBase.'/assets/branding/prisonlab-512.png';
+try{$publicEnv=labRuntimeBootstrap();$metaBase=labBaseUrl($publicEnv);$metaUrl=$metaBase.'/public.php';$metaImage=$metaBase.'/assets/branding/prisonlab-512.png';
     $metaSid=$_GET['session_id'] ?? '';
     if($metaSid!==''){
         if(!is_string($metaSid) || !preg_match('/^session_[a-zA-Z0-9_]+$/D',$metaSid))throw new RuntimeException('private');
@@ -120,20 +120,6 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
         </div>
     </section>
 
-    <section id="public-profile-heading" hidden></section>
-    <div class="public-toolbar"><button class="btn btn-secondary" id="show-gallery">المحادثات المنشورة</button><button class="btn btn-secondary" id="show-leaderboard">ترتيب النماذج · Leaderboard</button><a href="public.php" id="all-profiles-link" hidden>جميع المشاركين</a></div>
-    <section id="community-leaderboard" class="community-board" hidden>
-        <h2>التجارب الأعلى تقييمًا مع كل موديل</h2><p class="community-notice">المحادثات المنشورة فقط. الدرجة تخص أداء الموديل في دوره، وليست تقييمًا للشخص. استخدم المرشحات لمقارنة نفس القضية والمستوى والمعيار؛ اختلاف هذه العوامل يؤثر في النتائج.</p>
-        <div class="community-filters">
-            <label>الموديل<select id="board-model"><option value="">جميع النماذج</option></select></label>
-            <label>الدور<select id="board-role"><option value="prisoner">المتهم</option><option value="interrogator">المحقق</option></select></label>
-            <label>القضية<select id="board-case"><option value="">جميع القضايا</option></select></label>
-            <label>مستوى الشخصية<select id="board-level"><option value="">كل المستويات</option><?php for($i=1;$i<=10;$i++): ?><option value="<?= $i ?>"><?= $i ?>/10</option><?php endfor; ?></select></label>
-            <label>مستوى الطرف المقابل<select id="board-opponent-level"><option value="">كل المستويات</option><option value="human">محقق بشري</option><?php for($i=1;$i<=10;$i++): ?><option value="<?= $i ?>"><?= $i ?>/10</option><?php endfor; ?></select></label>
-            <label>معيار التحكيم<select id="board-rubric"><option value="">كل الإصدارات</option></select></label>
-        </div><p id="board-status" class="community-notice" role="status"></p><div class="leaderboard-scroll"><table class="leaderboard-table"><thead><tr><th>المرتبة</th><th>الموديل / الدرجة</th><th>المشارك</th><th>التجربة والسياق</th><th>التكلفة</th></tr></thead><tbody id="board-rows"></tbody></table></div>
-    </section>
-
     <div class="case-filter-bar" style="margin-bottom:18px;">
         <input type="text" id="public-search" placeholder="ابحث باسم المتهم، أو المحقق، أو القضية المنشورة...">
     </div>
@@ -164,7 +150,6 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
 
 <script src="assets/session-view.js?v=<?= (int)filemtime(__DIR__ . "/assets/session-view.js") ?>"></script>
 <script src="assets/community.js?v=<?= (int)filemtime(__DIR__ . '/assets/community.js') ?>"></script>
-<script src="assets/public-community.js?v=<?= (int)filemtime(__DIR__ . '/assets/public-community.js') ?>"></script>
 <script>
 let publishedSessions = [];
 
@@ -172,12 +157,6 @@ async function loadPublicData() {
     const data = await LabCommunity.fetchJson('api.php?action=public_sessions');
 
     publishedSessions = (data.logs || []).filter(l => l.is_published);
-    PublicCommunity.setup(publishedSessions);
-    const requestedProfile=new URLSearchParams(location.search).get('profile');
-    if(requestedProfile){
-        let p;try{p=await LabCommunity.fetchJson('api.php?action=public_profile&profile_id='+encodeURIComponent(requestedProfile));}catch(e){p={ok:false};}
-        PublicCommunity.profile(p);publishedSessions=p.ok?p.logs:[];
-    }
     document.getElementById('stat-published-count').textContent = publishedSessions.length;
 
     let totalScore = 0;
