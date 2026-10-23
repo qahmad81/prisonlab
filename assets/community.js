@@ -10,7 +10,7 @@ const LabCommunity = {
     money(value) {return Number.isFinite(Number(value))?'$'+Number(value).toFixed(5):'غير متاح';},
     cost(s) {
         const c=s.cost;if(!c)return 'التكلفة غير متاحة';
-        const source=({site:'على نفقة الموقع',personal:'بالمفتاح الشخصي',legacy:'تجربة سابقة'})[c.funding_source] || '';
+        const source=c.funding_source==='sponsor'?'على نفقة الراعي '+(c.sponsor_label || c.sponsor_profile?.display_name || ''):({site:'على نفقة الموقع',personal:'بالمفتاح الشخصي',legacy:'تجربة سابقة'})[c.funding_source] || '';
         return `التكلفة المبلغ عنها ${this.money(c.total_usd)} · ${source}${c.complete?'':' · المبلغ المتاح فقط؛ بعض الاستدعاءات بلا تكلفة مبلغ عنها'}`;
     },
     publicUrl(s) {return new URL('public.php?session_id='+encodeURIComponent(s.session_id),location.href).href;},
@@ -32,7 +32,7 @@ const LabCommunity = {
     },
     result(s) {
         const box=document.createElement('section');box.className='publication-summary';
-        box.appendChild(this.operator(s));const cost=document.createElement('p');cost.className='session-total-cost';cost.textContent=this.cost(s);box.appendChild(cost);
+        box.appendChild(this.operator(s));const cost=document.createElement('p');cost.className='session-total-cost';cost.textContent=this.cost(s);box.appendChild(cost);if(s.cost?.sponsor_profile?.public_id)box.appendChild(LabSharing.link('الراعي: '+(s.cost.sponsor_label || s.cost.sponsor_profile.display_name),LabSharing.profile(s.cost.sponsor_profile.public_id)));if(s.is_published)box.appendChild(LabSharing.copy(this.publicUrl(s),'نسخ رابط التحقيق العام'));
         for(const [role,r] of Object.entries(s.rankings || {})){
             const p=document.createElement('p');p.textContent=`${role==='prisoner'?'المتهم':'المحقق'} · ${r.model}: المرتبة ${r.rank} من ${r.total}${r.provisional?' إذا نشرت الآن (ترتيب تقديري يتغير مع التجارب الجديدة)':''}.`;box.appendChild(p);
             const compare=document.createElement('a');const params=new URLSearchParams({view:'leaderboard',model:r.model,role,

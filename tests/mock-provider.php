@@ -28,7 +28,7 @@ $GLOBALS['lab_transport'] = function(array $payload, string $key, bool $decision
     $callsFile = $GLOBALS['lab_storage'] . '/test-calls.json';
     $calls = is_file($callsFile) ? json_decode(file_get_contents($callsFile), true) : [];
     $calls[] = ['model'=>$payload['model'],'decisions'=>$decisions,'question_ids'=>array_keys($payload['questions'] ?? []),
-        'reasoning'=>$payload['reasoning'] ?? null,'max_tokens'=>$payload['max_tokens'] ?? null,'output_correction'=>str_contains($payload['messages'][array_key_last($payload['messages'] ?? [])]['content'] ?? '','المحاولة السابقة تجاوزت'),
+        'price_caps'=>$payload['provider']['max_price'] ?? null,'test_key_hash'=>hash('sha256',$key),'reasoning'=>$payload['reasoning'] ?? null,'max_tokens'=>$payload['max_tokens'] ?? null,'output_correction'=>str_contains($payload['messages'][array_key_last($payload['messages'] ?? [])]['content'] ?? '','المحاولة السابقة تجاوزت'),
         'investigator_persona'=>str_contains($payload['messages'][0]['content'] ?? '','شخصية المحقق ثابتة')];
     $calls[array_key_last($calls)]['suspect_focus']=str_contains($payload['messages'][0]['content'] ?? '','هدف الجلسة: استجواب المتهم الحاضر');
     $calls[array_key_last($calls)]['prisoner_level']=str_contains($payload['messages'][0]['content'] ?? '','ملف مستوى المتهم ثابت');

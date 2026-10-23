@@ -75,6 +75,14 @@ Reliability colors use completed measured calls: green below 10% failure, yellow
 
 Owners may review each actual AI role after ending a test, including after publication: 1–5 stars and 3–2000 characters. Updating a review replaces its session/role record rather than adding votes. Jury and user averages stay separate. No human performance is assigned to an unrelated model. Public model information includes published tests; signed-in owners additionally see their own private assessments. Other accounts' private review text is never exposed.
 
+## Community sponsors and public links (LinkedIn edition)
+
+Participants can opt into donating an OpenRouter key, linked to their authenticated profile, under a public person/company label. The private JSON vault encrypts keys with AES-256-GCM and a separate 0600 random key outside source/public roots. The server never returns secrets or fingerprints. Owners can rotate, disable, delete and change daily per-account start quotas and actor price ceilings. Account-local locked quota ledgers preserve reservations across edits/rotation and session deletion; visitor-funded personal keys remain transient browser credentials.
+
+A zero ceiling permits free chat actors while that sponsor still pays JEV, compaction and the jury. All paid stages retain the session's original sponsor identity, including retries; no fallback key is charged on revocation. Requests already sent to a provider cannot be recalled. Explicitly opting into sponsorship is separate from entering a temporary personal key. See [sponsors and links](docs/SPONSORS_AND_LINKS.md) for custody, migration and rollback.
+
+Public sessions have stable direct URLs. Model/role leaderboards, case/accused pages, investigator personas and public member profiles have shareable links and previews; filter choices update the address. Public profiles default to investigator tests, then accused tests, then AI simulations, displaying funding attribution and reported costs. Only published conversations appear. Sponsoring a test does not grant access to its private transcript.
+
 ## Identity, storage and publication
 
 Default private storage is ../.ai_prison_game-data. LAB_DATA_DIR may override it via server environment or .env, but must remain outside source and public roots. API keys are not stored in sessions. Visitor keys stay in sessionStorage and travel in a request header.

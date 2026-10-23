@@ -53,6 +53,7 @@ function labJuryWave(array &$s,array $jobs,string $key,callable $save,bool $veri
     $started=labJuryNow();$reason=null;$seconds=(int)($s['jury_policy']['seconds'] ?? 50);
     $s['jury_wait']=['total_seconds'=>$seconds,'phase'=>'reviewing','started_at'=>gmdate('c'),'deadline_at'=>microtime(true)+$seconds,'tier'=>$s['jury_policy']['tier'] ?? 'economic'];
     $launch=function(array $job)use(&$s,&$active,&$attempts,$multi,$mock,$key,$started,$seconds):void {
+        if(function_exists('labGuardFunding'))labGuardFunding();
         $id=$job['model'];$attempts[$id]=1+($attempts[$id] ?? 0);
         $s['judge_progress'][$id]=['status'=>'running','attempt'=>$attempts[$id],'at'=>gmdate('c')];
         if($mock) {$active[$id]=['job'=>$job,'start'=>labJuryNow()];return;}

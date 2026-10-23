@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/lib/lab.php';
 require_once __DIR__ . '/lib/accounts.php';
+require_once __DIR__ . '/lib/sponsors.php';
 require_once __DIR__ . '/provider_icons.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -45,7 +46,7 @@ function publicSession(array $s, string $owner): array {
 }
 function summary(array $s): array {
     $keys = ['session_id','created_at','updated_at','model','gender','character_slug','case_file','case_title',
-        'closure_policy','termination','prisoner_reasoning','interrogator_reasoning','current_state','interrogator_type','interrogator_model','interrogator_character','prisoner_character','is_ended','is_published','published_at','evaluation','evaluation_status','end_reason'];
+        'sponsor_profile','sponsor_label','closure_policy','termination','prisoner_reasoning','interrogator_reasoning','current_state','interrogator_type','interrogator_model','interrogator_character','prisoner_character','is_ended','is_published','published_at','evaluation','evaluation_status','end_reason'];
     return array_intersect_key($s, array_flip($keys)) + ['operator_profile'=>$s['operator_profile'] ?? null,
         'cost'=>labSessionCost($s),'user_reviews'=>labSessionReviews($s),'turns_count' => labTurns($s), 'breaking_point' => $s['confession_check']['probability'] ?? 0];
 }
@@ -75,7 +76,7 @@ try {
         if (!is_array($body)) respond(['ok'=>false,'error'=>'طلب غير صالح'],400);
         $action = $body['action'] ?? $action;
         if (!hash_equals($csrf, $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '')) respond(['ok'=>false,'error'=>'انتهت صلاحية الصفحة؛ أعد تحميلها.'],403);
-    } elseif (!in_array($action, ['init_data','public_sessions','load_session','leaderboard','public_profile'],true)) {
+    } elseif (!in_array($action, ['init_data','public_sessions','load_session','leaderboard','public_profile','sponsors'],true)) {
         respond(['ok'=>false,'error'=>'هذه العملية تتطلب POST'],405);
     }
     $userKey = trim($_SERVER['HTTP_X_USER_OPENROUTER_KEY'] ?? '');
@@ -86,19 +87,26 @@ try {
         labBrowserSession();session_regenerate_id(true);$_SESSION=['csrf'=>bin2hex(random_bytes(24))];$newCsrf=$_SESSION['csrf'];session_write_close();
         respond(['ok'=>true,'csrf_token'=>$newCsrf]);
     }
+    if($action==='sponsors')respond(['ok'=>true,'sponsors'=>labSponsors($account)]);
+    if($action==='save_sponsor'){ $r=labSaveSponsor($account,$body);respond(['ok'=>true,'sponsor'=>$r,'sponsors'=>labSponsors($account)]); }
+    if($action==='delete_sponsor'){if(($body['confirm'] ?? '')!==($body['id'] ?? null))throw new RuntimeException('أكد حذف المفتاح');labDeleteSponsor($account,(string)$body['id']);respond(['ok'=>true,'sponsors'=>labSponsors($account)]);}
     if($action==='key_balance')respond(['ok'=>true,'balance'=>labVisitorBalance($userKey)]);
-    if(in_array($action,['leaderboard','public_profile'],true)) {
+    if(in_array($action,['leaderboard','public_profile','sponsors'],true)) {
         $published=labPublicSessions();$profileId=(string)($_GET['profile_id'] ?? '');
         if($action==='public_profile') {
             if(!preg_match('/^[a-f0-9]{32}$/D',$profileId))respond(['ok'=>false,'error'=>'الملف غير موجود'],404);
             $items=array_values(array_filter($published,fn($s)=>($s['operator_profile']['public_id'] ?? '')===$profileId));
             usort($items,fn($a,$b)=>strcmp($b['published_at'],$a['published_at']));
             $profile=$items[0]['operator_profile'] ?? null;
+            if(!$profile)foreach($published as $funded)if(($funded['sponsor_profile']['public_id'] ?? '')===$profileId)$profile=$funded['sponsor_profile'];
+            if(!$profile)foreach(labSponsors(null) as $sponsor)if(($sponsor['profile']['public_id'] ?? '')===$profileId)$profile=$sponsor['profile'];
+            if(!$profile && $account && $account['public_id']===$profileId)$profile=labAccountProfile($account);
             if(!$profile)respond(['ok'=>false,'error'=>'لا توجد محادثات منشورة لهذا الملف'],404);
             respond(['ok'=>true,'profile'=>$profile,'logs'=>array_map('summary',$items)]);
         }
-        $rows=[];$filterModel=(string)($_GET['model'] ?? '');$filterRole=(string)($_GET['role'] ?? '');
+        $rows=[];$filterProfile=(string)($_GET['profile_id'] ?? '');$filterInvestigator=(string)($_GET['investigator'] ?? '');$filterModel=(string)($_GET['model'] ?? '');$filterRole=(string)($_GET['role'] ?? '');
         foreach($published as $p)foreach(labActorModels($p) as $role=>$model) {
+            if(($filterProfile!=='' && ($p['operator_profile']['public_id'] ?? '')!==$filterProfile) || ($filterInvestigator!=='' && ($p['interrogator_character']['id'] ?? '')!==$filterInvestigator))continue;
             if(($filterModel!=='' && $model!==$filterModel) || ($filterRole!=='' && $role!==$filterRole))continue;
             $score=$p['evaluation'][$role==='prisoner'?'prisoner_score':'investigator_score'] ?? null;if(!is_numeric($score))continue;
             $level=$p[$role==='prisoner'?'prisoner_character':'interrogator_character']['level'] ?? null;
@@ -120,7 +128,10 @@ try {
             if (!empty($s['is_published']) && !empty($s['evaluation'])) $published[] = summary($s);
         }
         foreach (['logs','published'] as $var) usort($$var, fn($a,$b)=>strcmp($b['updated_at'],$a['updated_at']));
-        if ($action === 'public_sessions') respond(['ok'=>true,'logs'=>$published]);
+        if ($action === 'public_sessions') {
+            $publicCases=[];foreach(glob($casesDir.'/*.md') as $casePath){$text=file_get_contents($casePath);preg_match('/^#\s+(.+)$/m',$text,$title);preg_match('/^(char_\d+)_/',basename($casePath),$slug);$publicCases[]=['filename'=>basename($casePath),'title'=>$title[1] ?? basename($casePath),'content'=>$text,'character_slug'=>$slug[1] ?? 'char_1','difficulty'=>labPrisonerCharacter(basename($casePath))];}
+            respond(['ok'=>true,'logs'=>$published,'cases'=>$publicCases,'investigators'=>labInvestigators(),'models'=>array_map(fn($m)=>['id'=>$m['id'],'name'=>$m['name']],$models)]);
+        }
         $processedModels = [];
         $performance=labPerformance(labPublicBenchmarkData($owner));$curated=labCurated($models);
         $health = is_file($storage.'/model-health.json') ? labRead($storage.'/model-health.json') : [];
@@ -196,11 +207,14 @@ try {
 
 
         $authReady=false;try{labOAuthConfig($env);$authReady=true;}catch(RuntimeException $e){}
-        respond(['ok'=>true,'participant_profile'=>$account?labAccountProfile($account):null,'auth_ready'=>$authReady,'quota'=>labQuota($account),'csrf_token'=>$csrf,'curated'=>$curated,'investigators'=>labInvestigators(),'cases'=>$cases,'states'=>$statesData,'models'=>$processedModels,'discovery_meta'=>$catalog['discovery_meta'] ?? [],
+        respond(['ok'=>true,'sponsors'=>labSponsors($account),'participant_profile'=>$account?labAccountProfile($account):null,'auth_ready'=>$authReady,'quota'=>labQuota($account),'csrf_token'=>$csrf,'curated'=>$curated,'investigators'=>labInvestigators(),'cases'=>$cases,'states'=>$statesData,'models'=>$processedModels,'discovery_meta'=>$catalog['discovery_meta'] ?? [],
             'logs'=>$logs,'published_logs'=>$published,'rubric'=>labRubric(),'env'=>['sense_model'=>$senseModel,
             'compaction_model'=>$compactionModel,'max_turns'=>LAB_MAX_TURNS]]);
     }
     if ($action === 'start_session') {
+        $prior=labExistingAccountStart($account,(string)($body['request_id'] ?? ''));if($prior)respond(['ok'=>true,'quota'=>labQuota($account),'duplicate'=>true,'session'=>publicSession($prior,$owner)]);
+        $funding=labFunding((string)($body['sponsor_id'] ?? ''),$userKey,$env);labUseFunding($funding);$key=$funding['key'];if($funding['source']!=='personal')$userKey='';
+        if($funding['sponsor_id']!==''){$balance=labVisitorBalance($key);if($balance['available_to_spend']!==null && $balance['available_to_spend']<=0)throw new RuntimeException('رصيد مفتاح الراعي غير متاح الآن؛ اختر راعيًا آخر أو مفتاحك الشخصي');}
         $model = (string)($body['model'] ?? 'google/gemini-2.5-flash-lite');
         $type = (string)($body['interrogator_type'] ?? 'human');
         if(!in_array($type,['human','ai','reverse'],true))throw new RuntimeException('وضع الاستجواب غير صالح');
@@ -238,7 +252,7 @@ try {
         if($key==='')throw new RuntimeException('مفتاح الموقع غير متوفر؛ أضف مفتاح OpenRouter الخاص بك');
         foreach(labActorModels($s) as $actorId)foreach($models as $actor)if($actor['id']===$actorId)$s['actor_output_prices'][$actorId]=(float)$actor['pricing']['completion_per_1m'];
         $s['jury_preview']=labJuryPolicy($s,$models);
-        $s=labAccountStart($account,$s,(string)($body['request_id'] ?? ''),$userKey);
+        $s=labAccountStart($account,$s,(string)($body['request_id'] ?? ''),$userKey,$funding);
         respond(['ok'=>true,'quota'=>labQuota($account),'session'=>publicSession($s,$owner)]);
     }
     $id = (string)($body['session_id'] ?? $_GET['session_id'] ?? '');
@@ -276,7 +290,7 @@ try {
         if(!in_array($action,['publish_session','submit_review'],true)) {
             if(($s['funding_source'] ?? '')==='personal') {
                 if($userKey==='' || !hash_equals($s['key_fingerprint'] ?? '',hash('sha256',$userKey)))throw new RuntimeException('هذه التجربة على نفقتك؛ أعد إدخال مفتاح OpenRouter نفسه لمتابعتها');
-            }else {$key=$env['OPENROUTER_API_KEY'] ?? ''; $userKey='';$GLOBALS['lab_user_key']=false;}
+            }else {$funding=labFunding($s['sponsor_id'] ?? '','',$env);labUseFunding($funding);$key=$funding['key'];$userKey='';}
         }
         $save = function(array $value) use ($path): void { labWrite($path,$value); };
         $GLOBALS['lab_checkpoint'] = $save;

@@ -4,7 +4,7 @@
 
 Production: https://prisonlab.odehit.com/ . Its Hestia Nginx/Apache configuration declares /home/user/web/prisonlab.odehit.com/public_html as the document root. PHP 8.3-FPM has curl/mbstring/OpenSSL and permits the domain private directory through open_basedir.
 
-The Git checkout is /home/user/web/prisonlab.odehit.com/private/app, branch main. Runtime storage is /home/user/web/prisonlab.odehit.com/private/data. Neither is a public document root. There is no database or migration system.
+The Git checkout is /home/user/web/prisonlab.odehit.com/private/app, branch linkedin. Runtime storage is /home/user/web/prisonlab.odehit.com/private/data. Neither is a public document root. There is no database or migration system.
 
 public_html contains five minimal PHP entry wrappers (index.php, api.php, public.php, privacy.php and auth.php) loading private/app, copied favicon/assets and the allowlist .htaccess, alongside the preexisting robots.txt. This keeps private directories inaccessible to the Nginx worker while PHP-FPM can read them. PHP resolves application source paths in the private checkout. Secrets are copied separately to private/app/.env with restricted permissions; LAB_DATA_DIR points to private/data. Never stage, commit or print .env.
 
@@ -13,14 +13,14 @@ public_html contains five minimal PHP entry wrappers (index.php, api.php, public
 1. Verify the domain's HTTP/HTTPS configuration and resolve its exact root; never infer a path from another site.
 2. Back up existing public files and relevant domain/pool configuration under private/backups.
 3. Push only the inspected allowlist to the public MIT-licensed repository after a staged secret/asset audit.
-4. Clone into private/app and run git pull --ff-only origin main. Verify its commit against the reviewed local commit.
+4. Clone into private/app and run git pull --ff-only origin linkedin. Verify its commit against the reviewed local commit.
 5. Transfer .env directly over SCP and set production LAB_DATA_DIR. Restrict source/secret/data permissions. Do not transfer developer sessions, telemetry, benchmark votes, verification artifacts or screenshots.
 6. Run bash tools/publish-public.sh with the verified public_html path to publish only reviewed wrappers/assets, preserving robots.txt and backing up the old placeholder. Scope proxy/PHP timeout changes to this domain so long jury calls finish.
 7. Validate server configuration before graceful reload. Verify HTTPS, init_data, assets, cookie/CSRF behavior and denial of private paths.
 
 ## Subsequent deployment
 
-SSH to the registered server, cd to the exact private/app path, inspect git status, then git pull --ff-only origin main and bash tools/publish-public.sh /home/user/web/prisonlab.odehit.com/public_html. Do not force-reset remote changes or run migrations. Keep .env/private data out of Git and preserve permissions. Source is root-owned and readable by the domain application user; mutable data is owned by that application user.
+SSH to the registered server, cd to the exact private/app path, inspect git status, then git pull --ff-only origin linkedin and bash tools/publish-public.sh /home/user/web/prisonlab.odehit.com/public_html. Do not force-reset remote changes or run migrations. Keep .env/private data out of Git and preserve permissions. Source is root-owned and readable by the domain application user; mutable data is owned by that application user.
 
 Nginx may serve static JSON without consulting .htaccess. Source must stay outside public_html. The public publisher refuses unexpected source/target directory layouts and never copies source directories or private files. Never expose models.json, cases, lib, tests, tools, docs, .git, .env, backups or data directly.
 

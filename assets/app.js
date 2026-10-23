@@ -1,5 +1,10 @@
 const App = {
     models: [],
+    sponsors: [],
+    selectedSponsorId: sessionStorage.getItem('selected_sponsor_id') || '',
+    personalFunding() {return !!this.userApiKey && !this.selectedSponsorId;},
+    fundingCap() {return this.selectedSponsorId?(this.sponsors.find(r=>r.id===this.selectedSponsorId)?.price_cap ?? 1):this.personalFunding()?Infinity:1;},
+    modelLocked(m) {return !m || Math.max(Number(m.pricing?.prompt_per_1m ?? Infinity),Number(m.pricing?.completion_per_1m ?? Infinity))>this.fundingCap();},
     reasoningSelections: {prisoner:{},interrogator:{}},
     states: [],
     cases: [],
@@ -52,6 +57,8 @@ const App = {
 
         const data = await this.fetchData('api.php?action=init_data', { headers });
 
+        this.sponsors=data.sponsors || [];
+        if(this.selectedSponsorId && !this.sponsors.some(r=>r.id===this.selectedSponsorId && r.active))this.selectedSponsorId='';
         this.models = data.models || [];
         this.states = data.states || [];
         this.cases = data.cases || [];
@@ -84,11 +91,11 @@ const App = {
             'openai/gpt-4o-mini',
             'deepseek/deepseek-chat'
         ];
-        const focusPreferred=this.models.filter(m=>m.curated_tier==='focus_economic' && !m.is_locked)
+        const focusPreferred=this.models.filter(m=>m.curated_tier==='focus_economic' && !this.modelLocked(m))
             .sort((a,b)=>(a.usage_rank || 99999)-(b.usage_rank || 99999) || Number(b.created || 0)-Number(a.created || 0))[0];
-        let foundPreferred = focusPreferred || preferred.map(id => this.models.find(m => m.id === id && !m.is_locked)).find(Boolean);
+        let foundPreferred = focusPreferred || preferred.map(id => this.models.find(m => m.id === id && !this.modelLocked(m))).find(Boolean);
         if (!foundPreferred) {
-            foundPreferred = this.models.find(m => !m.is_locked) || this.models[0];
+            foundPreferred = this.models.find(m => !this.modelLocked(m)) || this.models[0];
         }
         if (foundPreferred) {
             this.selectedModelId = foundPreferred.id;
@@ -101,7 +108,8 @@ const App = {
         this.renderLogsList();
         this.bindEvents();
         this.updateControls();
-        this.renderAccount();if(this.participantProfile && this.userApiKey)this.refreshKeyBalance();
+        const linkedCase=new URL(location.href).searchParams.get('case_file');if(linkedCase && this.cases.some(c=>c.filename===linkedCase)){this.selectedCaseFilename=linkedCase;this.renderSelectedCaseSummary();}
+        this.renderAccount();SponsorUI.render();if(new URL(location.href).searchParams.get('sponsors')==='1')SponsorUI.open();if(this.participantProfile && this.userApiKey)this.refreshKeyBalance();
         document.getElementById('archive-modal-search').addEventListener('input', () => this.renderArchive());
         document.getElementById('model-sort').addEventListener('change',e=>{this.modelSort=e.target.value;this.renderModalModels();});
         document.querySelectorAll('.modal-overlay').forEach(el => el.addEventListener('click', e => {if(e.target === el) el.classList.remove('active');}));
@@ -277,7 +285,7 @@ const App = {
     },
 
     confirmSelectedCase() {
-        this.selectedCaseFilename = this.previewCaseFilename;
+        this.selectedCaseFilename = this.previewCaseFilename;LabSharing.setupLinks();
         this.renderSelectedModelSummary();
         const c = this.getSelectedCase();
         if (c) {
@@ -303,11 +311,12 @@ const App = {
         container.classList.toggle('connection-weak',!!m.health?.weak);
         const pIn = m.pricing?.prompt_per_1m ?? 0;
         const pOut = m.pricing?.completion_per_1m ?? 0;
+        LabSharing.setupLinks();
         const isLocked = !!m.is_locked;
 
         let statusBadge = '';
         if (isLocked) {
-            if (this.userApiKey) {
+            if (!this.modelLocked(m)) {
                 statusBadge = '<span class="model-card-badge badge-userkey">✓ مفعل بمفتاحك</span>';
                 tip.innerHTML = '<span style="color:#10b981;">✓ موديول متقدم (مفعّل باستخدام مفتاحك الخاص).</span>';
             } else {
@@ -320,6 +329,8 @@ const App = {
         }
 
         this.renderReasoningControl('prisoner',m);
+        if(this.modelLocked(m)) {statusBadge='<span class="model-card-badge badge-locked">يتجاوز حد التمويل المختار</span>';tip.textContent='اختر راعيًا بحد أعلى أو استخدم مفتاحك الشخصي.';}
+        else if(this.selectedSponsorId){statusBadge='<span class="model-card-badge badge-userkey">✓ تمويل الراعي متاح</span>';tip.textContent='التجربة التالية على نفقة الراعي المختار، ضمن حصتك لديه.';}
         container.innerHTML = `
             <span class="selected-model-icon">
                 ${m.icon_svg || '🤖'}
@@ -404,12 +415,13 @@ const App = {
         filtered.forEach(m => {
             const card = document.createElement('div');
             const isSelected = (m.id === (this.modelTarget === 'interrogator' ? this.selectedInterrogatorId : this.selectedModelId));
-            const isLocked = !!m.is_locked;
+            LabSharing.setupLinks();
+        const isLocked = !!m.is_locked;
 
             let cardClass = 'model-card';
             if (isSelected) cardClass += ' active';
-            if (isLocked && !this.userApiKey) cardClass += ' locked';
-            if (isLocked && this.userApiKey) cardClass += ' key-funded';
+            if (this.modelLocked(m)) cardClass += ' locked';
+            if (isLocked && !this.modelLocked(m)) cardClass += ' key-funded';
             const quality=m.performance?.[this.modelTarget];
             const bands=[m.health?.reliability_band,quality?.quality_band];
             const band=bands.includes('orange')?'orange':bands.includes('yellow')?'yellow':bands.includes('green')?'green':null;
@@ -421,7 +433,7 @@ const App = {
 
             let badgeHtml = '';
             if (isLocked) {
-                if (this.userApiKey) {
+                if (!this.modelLocked(m)) {
                     badgeHtml = '<span class="model-card-badge badge-userkey">✓ مفتاحك مفعل</span>';
                 } else {
                     badgeHtml = '<span class="model-card-badge badge-locked">🔒 متقدم (&gt; $1.00)</span>';
@@ -432,6 +444,8 @@ const App = {
 
             const descText = m.description_ar || `${m.name} نموذج ذكاء اصطناعي عبر منصة OpenRouter.`;
 
+            if(this.modelLocked(m))badgeHtml='<span class="model-card-badge badge-locked">يتجاوز حد التمويل</span>';
+            else if(this.selectedSponsorId)badgeHtml='<span class="model-card-badge badge-userkey">✓ تمويل الراعي متاح</span>';
             card.innerHTML = `
                 <div class="model-card-icon">
                     ${m.icon_svg || '🤖'}
@@ -455,7 +469,8 @@ const App = {
                 </div>
             `;
 
-            card.addEventListener('click', e => {if(!e.target.closest('details'))this.selectModalModel(m.id);});
+            card.appendChild(LabSharing.link('نتائج النموذج ورابطه ↗',LabSharing.model(m.id,this.modelTarget)));
+            card.addEventListener('click', e => {if(!e.target.closest('details,a,button'))this.selectModalModel(m.id);});
             container.appendChild(card);
         });
     },
@@ -495,10 +510,9 @@ const App = {
         const m = this.models.find(item => item.id === modelId);
         if (!m) return;
 
-        if (m.is_locked && !this.userApiKey) {
-            alert('عذراً لا تتوفر لدينا ميزانية لفتح هذه الموديولات، أرجو أن تستخدم مفتاحك في زر (استخدام مفتاحي) في الأعلى لتختبر هذا الموديول على نفقتك الخاصة.. ملاحظة: المفاتيح الخاصة تحفظ أثناء الزيارة فقط على متصفحك ولا يتم تخزين أي مفاتيح للزوار هنا.');
-            this.closeModelModal();
-            this.openKeyModal();
+        if (this.modelLocked(m)) {
+            this.notify('هذا النموذج يتجاوز حد جهة التمويل المختارة؛ اختر راعيًا بحد أعلى أو فعّل مفتاحك الشخصي.',true);
+            this.closeModelModal();SponsorUI.open();
             return;
         }
 
@@ -531,6 +545,7 @@ const App = {
         const old=this.userApiKey;this.userApiKey = val;
         if(val){try{this.keyBalance=(await this.api('key_balance')).balance;}catch(e){this.userApiKey=old;return this.notify('تعذر التحقق من المفتاح: '+e.message,true);}}
         if (val) {
+            this.selectedSponsorId='';this.startRequestId=null;sessionStorage.removeItem('selected_sponsor_id');
             sessionStorage.setItem('user_openrouter_api_key', val);
             this.notify('تم التحقق من مفتاحك. التجارب الجديدة ستكون على نفقتك؛ كل تجربة تحتفظ بمصدر تمويلها عند إنشائها.');
         } else {
@@ -557,7 +572,7 @@ const App = {
         const btn = document.getElementById('open-key-modal-btn');
         if (this.userApiKey) {
             const amount=this.keyBalance?.available_to_spend;
-            btn.textContent='🔑 مفتاحي مفعل ✓'+(amount!=null?' '+Number(amount).toFixed(2)+'$':' · الرصيد غير متاح');
+            btn.textContent=(this.selectedSponsorId?'🔑 مفتاحي محفوظ ✓':'🔑 مفتاحي مفعل ✓')+(amount!=null?' '+Number(amount).toFixed(2)+'$':' · الرصيد غير متاح');
             btn.classList.add('has-key');
         } else {
             btn.innerHTML = '🔑 استخدام مفتاحي';
@@ -743,8 +758,8 @@ const App = {
         const m=this.models.find(m=>m.id===this.selectedInterrogatorId);
         const card=document.getElementById('selected-interrogator-card');
         card.classList.toggle('connection-weak',!!m?.health?.weak);
-        card.innerHTML=m ? `<span class="selected-model-icon">${m.icon_svg || '🤖'}</span><span class="selected-model-info"><span class="model-summary-heading"><strong class="selected-model-name">${this.escapeHtml(m.name)}</strong><span class="model-change-label">تغيير ↗</span></span><span class="selected-model-meta"><span>${this.escapeHtml(m.context_formatted || '')} سياق</span><span>إدخال $${m.pricing.prompt_per_1m} · إخراج $${m.pricing.completion_per_1m} / مليون</span></span><span class="model-card-badge ${m.is_locked && !this.userApiKey?'badge-locked':this.userApiKey?'badge-userkey':'badge-unlocked'}">${m.is_locked?'نموذج احترافي':'خفيف / اقتصادي'}</span></span>` : 'اختر نموذج المحقق';
-        this.renderReasoningControl('interrogator',m);
+        card.innerHTML=m ? `<span class="selected-model-icon">${m.icon_svg || '🤖'}</span><span class="selected-model-info"><span class="model-summary-heading"><strong class="selected-model-name">${this.escapeHtml(m.name)}</strong><span class="model-change-label">تغيير ↗</span></span><span class="selected-model-meta"><span>${this.escapeHtml(m.context_formatted || '')} سياق</span><span>إدخال $${m.pricing.prompt_per_1m} · إخراج $${m.pricing.completion_per_1m} / مليون</span></span><span class="model-card-badge ${this.modelLocked(m)?'badge-locked':!m.is_locked?'badge-unlocked':'badge-userkey'}">${m.is_locked?'نموذج احترافي':'خفيف / اقتصادي'}</span></span>` : 'اختر نموذج المحقق';
+        this.renderReasoningControl('interrogator',m);LabSharing.setupLinks();
         const p=this.investigators.find(p=>p.id===this.selectedInvestigatorPersona);
         document.getElementById('selected-investigator-persona').innerHTML=p?`${LabView.investigatorAvatar(p)}<span><strong dir="ltr">${this.escapeHtml(p.name)}</strong><small>المستوى ${p.level}/10 · ${this.escapeHtml(p.level_ar)}</small><small>${this.escapeHtml(p.specialty)}</small></span><span>تغيير ←</span>`:'اختر شخصية المحقق';
     },
@@ -776,7 +791,7 @@ const App = {
             const c=this.getSelectedCase();
             this.startRequestId ||= this.requestId();
             const data=await this.api('start_session',{request_id:this.startRequestId,case_file:c.filename,model:this.selectedModelId,
-                interrogator_type:this.interrogationMode,interrogator_model:this.selectedInterrogatorId,interrogator_character:this.selectedInvestigatorPersona,prisoner_effort:this.reasoningSelection('prisoner'),interrogator_effort:this.reasoningSelection('interrogator')});
+                sponsor_id:this.selectedSponsorId,interrogator_type:this.interrogationMode,interrogator_model:this.selectedInterrogatorId,interrogator_character:this.selectedInvestigatorPersona,prisoner_effort:this.reasoningSelection('prisoner'),interrogator_effort:this.reasoningSelection('interrogator')});
             this.generation++; this.currentSession=data.session; this.stopRequested=false;this.aiPaused=false;
             this.startRequestId=null;this.quota=data.quota;this.renderAccount();
             this.renderActiveSession(); await this.reloadLogsOnly(); this.notify('بدأت الجلسة. حد الاستجواب 30 ردًا للسجين.');
@@ -787,7 +802,7 @@ const App = {
     },
     async reloadLogsOnly() {
         const d=await this.fetchData('api.php?action=init_data');
-        if(d.ok) {this.logs=d.logs;this.publishedLogs=d.published_logs;this.csrfToken=d.csrf_token;this.models=d.models;this.participantProfile=d.participant_profile;this.quota=d.quota;this.renderAccount();this.renderLogsList();}
+        if(d.ok) {this.logs=d.logs;this.publishedLogs=d.published_logs;this.csrfToken=d.csrf_token;this.models=d.models;this.sponsors=d.sponsors || [];this.participantProfile=d.participant_profile;this.quota=d.quota;this.renderAccount();this.renderLogsList();}
     },
     async loadSession(id) {
         if(this.busy || this.generating) return this.notify('انتظر انتهاء الجولة أو أنهِ التشغيل قبل فتح سجل آخر.',true);
@@ -1014,6 +1029,7 @@ const App = {
         }
     },
     renderAccount() {
+        SponsorUI.selection();LabSharing.setupLinks();
         const controls=document.getElementById('account-controls'),notice=document.getElementById('account-notice');controls.replaceChildren();notice.replaceChildren();
         if(!this.participantProfile){
             const a=document.createElement('a');a.href='auth.php?action=login';a.className='btn linkedin-share';a.textContent='الدخول عبر LinkedIn';controls.appendChild(a);
@@ -1021,8 +1037,8 @@ const App = {
         }
         const a=document.createElement('a');a.href='public.php?profile='+encodeURIComponent(this.participantProfile.public_id);a.textContent=this.participantProfile.display_name;a.className='account-name';controls.appendChild(a);
         const out=document.createElement('button');out.id='logout-btn';out.className='text-button';out.textContent='خروج';out.disabled=this.busy || this.generating;out.addEventListener('click',()=>this.logout());controls.appendChild(out);
-        const p=document.createElement('p');p.textContent=this.userApiKey?'مفتاحك مفعل: تجارب غير محدودة على نفقتك، ضمن رصيد المفتاح وحدود مزوده.':`تجارب الموقع اليوم: ${this.quota?.remaining ?? 0} من 3 متبقية · تتجدد منتصف الليل بتوقيت القدس.`;notice.appendChild(p);
-        if(!this.userApiKey && this.quota?.remaining===0){const p=document.createElement('p');p.textContent='شكرًا لمساهمتك! ميزانية الموقع محدودة؛ ننتظرك غدًا، أو استخدم مفتاحك الخاص لتجارب غير محدودة على نفقتك.';notice.appendChild(p);}
+        const p=document.createElement('p');p.textContent=this.selectedSponsorId?'تمويل الراعي المختار للتجربة التالية؛ حصة مستقلة لكل راعٍ.':this.userApiKey?'مفتاحك مفعل: تجارب غير محدودة على نفقتك، ضمن رصيد المفتاح وحدود مزوده.':`تجارب الموقع اليوم: ${this.quota?.remaining ?? 0} من ${this.quota?.limit ?? 3} متبقية · تتجدد منتصف الليل بتوقيت القدس.`;notice.appendChild(p);
+        if(!this.userApiKey && !this.selectedSponsorId && this.quota?.remaining===0){const p=document.createElement('p');p.textContent='شكرًا لمساهمتك! ميزانية الموقع محدودة؛ ننتظرك غدًا، أو استخدم مفتاحك الخاص لتجارب غير محدودة على نفقتك.';notice.appendChild(p);}
         if(this.userApiKey){const balance=document.createElement('p');balance.id='personal-key-balance';
             const b=this.keyBalance;balance.textContent=b?(b.available_to_spend!=null?`المتاح للإنفاق بهذا المفتاح: ${Number(b.available_to_spend).toFixed(2)}$${b.key_limit!=null?' · سقف المفتاح '+Number(b.key_limit).toFixed(2)+'$':''}`:'الرصيد غير متاح لهذا المفتاح؛ تحقق من حدوده لدى OpenRouter.'):'جارٍ التحقق من رصيد مفتاحك…';notice.appendChild(balance);
             const refresh=document.createElement('button');refresh.className='text-button';refresh.textContent='تحديث الرصيد';refresh.addEventListener('click',()=>this.refreshKeyBalance());notice.appendChild(refresh);

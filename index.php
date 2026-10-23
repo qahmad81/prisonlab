@@ -23,7 +23,7 @@
     </div>
     <div class="header-actions">
         <div id="account-controls" class="account-controls"><a href="auth.php?action=login" class="btn linkedin-share">الدخول عبر LinkedIn</a></div>
-        <nav class="brand-links" aria-label="معلومات الموقع"><a href="public.php?view=leaderboard">الترتيب والتجارب</a><a href="privacy.php">الخصوصية</a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer">تواصل معنا ↗</a></nav>
+        <a href="index.php?sponsors=1" class="text-button" id="open-sponsors-btn" onclick="event.preventDefault();SponsorUI.open()">الرعاة وتمويل التجارب</a><nav class="brand-links" aria-label="معلومات الموقع"><a href="public.php?view=leaderboard">الترتيب والتجارب</a><a href="privacy.php">الخصوصية</a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer">تواصل معنا ↗</a></nav>
         <div class="env-pills">
             <div class="env-pill">محرك المشاعر (SENSE): <strong id="sense-model-pill">typesafe/jev-1.14</strong></div>
             <div class="env-pill">موديل الضغط: <strong id="compact-model-pill">...</strong></div>
@@ -61,11 +61,13 @@
                 <div class="role-character-section">
                     <div class="role-section-label"><span>الشخصية والقضية</span><button type="button" id="open-case-modal-btn" class="role-change" onclick="App.openCaseModal()">استعراض القضايا ↗</button></div>
                     <button type="button" id="selected-case-summary" class="selected-case-card" onclick="App.openCaseModal()" title="تغيير شخصية المتهم والقضية"></button>
+                    <a id="case-share-link" class="text-button public-context-link" target="_blank" rel="noopener"></a>
                 </div>
                 <div class="role-representation">
                     <div class="role-section-label"><span>من يؤدي الدور؟</span><span id="prisoner-performer-type">نموذج ذكاء اصطناعي</span></div>
                     <div id="prisoner-model-group">
                         <button type="button" id="selected-model-card" class="selected-model-card" onclick="App.openModelModal('prisoner')" title="تغيير نموذج المتهم"></button>
+                    <a id="prisoner-share-link" class="text-button public-context-link" target="_blank" rel="noopener"></a>
                         <button type="button" id="prisoner-reasoning-btn" class="reasoning-control" onclick="App.openReasoningModal('prisoner')" aria-haspopup="dialog"></button>
                         <div id="model-status-tip" class="role-model-tip"></div>
                     </div>
@@ -84,12 +86,14 @@
                 <div class="role-character-section" id="interrogator-persona-group" hidden>
                     <div class="role-section-label"><span>شخصية المحقق ومستواه</span><span>ملف المحقق</span></div>
                     <button type="button" id="selected-investigator-persona" class="investigator-selected" onclick="App.openInvestigatorModal()"></button>
+                    <a id="investigator-share-link" class="text-button public-context-link" target="_blank" rel="noopener"></a>
                 </div>
                 <div id="human-investigator-character" class="human-character-note">أسلوبك، أسئلتك، وطريقتك في كشف الحقيقة.</div>
                 <div class="role-representation">
                     <div class="role-section-label"><span>من يؤدي الدور؟</span><span id="interrogator-performer-type">المشارك البشري</span></div>
                     <div id="interrogator-model-group" hidden>
                         <button type="button" id="selected-interrogator-card" class="selected-model-card" onclick="App.openModelModal('interrogator')" title="تغيير نموذج المحقق"></button>
+                    <a id="interrogator-share-link" class="text-button public-context-link" target="_blank" rel="noopener"></a>
                         <button type="button" id="interrogator-reasoning-btn" class="reasoning-control" onclick="App.openReasoningModal('interrogator')" aria-haspopup="dialog"></button>
                     </div>
                     <div id="interrogator-human-card" class="human-performer"></div>
@@ -98,6 +102,7 @@
             </article>
             <div id="reverse-role-brief" class="reverse-role-brief" hidden>أنت تؤدي دور المتهم من القضية المختارة. اقرأ خلفيته وأسراره في ملف القضية، ثم أجب بكلماتك. المحقق يبدأ، وله 30 جولة كحد أقصى. توجيهات JEV مقترحات لتمثيل الدور وليست قياسًا لمشاعرك.</div>
 
+            <p id="funding-selection" class="investigator-hint"></p>
             <p id="closure-policy-hint" class="investigator-hint">يمكن للطرفين طلب إنهاء التحقيق بكلام صريح يراجعه JEV. الهدف الطبيعي 5–15 جولة؛ توقيت الإنهاء ومبرره يؤثران في التقييم.</p>
             <button type="button" id="start-session-btn" class="btn btn-primary" style="margin-top:6px;">🚨 بدء جلسة استجواب جديدة</button>
 
@@ -363,6 +368,22 @@
 <div id="reasoning-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reasoning-title">
     <section class="reasoning-dialog"><header><h3 id="reasoning-title">مستوى التفكير</h3><button type="button" class="text-button" onclick="App.closeReasoningModal()" aria-label="إغلاق">×</button></header><p id="reasoning-model-name" dir="ltr"></p><div id="reasoning-options"></div><p class="reasoning-help">يطبق على التجربة التالية فقط. مستوى الشخصية وتعليماتها مستقلان عن ميزانية التفكير.</p></section>
 </div>
+<div id="sponsors-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="sponsors-title">
+<section class="sponsors-dialog"><header class="modal-header"><h2 id="sponsors-title">الرعاة · تجارب بتمويل المجتمع</h2><button type="button" class="text-button" onclick="document.getElementById('sponsors-modal').classList.remove('active')" aria-label="إغلاق الرعاة">×</button></header>
+<div class="sponsors-body"><p>اختر جهة تمويل للتجربة التالية. لكل حساب LinkedIn حصة يومية مستقلة لدى كل راعٍ، تتجدد منتصف الليل بتوقيت القدس. يشمل التمويل طرفَي الحوار وJEV وضغط السياق ولجنة التحكيم.</p>
+<div class="sponsor-funding-actions"><button type="button" class="btn btn-secondary" onclick="SponsorUI.choose('')">العودة لتمويل الموقع / مفتاحي</button><button type="button" class="btn btn-secondary" id="sponsor-personal" onclick="if(App.userApiKey)SponsorUI.choose('');else{document.getElementById('sponsors-modal').classList.remove('active');App.openKeyModal();}">استخدام مفتاحي الشخصي</button></div><div id="sponsor-list" class="sponsor-grid"></div>
+<p id="sponsor-auth-notice"><a href="auth.php?action=login">سجّل الدخول عبر LinkedIn لإضافة رعاية أو بدء تجربة.</a></p>
+<form id="sponsor-form" class="sponsor-form"><h3>أضف مفتاحًا راعيًا</h3><input type="hidden" name="id"><input type="hidden" name="revision">
+<label>اسم الراعي أو المؤسسة<input name="label" required minlength="2" maxlength="100" autocomplete="organization"></label>
+<label>مفتاح OpenRouter<input name="key" type="password" required maxlength="512" autocomplete="off" placeholder="sk-or-…" dir="ltr"></label>
+<label>عدد التجارب اليومية لكل حساب LinkedIn<input name="daily_limit" type="number" min="1" max="1000" value="3" required></label>
+<label>أقصى سعر إخراج لكل مليون توكن بالدولار<input name="price_cap" type="number" min="0" max="1000" step="0.01" value="1" required></label>
+<p>سعر الإدخال لا يتجاوز الحد نفسه. صفر يسمح بنماذج حوار مجانية فقط، وتبقى تكلفة JEV والضغط والتحكيم على المفتاح الراعي. هذه قيود داخل المختبر؛ اضبط ميزانية المفتاح الكلية في OpenRouter أيضًا.</p>
+<label class="sponsor-active"><input name="active" type="checkbox" checked> الرعاية مفعلة للزوار</label>
+<p>يرتبط المفتاح بحساب LinkedIn المسجل، ويُعرض اسم الراعي وصاحب الحساب ونسبة التمويل علنًا. لا يستطيع الراعي الاطلاع على المحادثات الخاصة التي موّلها. يُحفظ المفتاح مشفرًا على الخادم؛ يمكنك تبديله أو تغيير القيود أو حذفه. لا تُلغى الطلبات التي بدأت لدى المزود بالفعل، ولا تُصفّر حصص اليوم عند تعديل المفتاح.</p>
+<div><button class="btn btn-primary" type="submit">حفظ الرعاية</button><button class="text-button" type="button" onclick="SponsorUI.reset()">إضافة مفتاح آخر / إلغاء التعديل</button></div><p id="sponsor-save-status" role="status"></p></form></div></section></div>
+<script src="assets/sharing.js?v=<?= (int)filemtime(__DIR__.'/assets/sharing.js') ?>"></script>
+<script src="assets/sponsors.js?v=<?= (int)filemtime(__DIR__.'/assets/sponsors.js') ?>"></script>
 <script src="assets/session-view.js?v=<?= (int)filemtime(__DIR__ . "/assets/session-view.js") ?>"></script>
 <script src="assets/community.js?v=<?= (int)filemtime(__DIR__ . '/assets/community.js') ?>"></script>
 <script src="assets/app.js?v=<?= (int)filemtime(__DIR__ . "/assets/app.js") ?>"></script>

@@ -97,27 +97,30 @@ function labOAuthFinish(array $query,array $config):array {
 function labQuota(?array $a):array {
     $now=new DateTimeImmutable('now',new DateTimeZone('Asia/Jerusalem'));$day=$now->format('Y-m-d');$used=0;
     if($a){$path=$GLOBALS['lab_storage'].'/quota_'.$a['id'].'.json';if(is_file($path)){$q=labRead($path);if(($q['day'] ?? '')===$day)$used=(int)($q['used'] ?? count($q['session_ids'] ?? []));}}
-    return ['day'=>$day,'timezone'=>'Asia/Jerusalem','limit'=>3,'used'=>$used,'remaining'=>max(0,3-$used),
+    $limit=3;
+    if(function_exists('labSponsorSiteQuota')){$site=labSponsorSiteQuota($a);if($site){$limit=$site['daily_limit'];$used=$site['used'];}}
+    return ['day'=>$day,'timezone'=>'Asia/Jerusalem','limit'=>$limit,'used'=>$used,'remaining'=>max(0,$limit-$used),
         'resets_at'=>$now->modify('tomorrow')->setTime(0,0)->format(DateTimeInterface::ATOM)];
 }
 /** Serialize starts for one account. Keep reservations after deletion to prevent quota evasion. */
-function labAccountStart(array $account,array $s,string $requestId,string $userKey):array {
+function labAccountStart(array $account,array $s,string $requestId,string $userKey,?array $funding=null):array {
     if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException('معرّف إنشاء الجلسة مفقود');
     $file=$GLOBALS['lab_storage'].'/quota_'.$account['id'].'.json';$lock=fopen($file.'.lock','c');
     if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException('تعذر حجز التجربة');
     try {
         $q=is_file($file)?labRead($file):[];$quota=labQuota($account);
-        if(($q['day'] ?? '')!==$quota['day'])$q=['day'=>$quota['day'],'used'=>0,'requests'=>[]];
+        if(($q['day'] ?? '')!==$quota['day'])$q=['day'=>$quota['day'],'used'=>0,'requests'=>$q['requests'] ?? []];
         if(isset($q['requests'][$requestId])) {
             $path=$GLOBALS['lab_storage'].'/'.$q['requests'][$requestId].'.json';
             if(!is_file($path))throw new RuntimeException('هذه الجلسة حُذفت؛ ابدأ طلبًا جديدًا');return labRead($path);
         }
-        if($userKey==='' && (int)($q['used'] ?? 0)>=3)throw new RuntimeException('شكرًا لمساهمتك في المختبر! ميزانية الموقع محدودة، وقد استخدمت تجاربك الثلاث اليوم. عد غدًا لتجارب جديدة، أو أضف مفتاح OpenRouter الخاص بك لاستخدام غير محدود على نفقتك.');
+        if($userKey==='' && empty($funding['sponsor_id']) && (int)($q['used'] ?? 0)>=3)throw new RuntimeException('شكرًا لمساهمتك في المختبر! ميزانية الموقع محدودة، وقد استخدمت تجاربك الثلاث اليوم. عد غدًا لتجارب جديدة، أو أضف مفتاح OpenRouter الخاص بك لاستخدام غير محدود على نفقتك.');
         if($userKey!=='')labVisitorBalance($userKey);
-        $s['funding_source']=$userKey!==''?'personal':'site';
+        if(!empty($funding['sponsor_id']))labReserveSponsor($account,$s,$requestId,$funding,$q);
+        else $s['funding_source']=$userKey!==''?'personal':'site';
         if($userKey!=='')$s['key_fingerprint']=hash('sha256',$userKey);
         $s['operator_profile']=labAccountProfile($account);
-        $q['requests'][$requestId]=$s['session_id'];if($userKey==='')$q['used']=1+(int)($q['used'] ?? 0);
+        $q['requests'][$requestId]=$s['session_id'];if($userKey==='' && (empty($funding['sponsor_id']) || $funding['source']==='site'))$q['used']=1+(int)($q['used'] ?? 0);
         // Reserve before creating the session: a crash may consume a slot, never create a free extra session.
         labWrite($file,$q);labWrite($GLOBALS['lab_storage'].'/'.$s['session_id'].'.json',$s);return $s;
     }finally{flock($lock,LOCK_UN);fclose($lock);}
@@ -149,7 +152,7 @@ function labSessionCost(array $s):array {
     $total=0.;$reported=0;$calls=count($s['usage'] ?? []);
     foreach($s['usage'] ?? [] as $u)if(is_numeric($u['usage']['cost'] ?? null)){$total+=(float)$u['usage']['cost'];$reported++;}
     return ['total_usd'=>round($total,8),'reported_calls'=>$reported,'recorded_calls'=>$calls,'complete'=>$reported===$calls,
-        'funding_source'=>$s['funding_source'] ?? 'legacy','scope'=>'provider_reported'];
+        'funding_source'=>$s['funding_source'] ?? 'legacy','sponsor_label'=>$s['sponsor_label'] ?? null,'sponsor_profile'=>$s['sponsor_profile'] ?? null,'scope'=>'provider_reported'];
 }
 function labPublicSessions():array {
     $out=[];foreach(glob($GLOBALS['lab_storage'].'/session_*.json') as $file){$s=labReadSessionIfPresent($file);if(!$s)continue;
@@ -192,6 +195,12 @@ function labBenchmarkDelete(string $id):void {
 function labForgetStartReference(array $account,string $id):void {
     $file=$GLOBALS['lab_storage'].'/quota_'.$account['id'].'.json';$lock=fopen($file.'.lock','c');
     if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException('تعذر تنظيف مرجع الجلسة');
-    try{if(is_file($file)){$q=labRead($file);$q['requests']=array_filter($q['requests'] ?? [],fn($sid)=>$sid!==$id);labWrite($file,$q);}}
+    try{if(is_file($file)){$q=labRead($file);$q['requests']=array_filter($q['requests'] ?? [],fn($sid)=>$sid!==$id);foreach($q['sponsor_usage'] ?? [] as $day=>$donors)foreach($donors as $donor=>$requests)foreach($requests as $rid=>$sid)if($sid===$id)$q['sponsor_usage'][$day][$donor][$rid]='deleted';labWrite($file,$q);}}
     finally{flock($lock,LOCK_UN);fclose($lock);}
+}
+
+function labExistingAccountStart(array $a,string $requestId):?array {
+    if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException('معرف إنشاء الجلسة غير صالح');
+    $file=$GLOBALS['lab_storage'].'/quota_'.$a['id'].'.json';$lock=fopen($file.'.lock','c');if(!$lock || !flock($lock,LOCK_SH))throw new RuntimeException('تعذر قراءة سجل الإنشاء');
+    try{$q=is_file($file)?labRead($file):[];$id=$q['requests'][$requestId] ?? null;if(!$id)return null;$path=$GLOBALS['lab_storage'].'/'.$id.'.json';if(!is_file($path))throw new RuntimeException('هذه الجلسة حذفت؛ ابدأ طلبا جديدا');return labRead($path);}finally{flock($lock,LOCK_UN);fclose($lock);}
 }

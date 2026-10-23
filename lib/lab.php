@@ -66,6 +66,7 @@ function labUsage(array &$s, string $purpose, array $response, string $requested
 
 /** Transport can be replaced in deterministic tests; never controlled by HTTP input. */
 function labRequest(array $payload, string $key, bool $decisions = false, int $timeout = 65): array {
+    if(function_exists('labGuardFunding'))labGuardFunding();
     $start = microtime(true); $GLOBALS['lab_first_byte_ms'] = null;
     try {
         $res = labRequestOnce($payload,$key,$decisions,$timeout);
@@ -102,7 +103,10 @@ function labChat(array &$s, string $purpose, string $model, array $messages, str
     $payload = ['model' => $model, 'messages' => $messages, 'temperature' => $json ? 0.2 : 0.65, 'max_tokens' => $max];
     if ($json) $payload['response_format'] = ['type' => 'json_object'];
     if ($purpose === 'judge') $payload['provider'] = ['sort' => 'throughput', 'max_price' => ['prompt' => 10, 'completion' => 10]];
-    elseif (empty($GLOBALS['lab_user_key'])) $payload['provider'] = ['max_price' => ['prompt' => 1, 'completion' => 1]];
+    elseif (empty($GLOBALS['lab_user_key'])) {
+        $cap=in_array($purpose,['prisoner','interrogator'],true)?($GLOBALS['lab_actor_price_cap'] ?? 1):1;
+        $payload['provider']=['max_price'=>['prompt'=>$cap,'completion'=>$cap]];
+    }
     if (!in_array($purpose,['interrogator','prisoner'],true) && str_starts_with($model, 'deepseek/')) $payload['reasoning'] = ['enabled' => false];
     if(in_array($purpose,['interrogator','prisoner'],true)) {
         $policy=$s[$purpose.'_reasoning'] ?? [];
@@ -136,6 +140,7 @@ function labObject(string $text): array {
 }
 
 function labModel(string $id, array $models, bool $userKey, float $cap = 1.0): array {
+    $cap=$GLOBALS['lab_actor_price_cap'] ?? $cap;
     foreach ($models as $m) if ($m['id'] === $id) {
         $p = $m['pricing'] ?? [];
         if (!isset($p['prompt_per_1m'], $p['completion_per_1m'])) break;

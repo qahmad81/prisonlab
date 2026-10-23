@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/lib/lab.php';require_once __DIR__.'/lib/accounts.php';
+require_once __DIR__.'/lib/lab.php';require_once __DIR__.'/lib/accounts.php';require_once __DIR__.'/lib/sponsors.php';
 header('Cache-Control: no-store');header('X-Content-Type-Options: nosniff');
 $metaTitle='PrisonLab | تجارب مجتمع الذكاء الاصطناعي';$metaDescription='تجارب منشورة لمقارنة النماذج مع نتائج التحكيم والمراجعات والتكلفة.';$metaUrl='';$metaImage='';
 try{$publicEnv=labAccountBootstrap();$metaBase=labBaseUrl($publicEnv);$metaUrl=$metaBase.'/public.php';$metaImage=$metaBase.'/assets/branding/prisonlab-512.png';
@@ -11,6 +11,21 @@ try{$publicEnv=labAccountBootstrap();$metaBase=labBaseUrl($publicEnv);$metaUrl=$
         $metaTitle='PrisonLab | '.mb_substr($metaSession['case_title'],0,120);
         $metaDescription='تجربة منشورة · '.($metaSession['operator_profile']['display_name'] ?? 'المجتمع').' · السجين '.($metaSession['evaluation']['prisoner_score'] ?? '—').'/100 · المحقق '.($metaSession['evaluation']['investigator_score'] ?? '—').'/100 · التكلفة المبلغ عنها $'.labSessionCost($metaSession)['total_usd'];
         $metaUrl=$metaBase.'/public.php?session_id='.rawurlencode($metaSid);
+    }else {
+        $params=[];
+        foreach(['view','model','role','case_file','investigator','profile','tab','level','opponent_level','rubric'] as $k)if(is_string($_GET[$k] ?? null) && strlen($_GET[$k])<240)$params[$k]=$_GET[$k];
+        $metaUrl=$metaBase.'/public.php'.($params?'?'.http_build_query($params):'');
+        if(!empty($params['case_file'])){
+            $file=$params['case_file'];if(basename($file)!==$file || !preg_match('/^[a-zA-Z0-9_-]+\.md$/D',$file) || !is_file(__DIR__.'/cases/'.$file))throw new RuntimeException('missing');
+            preg_match('/^#\s+(.+)$/m',file_get_contents(__DIR__.'/cases/'.$file),$t);$metaTitle='PrisonLab | '.($t[1] ?? 'القضية');$metaDescription='ملف القضية وشخصية المتهم والتجارب المنشورة المرتبطة بهما.';
+        }elseif(!empty($params['investigator'])){$p=labInvestigator($params['investigator']);$metaTitle='PrisonLab | '.$p['name'];$metaDescription=$p['bio'];}
+        elseif(!empty($params['model'])){$found=null;foreach(labRead(__DIR__.'/models.json')['models'] as $m)if($m['id']===$params['model'])$found=$m;if(!$found)throw new RuntimeException('missing');$metaTitle='PrisonLab | '.$found['name'];$metaDescription='نتائج النموذج المنشورة في دور '.(($params['role'] ?? '')==='interrogator'?'المحقق':'المتهم').' مع روابط التجارب والتكلفة.';}
+        elseif(!empty($params['profile'])){
+            $profile=null;foreach(labPublicSessions() as $p)if(($p['operator_profile']['public_id'] ?? '')===$params['profile'])$profile=$p['operator_profile'];
+            if(!$profile)foreach(labPublicSessions() as $p)if(($p['sponsor_profile']['public_id'] ?? '')===$params['profile'])$profile=$p['sponsor_profile'];
+            if(!$profile)foreach(labSponsors(null) as $r)if($r['profile']['public_id']===$params['profile'])$profile=$r['profile'];
+            if($profile){$metaTitle='PrisonLab | '.$profile['display_name'];$metaDescription='التجارب المنشورة للمشارك: محقق، متهم، ومحاكاة بين النماذج، مع مصادر تمويلها.';}
+        }
     }
 }catch(Throwable $e){if(!empty($_GET['session_id'])){http_response_code(404);$metaTitle='PrisonLab | المحادثة غير متاحة';$metaDescription='هذه المحادثة غير منشورة أو حُذفت.';$metaUrl='';}}
 $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
@@ -120,6 +135,7 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
         </div>
     </section>
 
+    <section id="public-context-heading" class="profile-heading" hidden></section><div id="public-directory" class="community-filters"></div><div id="public-share-control" class="public-toolbar"></div>
     <section id="public-profile-heading" hidden></section>
     <div class="public-toolbar"><button class="btn btn-secondary" id="show-gallery">المحادثات المنشورة</button><button class="btn btn-secondary" id="show-leaderboard">ترتيب النماذج · Leaderboard</button><a href="public.php" id="all-profiles-link" hidden>جميع المشاركين</a></div>
     <section id="community-leaderboard" class="community-board" hidden>
@@ -163,6 +179,7 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
 </div>
 
 <script src="assets/session-view.js?v=<?= (int)filemtime(__DIR__ . "/assets/session-view.js") ?>"></script>
+<script src="assets/sharing.js?v=<?= (int)filemtime(__DIR__.'/assets/sharing.js') ?>"></script>
 <script src="assets/community.js?v=<?= (int)filemtime(__DIR__ . '/assets/community.js') ?>"></script>
 <script src="assets/public-community.js?v=<?= (int)filemtime(__DIR__ . '/assets/public-community.js') ?>"></script>
 <script>
@@ -171,6 +188,7 @@ let publishedSessions = [];
 async function loadPublicData() {
     const data = await LabCommunity.fetchJson('api.php?action=public_sessions');
 
+    PublicCommunity.catalog=data;
     publishedSessions = (data.logs || []).filter(l => l.is_published);
     PublicCommunity.setup(publishedSessions);
     const requestedProfile=new URLSearchParams(location.search).get('profile');
@@ -206,7 +224,7 @@ function renderPublicGrid(q) {
     container.innerHTML = '';
 
     const query = q.trim().toLowerCase();
-    const filtered = publishedSessions.filter(s => {
+    const filtered = PublicCommunity.filterSessions(publishedSessions).filter(s => {
         if (!query) return true;
         return (s.case_title && s.case_title.toLowerCase().includes(query)) ||
                (s.model && s.model.toLowerCase().includes(query)) ||
@@ -264,6 +282,9 @@ function renderPublicGrid(q) {
         card.appendChild(LabCommunity.operator(s));const cost=document.createElement('p');cost.className='archive-cost';cost.textContent=LabCommunity.cost(s);card.appendChild(cost);
         for(const [role,review] of Object.entries(s.user_reviews || {})){const p=document.createElement('p');p.className='archive-cost';p.textContent=`مراجعته للموديل ${role==='prisoner'?'المتهم':'المحقق'} · ${review.rating}/5: ${review.text}`;card.appendChild(p);}
         card.addEventListener('click',e=>{if(!e.target.closest('a'))openSessionReader(s.session_id);});
+        card.appendChild(LabSharing.link('القضية والشخصية ↗',LabSharing.case(s.case_file)));
+        if(s.interrogator_type!=='reverse')card.appendChild(LabSharing.link('نتائج نموذج المتهم ↗',LabSharing.model(s.model,'prisoner')));
+        if(s.interrogator_type!=='human')card.appendChild(LabSharing.link('نتائج نموذج المحقق ↗',LabSharing.model(s.interrogator_model,'interrogator')));
         container.appendChild(card);
     });
 }
@@ -290,10 +311,12 @@ async function openSessionReader(sessionId) {
     chatBox.appendChild(LabCommunity.result({...s,can_delete:false}));
     if(s.evaluation)chatBox.appendChild(LabView.benchmark({...s,can_review:false}));
     const link=document.createElement('a');link.href='public.php?session_id='+encodeURIComponent(s.session_id);link.textContent='رابط مشاركة هذه الجلسة';link.className='btn btn-secondary';chatBox.appendChild(link);
+    const direct=new URL(location.href);direct.searchParams.set('session_id',s.session_id);history.replaceState(null,'',direct);
     document.getElementById('session-reader-modal').classList.add('active');
 }
 
 function closeReaderModal() {
+    const direct=new URL(location.href);direct.searchParams.delete('session_id');history.replaceState(null,'',direct);
     document.getElementById('session-reader-modal').classList.remove('active');
 }
 
