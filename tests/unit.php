@@ -140,3 +140,21 @@ $bad=$verbose;$bad['role']='interrogator';$rejected=false;
 try{labValidateIncidents([$bad],$bounded);}catch(RuntimeException){$rejected=true;}
 check($rejected,'output overrun attributed to wrong model role');
 echo "PASS unit: immutable identity/case, spoken-only compaction, persistent deduplicated notes, investigator thought isolation, factual connection health.\n";
+
+// Explicit reasoning choices, legacy preservation and actor watchdogs.
+$catalog=labRead(dirname(__DIR__).'/models.json')['models'];
+$gpt=labModel('openai/gpt-6.1-sol',$catalog,true);
+$argon=labModel('google/gemini-4-argon',$catalog,true);
+check(labReasoningCapabilities($gpt)['efforts']===['low','medium','high','xhigh','max'],'GPT effort choices differ from catalog');
+check(labReasoningCapabilities($argon)['efforts']===['low','medium','high'],'Argon effort choices differ from catalog');
+check(!labReasoningCapabilities(['reasoning'=>['mandatory'=>false]])['efforts'],'missing efforts fabricated options');
+check(count(labReasoningCapabilities(['reasoning'=>['supported_efforts'=>null]])['efforts'])===7,'explicit null should support gateway efforts');
+foreach(['none','minimal','bogus'] as $invalid){$failed=false;try{labInvestigatorReasoning($profiles[9],$gpt,$invalid);}catch(RuntimeException){$failed=true;}check($failed,'invalid or mandatory-disabled effort accepted');}
+$manual=labInvestigatorReasoning($profiles[9],$gpt,'low');check($manual['source']==='manual' && $manual['effort']==='low','manual effort ignored');
+$session=['case_file'=>'char_1_victor_vance.md','interrogator_type'=>'human','model'=>$gpt['id'],'prisoner_reasoning'=>$manual];
+labSessionLevels($session,$catalog);check($session['prisoner_reasoning']===$manual,'per-turn levels overwrote saved reasoning');
+$timed=[];$GLOBALS['lab_transport']=function($payload,$key,$decisions,$timeout)use(&$timed){$timed[]=$timeout;return ['choices'=>[['message'=>['content'=>'ok'],'finish_reason'=>'stop']]];};
+labChat($session,'prisoner',$gpt['id'],[],'test');labChat($session,'interrogator',$argon['id'],[],'test');labChat($session,'judge','test/judge',[],'test');
+check($timed===[300,300,180],'actor watchdog not independent from judge watchdog');
+unset($GLOBALS['lab_transport']);
+echo "PASS reasoning: declared choices, strict validation, immutable manual settings and 300-second actor timeouts.\n";

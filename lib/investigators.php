@@ -26,29 +26,37 @@ function labInterrogationFocus():string {
         ."الغاية كشف رواية دقيقة واعتراف جوهري صحيح إن وقع، لا انتزاع موافقة أو تلقين المتهم سرًا من الملف. لا تكشف الأسرار بدلًا منه، ولا تختلق دليلًا أو تعتبر ادعاء المتهم حقيقة مثبتة. المبتدئ يلتزم هذا التركيز بأسئلة بسيطة، والخبير بربط أدق للحوار، لا بخروج أكبر عن المتهم.";
 }
 
-/** Respect catalog effort choices; never promise control over unsupported models. */
-function labInvestigatorReasoning(array $p,array $model):array {
+/** Only catalog-declared controls may be selected; missing efforts are not all efforts. */
+function labReasoningCapabilities(array $model):array {
     $meta=$model['reasoning'] ?? [];
-    $supported=$model['supported_parameters'] ?? [];
-    if(!$meta && !in_array('reasoning',$supported,true) && !in_array('reasoning_effort',$supported,true))
-        return ['supported'=>false,'requested'=>$p['thinking'],'note'=>'يعتمد مستوى الشخصية على تعليماتها؛ النموذج لا يعلن تحكمًا في التفكير.'];
-    $efforts=$meta['supported_efforts'] ?? null;
+    $params=$model['supported_parameters'] ?? [];
+    $reasoning=(bool)$meta || in_array('reasoning',$params,true) || in_array('reasoning_effort',$params,true);
     $order=['none','minimal','low','medium','high','xhigh','max'];
-    if(is_array($efforts))$order=array_values(array_filter($order,fn($e)=>in_array($e,$efforts,true)));
-    if(!empty($meta['mandatory']))$order=array_values(array_diff($order,['none']));
-    if(!$order)return ['supported'=>false,'requested'=>$p['thinking'],'note'=>'لا توجد مستويات تفكير معلنة قابلة للاختيار.'];
-    $wanted=$p['thinking'];
-    // For legacy catalogs, use the widely supported high rather than claiming max.
-    if($wanted==='highest')$effort=is_array($efforts)?end($order):'high';
+    $efforts=[];
+    if(array_key_exists('supported_efforts',$meta)) {
+        $efforts=$meta['supported_efforts']===null?$order:array_values(array_intersect($order,(array)$meta['supported_efforts']));
+    }
+    if(!empty($meta['mandatory']))$efforts=array_values(array_diff($efforts,['none']));
+    return ['has_reasoning'=>$reasoning,'efforts'=>$efforts,'mandatory'=>!empty($meta['mandatory']),
+        'default_effort'=>$meta['default_effort'] ?? null,'default_enabled'=>$meta['default_enabled'] ?? null];
+}
+
+function labInvestigatorReasoning(array $p,array $model,string $selection='auto'):array {
+    $c=labReasoningCapabilities($model);$order=$c['efforts'];$wanted=$p['thinking'];
+    if($selection!=='auto' && !in_array($selection,$order,true))throw new RuntimeException('مستوى التفكير المحدد غير متاح لهذا النموذج؛ اختر من مستوياته المعلنة.');
+    $base=['supported'=>(bool)$order,'has_reasoning'=>$c['has_reasoning'],'requested'=>$wanted,'source'=>$selection==='auto'?'character':'manual'];
+    if(!$order)return $base+['config'=>$c['has_reasoning']?['exclude'=>true]:[],
+        'note'=>$c['has_reasoning']?'استدلال بإعداد المزود؛ لا يعلن مستويات قابلة للاختيار.':'بلا استدلال معلن؛ مستوى الشخصية بالتعليمات.'];
+    if($selection!=='auto')$effort=$selection;
+    elseif($wanted==='highest')$effort=end($order);
     elseif(in_array($wanted,$order,true))$effort=$wanted;
     else {
-        $rank=array_search($wanted,['none','minimal','low','medium','high','xhigh','max'],true);
-        $effort=$order[0];$best=PHP_INT_MAX;
+        $ranks=['none','minimal','low','medium','high','xhigh','max'];
+        $rank=array_search($wanted,$ranks,true);$effort=$order[0];$best=PHP_INT_MAX;
         foreach($order as $candidate) {
-            $distance=abs(array_search($candidate,['none','minimal','low','medium','high','xhigh','max'],true)-$rank);
+            $distance=abs(array_search($candidate,$ranks,true)-$rank);
             if($distance<$best){$best=$distance;$effort=$candidate;}
         }
     }
-    return ['supported'=>true,'requested'=>$wanted,'effort'=>$effort,'config'=>['effort'=>$effort,'exclude'=>true],
-        'note'=>is_array($efforts)?'حسب مستويات النموذج المعلنة':'حسب دعم المزود؛ كتالوج النموذج لا يحدد قائمة المستويات.'];
+    return $base+['effort'=>$effort,'config'=>['effort'=>$effort,'exclude'=>true],'note'=>'حسب مستويات النموذج المعلنة؛ ثابت لهذه التجربة.'];
 }

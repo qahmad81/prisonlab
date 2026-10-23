@@ -99,6 +99,7 @@ function labBenchmarkSave(array $s,?array $review=null):void {
             $key=$s['session_id'].':'.$role;$old=$data[$key] ?? [];
             $entry=['session_id'=>$s['session_id'],'role'=>$role,'model'=>$model,'case_file'=>$s['case_file'],
                 'level'=>$s[$role==='prisoner'?'prisoner_character':'interrogator_character']['level'] ?? null,
+                'reasoning'=>$s[$role.'_reasoning'] ?? null,'opponent_reasoning'=>$s[($role==='prisoner'?'interrogator':'prisoner').'_reasoning'] ?? null,
                 'opponent_model'=>$role==='prisoner'?($s['interrogator_model'] ?: null):($s['model'] ?: null),
                 'providers'=>array_values(array_unique(array_filter(array_column(array_filter($s['usage'] ?? [],fn($u)=>$u['purpose']===$role),'provider'),'is_string'))),
                 'rubric_version'=>$s['evaluation']['rubric_version'] ?? null,'turns'=>labTurns($s),

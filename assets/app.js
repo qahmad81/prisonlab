@@ -1,5 +1,6 @@
 const App = {
     models: [],
+    reasoningSelections: {prisoner:{},interrogator:{}},
     states: [],
     cases: [],
     investigators: [],
@@ -276,6 +277,7 @@ const App = {
 
     confirmSelectedCase() {
         this.selectedCaseFilename = this.previewCaseFilename;
+        this.renderSelectedModelSummary();
         const c = this.getSelectedCase();
         if (c) {
             this.setCaseCharacter(c);
@@ -316,6 +318,7 @@ const App = {
             tip.innerHTML = this.userApiKey ? '<span style="color:#10b981;">✓ سيُستخدم مفتاحك الشخصي لهذا النموذج؛ لا يوجد حد يومي للتجارب.</span>' : '<span style="color:#94a3b8;">✓ موديول خفيف متاح على نفقة المشغّل.</span>';
         }
 
+        this.renderReasoningControl('prisoner',m);
         container.innerHTML = `
             <span class="selected-model-icon">
                 ${m.icon_svg || '🤖'}
@@ -442,7 +445,7 @@ const App = {
                     </div>
                     <div class="model-card-footer">
                         <span class="model-card-price">$${pIn} In / $${pOut} Out / مليون</span>
-                        <span class="model-card-context">${m.context_formatted || '128K'}</span>
+                        <span class="reasoning-badge">${LabView.escape(LabView.reasoningLabel(this.reasoningPreview(this.modelTarget,m)))}</span><span class="model-card-context">${m.context_formatted || '128K'}</span>
                     </div>
                     <div class="model-discovery-meta">${m.created ? new Date(m.created*1000).toLocaleDateString('ar') : 'تاريخ غير متوفر'}${m.usage_rank ? ` · الاستخدام #${m.usage_rank}` : ''}</div>
                     ${m.curated_family?`<div class="curated-family">${this.escapeHtml(m.curated_family)} · إصدار رسمي مختار</div>`:''}
@@ -614,15 +617,27 @@ const App = {
         const canRetry=['send_message','ai_vs_ai_step','reverse_question','reverse_answer','retry_confession','evaluate_session','compact_now'].includes(action);
         if(action==='compact_now' && !payload.request_id)payload={...payload,request_id:this.requestId()};
         const body=JSON.stringify({action,...payload});
+        const busyDeadline=Date.now()+1020000;
         const firstAttempt=retryContext.priorFailure?1:0;
         if(firstAttempt) {this.notify('تعذر فحص الاعتراف بعد حفظ الرد. المحاولة الثانية بعد 10 ثوانٍ.',true);await this.retryWait(10000);}
         for(let attempt=firstAttempt;attempt<3;attempt++) {
             try {
                 let res;
-                try {res=await fetch('api.php',{method:'POST',signal:AbortSignal.timeout(650000),headers:{'Content-Type':'application/json','X-CSRF-Token':this.csrfToken,...(this.userApiKey?{'X-User-OpenRouter-Key':this.userApiKey}:{})},body});}
+                try {res=await fetch('api.php',{method:'POST',signal:AbortSignal.timeout(1020000),headers:{'Content-Type':'application/json','X-CSRF-Token':this.csrfToken,...(this.userApiKey?{'X-User-OpenRouter-Key':this.userApiKey}:{})},body});}
                 catch(e) {throw Object.assign(new Error('تعذر الاتصال بالخادم.'),{retryable:true});}
                 let data;
                 try {data=await res.json();}catch {throw Object.assign(new Error('تعذر قراءة استجابة الخادم.'),{retryable:res.status>=500});}
+                if(res.status===409 && data.busy && canRetry && payload.session_id) {
+                    this.notify('الخادم ما زال يُكمل الطلب السابق؛ ننتظره دون تكرار الاستدعاء المدفوع.');
+                    let progress;
+                    do {
+                        if(Date.now()>busyDeadline)throw new Error('ما زال الطلب قيد التنفيذ. المراحل محفوظة؛ أعد فتح الجلسة لاحقًا.');
+                        await this.retryWait(3000);
+                        progress=await this.fetchData('api.php?action=load_session&session_id='+encodeURIComponent(payload.session_id));
+                    }while(progress.processing);
+                    // Replay the identical ID only after release; server idempotence returns saved work.
+                    attempt--;continue;
+                }
                 if(!data.ok)throw Object.assign(new Error(data.error || 'تعذر تنفيذ الطلب'),{retryable:!!data.retryable || [502,503,504].includes(res.status)});
                 if(action==='evaluate_session' && data.session?.evaluation_status==='failed') {
                     this.currentSession=data.session;
@@ -638,6 +653,45 @@ const App = {
             }
         }
     },
+    reasoningSelection(role) {
+        const id=role==='prisoner'?this.selectedModelId:this.selectedInterrogatorId;
+        return this.reasoningSelections[role][id] || 'auto';
+    },
+    reasoningPreview(role,m) {
+        const c=m?.reasoning_capabilities || {}, choice=this.reasoningSelections[role][m?.id] || 'auto';
+        if(!c.efforts?.length)return {supported:false,has_reasoning:c.has_reasoning};
+        if(choice!=='auto' && c.efforts.includes(choice))return {supported:true,effort:choice};
+        const wanted=role==='prisoner'?this.getSelectedCase()?.difficulty?.thinking:this.investigators.find(p=>p.id===this.selectedInvestigatorPersona)?.thinking;
+        const ranks=['none','minimal','low','medium','high','xhigh','max'];
+        const effort=wanted==='highest'?c.efforts.at(-1):c.efforts.reduce((a,b)=>Math.abs(ranks.indexOf(b)-ranks.indexOf(wanted))<Math.abs(ranks.indexOf(a)-ranks.indexOf(wanted))?b:a,c.efforts[0]);
+        return {supported:true,effort};
+    },
+    renderReasoningControl(role,m) {
+        const button=document.getElementById(role+'-reasoning-btn');
+        if(!button)return;
+        const adjustable=!!m?.reasoning_capabilities?.efforts?.length;
+        button.textContent=LabView.reasoningLabel(this.reasoningPreview(role,m))+(adjustable?' · تعديل ↗':'');
+        button.disabled=!m || !adjustable;
+        button.title='إعداد التجربة التالية؛ لا يغيّر الجلسة الحالية';
+    },
+    openReasoningModal(role) {
+        const id=role==='prisoner'?this.selectedModelId:this.selectedInterrogatorId,m=this.models.find(m=>m.id===id);
+        const efforts=m?.reasoning_capabilities?.efforts || [];if(!efforts.length)return;
+        this.reasoningReturnFocus=document.activeElement;
+        const box=document.getElementById('reasoning-options');box.replaceChildren();
+        document.getElementById('reasoning-model-name').textContent=m.name;
+        for(const choice of ['auto',...efforts]) {
+            const b=document.createElement('button');b.type='button';b.className='reasoning-option';b.dataset.effort=choice;
+            b.textContent=choice==='auto'?'تلقائي · حسب مستوى الشخصية':LabView.reasoningNames[choice];
+            b.setAttribute('aria-pressed',String(this.reasoningSelection(role)===choice));
+            b.addEventListener('click',()=>{this.reasoningSelections[role][id]=choice;this.startRequestId=null;this.renderSelectedModelSummary();this.renderInterrogatorSummary();this.closeReasoningModal();});box.appendChild(b);
+        }
+        document.getElementById('connection-toast').hidden=true;
+        const modal=document.getElementById('reasoning-modal');
+        modal.onkeydown=e=>{if(e.key==='Escape'){e.preventDefault();this.closeReasoningModal();}if(e.key==='Tab'){const items=[...modal.querySelectorAll('button')],first=items[0],last=items.at(-1);if(e.shiftKey && document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey && document.activeElement===last){e.preventDefault();first.focus();}}};
+        modal.classList.add('active');box.querySelector('button').focus();
+    },
+    closeReasoningModal() {document.getElementById('reasoning-modal').classList.remove('active');this.reasoningReturnFocus?.focus();},
     retryWait(ms) {return new Promise(resolve=>setTimeout(resolve,ms));},
     notify(text, error = false) {
         const el=document.getElementById('session-notice'); el.textContent=text; el.classList.toggle('error-text',error);
@@ -670,6 +724,7 @@ const App = {
     },
     swapRoles() {
         if(this.busy || this.generating)return;
+        [this.reasoningSelections.prisoner,this.reasoningSelections.interrogator]=[this.reasoningSelections.interrogator,this.reasoningSelections.prisoner];
         [this.selectedModelId,this.selectedInterrogatorId]=[this.selectedInterrogatorId,this.selectedModelId];
         this.setInterrogationMode(this.interrogationMode==='ai'?'ai':this.interrogationMode==='human'?'reverse':'human');
         this.updateControls();
@@ -682,6 +737,7 @@ const App = {
         const card=document.getElementById('selected-interrogator-card');
         card.classList.toggle('connection-weak',!!m?.health?.weak);
         card.innerHTML=m ? `<span class="selected-model-icon">${m.icon_svg || '🤖'}</span><span class="selected-model-info"><span class="model-summary-heading"><strong class="selected-model-name">${this.escapeHtml(m.name)}</strong><span class="model-change-label">تغيير ↗</span></span><span class="selected-model-meta"><span>${this.escapeHtml(m.context_formatted || '')} سياق</span><span>إدخال $${m.pricing.prompt_per_1m} · إخراج $${m.pricing.completion_per_1m} / مليون</span></span><span class="model-card-badge ${m.is_locked && !this.userApiKey?'badge-locked':this.userApiKey?'badge-userkey':'badge-unlocked'}">${m.is_locked?'نموذج احترافي':'خفيف / اقتصادي'}</span></span>` : 'اختر نموذج المحقق';
+        this.renderReasoningControl('interrogator',m);
         const p=this.investigators.find(p=>p.id===this.selectedInvestigatorPersona);
         document.getElementById('selected-investigator-persona').innerHTML=p?`${LabView.investigatorAvatar(p)}<span><strong dir="ltr">${this.escapeHtml(p.name)}</strong><small>المستوى ${p.level}/10 · ${this.escapeHtml(p.level_ar)}</small><small>${this.escapeHtml(p.specialty)}</small></span><span>تغيير ←</span>`:'اختر شخصية المحقق';
     },
@@ -711,7 +767,7 @@ const App = {
             const c=this.getSelectedCase();
             this.startRequestId ||= this.requestId();
             const data=await this.api('start_session',{request_id:this.startRequestId,case_file:c.filename,model:this.selectedModelId,
-                interrogator_type:this.interrogationMode,interrogator_model:this.selectedInterrogatorId,interrogator_character:this.selectedInvestigatorPersona});
+                interrogator_type:this.interrogationMode,interrogator_model:this.selectedInterrogatorId,interrogator_character:this.selectedInvestigatorPersona,prisoner_effort:this.reasoningSelection('prisoner'),interrogator_effort:this.reasoningSelection('interrogator')});
             this.generation++; this.currentSession=data.session; this.stopRequested=false;this.aiPaused=false;
             this.startRequestId=null;this.renderAccount();
             this.renderActiveSession(); await this.reloadLogsOnly(); this.notify('بدأت الجلسة. حد الاستجواب 30 ردًا للسجين.');
@@ -941,6 +997,7 @@ const App = {
         for(const s of logs){
             const card=document.createElement('div');card.className='archive-card';card.tabIndex=0;card.setAttribute('role','button');
             card.innerHTML=`<div class="archive-card-top"><img class="archive-card-avatar" src="${LabView.face(s.character_slug,s.current_state)}" alt=""><div class="archive-card-header-info"><div class="archive-card-name">${this.escapeHtml(s.case_title)}</div><div class="archive-card-roles">المحقق: ${this.escapeHtml(s.interrogator_type!=='human'?(s.interrogator_character?.name || '')+' · '+s.interrogator_model:'بشري')}</div><div class="archive-card-roles">السجين: ${this.escapeHtml(s.interrogator_type==='reverse'?'أنت · متهم بشري':s.model)}</div></div></div><div class="archive-card-body"><span>${s.turns_count} / 30 جولة · ${s.is_ended?'منتهية':'قيد التحقيق'}</span><progress max="30" value="${s.turns_count}"></progress>${s.evaluation?`<strong>السجين ${s.evaluation.prisoner_score ?? s.evaluation.overall_score} · المحقق ${s.evaluation.investigator_score ?? '—'}</strong>`:''}</div>`;
+            card.insertAdjacentHTML('beforeend',LabView.participants(s));
             const cost=document.createElement('p');cost.className='archive-cost';cost.textContent=LabCommunity.cost(s);card.appendChild(cost);
             const open=()=>this.loadSession(s.session_id);card.addEventListener('click',open);card.addEventListener('keydown',e=>{if(e.target===card && (e.key==='Enter' || e.key===' ')){e.preventDefault();open();}});
             if(this.archiveMode!=='public') {const remove=document.createElement('button');remove.className='btn danger-outline archive-delete';remove.textContent='حذف نهائي';remove.addEventListener('click',e=>{e.stopPropagation();this.deleteSession(s.session_id);});card.appendChild(remove);}

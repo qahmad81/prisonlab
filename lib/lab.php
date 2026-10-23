@@ -77,7 +77,7 @@ function labRequest(array $payload, string $key, bool $decisions = false, int $t
 }
 
 function labRequestOnce(array $payload, string $key, bool $decisions = false, int $timeout = 65): array {
-    if (isset($GLOBALS['lab_transport'])) return ($GLOBALS['lab_transport'])($payload, $key, $decisions);
+    if (isset($GLOBALS['lab_transport'])) return ($GLOBALS['lab_transport'])($payload, $key, $decisions, $timeout);
     if ($key === '') throw new RuntimeException('مفتاح OpenRouter غير متوفر. أضف مفتاحك من أعلى الصفحة.');
     $ch = curl_init('https://openrouter.ai/api/' . ($decisions ? 'alpha/decisions' : 'v1/chat/completions'));
     curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
@@ -102,21 +102,21 @@ function labChat(array &$s, string $purpose, string $model, array $messages, str
     if ($json) $payload['response_format'] = ['type' => 'json_object'];
     if ($purpose === 'judge') $payload['provider'] = ['sort' => 'throughput', 'max_price' => ['prompt' => 10, 'completion' => 10]];
     elseif (empty($GLOBALS['lab_user_key'])) $payload['provider'] = ['max_price' => ['prompt' => 1, 'completion' => 1]];
-    if (str_starts_with($model, 'deepseek/')) $payload['reasoning'] = ['enabled' => false];
+    if (!in_array($purpose,['interrogator','prisoner'],true) && str_starts_with($model, 'deepseek/')) $payload['reasoning'] = ['enabled' => false];
     if(in_array($purpose,['interrogator','prisoner'],true)) {
         $policy=$s[$purpose.'_reasoning'] ?? [];
         $budget=$s[$purpose.'_output_budget'] ?? $max;
         $payload['max_tokens']=min($max,$budget);
-        if(!empty($policy['supported'])) {
+        if(!empty($policy['config'])) {
             $payload['reasoning']=$policy['config'];
-            if(!in_array($policy['effort'],['none','minimal','low'],true))$payload['max_tokens']=$budget;
+            if(!in_array($policy['effort'] ?? null,['none','minimal','low'],true))$payload['max_tokens']=$budget;
         }
     }
     if(in_array($purpose,['interrogator','prisoner'],true)) {
         $events=array_filter($s['output_events'] ?? [],fn($e)=>$e['role']===$purpose && $e['turn']===labTurns($s)+1 && in_array($e['kind'],['visible_limit','token_limit'],true));
         if($events)$payload['messages'][]=['role'=>'system','content'=>'المحاولة السابقة تجاوزت ميزانية الإخراج. لا تعِد النص السابق؛ أجب بأقل من نصف الحد وأغلق JSON، واختصر الملاحظة الاختيارية أو احذفها.'.labOutputInstruction($purpose)];
     }
-    $r = labRequest($payload, $key, false, $purpose === 'judge' ? 180 : 65);
+    $r = labRequest($payload, $key, false, in_array($purpose,['interrogator','prisoner'],true) ? 300 : ($purpose === 'judge' ? 180 : 65));
     labUsage($s, $purpose, $r, $model);
     if (($r['choices'][0]['finish_reason'] ?? '') === 'length') {
         if(in_array($purpose,['interrogator','prisoner'],true))labOutputEvent($s,$purpose,$model,'token_limit',['max_tokens'=>$payload['max_tokens'],'completion_tokens'=>$r['usage']['completion_tokens'] ?? null]);

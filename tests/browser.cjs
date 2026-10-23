@@ -22,6 +22,23 @@ if(!chrome && process.platform==='win32') {
         await page.goto(base);await page.waitForFunction(()=>App.models.length>0);
         assert.equal(await page.evaluate(()=>App.models.find(m=>m.id===App.selectedModelId)?.curated_tier),'focus_economic');
         assert.equal(await page.locator('#states-gallery').isVisible(),false);
+        // Each actor offers only its declared efforts; selections travel with swapped models.
+        await page.evaluate(()=>{App.selectedModelId='openai/gpt-6.1-sol';App.selectedInterrogatorId='google/gemini-4-argon';App.setInterrogationMode('ai');});
+        await page.locator('#prisoner-reasoning-btn').click();
+        assert.deepEqual(await page.locator('#reasoning-options button').evaluateAll(xs=>xs.map(x=>x.dataset.effort)),['auto','low','medium','high','xhigh','max']);
+        await page.locator('[data-effort="low"]').click();
+        assert((await page.locator('#prisoner-reasoning-btn').innerText()).includes('قليل'));
+        await page.locator('#interrogator-reasoning-btn').click();
+        assert.deepEqual(await page.locator('#reasoning-options button').evaluateAll(xs=>xs.map(x=>x.dataset.effort)),['auto','low','medium','high']);
+        await page.locator('[data-effort="high"]').click();
+        await page.locator('#swap-roles-btn').click();
+        assert.equal(await page.evaluate(()=>App.reasoningSelection('interrogator')),'low');
+        assert.equal(await page.evaluate(()=>App.reasoningSelection('prisoner')),'high');
+        await page.locator('#swap-roles-btn').click();
+        await page.evaluate(()=>{App.selectedModelId='google/gemini-2.5-flash-lite';App.setInterrogationMode('human');});
+        assert(await page.locator('#prisoner-reasoning-btn').isDisabled());
+        assert((await page.locator('#prisoner-reasoning-btn').innerText()).includes('إعداد المزود'));
+
         // Investigator cards must render on initial mode changes and after selection.
         await page.locator('#mode-btn-reverse').click();
         assert(await page.locator('#selected-interrogator-card').isVisible());
@@ -75,9 +92,22 @@ if(!chrome && process.platform==='win32') {
         await page.locator('#swap-roles-btn').click();await page.locator('#swap-roles-btn').click();
         assert.deepEqual(await page.evaluate(()=>[App.currentSession.session_id,App.currentSession.model,App.currentSession.interrogator_model,App.currentSession.interrogator_type]),fixedSession,'Setup swap must not mutate the saved experiment');
 
+        // A busy server waits for the original worker, then replays exactly the same idempotency ID.
+        let busyOnce=true,pollCount=0;const replayIds=[];
+        await page.route('**/api.php',async route=>{
+            const req=route.request();if(req.method()!=='POST')return route.continue();
+            const body=req.postDataJSON();if(body.action!=='send_message')return route.continue();
+            replayIds.push(body.request_id);
+            if(busyOnce){busyOnce=false;return route.fulfill({status:409,contentType:'application/json',body:JSON.stringify({ok:false,busy:true,error:'Busy fixture'})});}
+            return route.continue();
+        });
+        await page.route('**/api.php?action=load_session&session_id=*',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({ok:true,processing:++pollCount===1})}));
         await page.locator('#user-input').fill('ما الدليل الذي تستند إليه في إنكارك؟');
         await page.locator('#send-btn').click();
         await page.waitForFunction(()=>App.currentSession.turns_count===1 && !App.busy);
+        assert.equal(pollCount,2);assert.equal(replayIds.length,2);assert.equal(replayIds[0],replayIds[1]);
+        await page.unroute('**/api.php');await page.unroute('**/api.php?action=load_session&session_id=*');
+        assert((await page.locator('.msg-assistant .reasoning-badge').innerText()).includes('إعداد المزود'));
         assert.equal(await page.locator('.msg-assistant .mini-metric').count(),4);
         assert.equal(await page.locator('.msg-face-portrait').count(),1);
         assert.equal(await page.locator('.emotion-target').count(),1);

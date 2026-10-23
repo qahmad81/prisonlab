@@ -42,13 +42,13 @@ function labSessionLevels(array &$s,array $models):void {
     $s['prisoner_character'] ??= labPrisonerCharacter($s['case_file']);
     if($s['interrogator_type']!=='reverse') {
         $m=labModel($s['model'],$models,true);
-        $s['prisoner_reasoning']=labInvestigatorReasoning($s['prisoner_character'],$m);
+        $s['prisoner_reasoning'] ??= labInvestigatorReasoning($s['prisoner_character'],$m);
         $s['prisoner_output_budget']=labActorOutputBudget($m);
     }
     if($s['interrogator_type']!=='human') {
         $s['interrogator_character'] ??= labInvestigator('ethan_cole');
         $m=labModel($s['interrogator_model'],$models,true);
-        $s['interrogator_reasoning']=labInvestigatorReasoning($s['interrogator_character'],$m);
+        $s['interrogator_reasoning'] ??= labInvestigatorReasoning($s['interrogator_character'],$m);
         $s['interrogator_output_budget']=labActorOutputBudget($m);
     }
     $s['level_policy_version']=1;

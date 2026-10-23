@@ -6,7 +6,7 @@ require_once __DIR__ . '/provider_icons.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
-set_time_limit(600);
+set_time_limit(900);
 ini_set('display_errors', '0');
 $env=labRuntimeBootstrap();labBrowserSession();$visitor=labBrowserIdentity();
 $_SESSION['guest_id'] ??= bin2hex(random_bytes(24));
@@ -45,7 +45,7 @@ function publicSession(array $s, string $owner): array {
 }
 function summary(array $s): array {
     $keys = ['session_id','created_at','updated_at','model','gender','character_slug','case_file','case_title',
-        'current_state','interrogator_type','interrogator_model','interrogator_character','prisoner_character','is_ended','is_published','published_at','evaluation','evaluation_status','end_reason'];
+        'prisoner_reasoning','interrogator_reasoning','current_state','interrogator_type','interrogator_model','interrogator_character','prisoner_character','is_ended','is_published','published_at','evaluation','evaluation_status','end_reason'];
     return array_intersect_key($s, array_flip($keys)) + ['operator_profile'=>$s['operator_profile'] ?? null,
         'cost'=>labSessionCost($s),'user_reviews'=>labSessionReviews($s),'turns_count' => labTurns($s), 'breaking_point' => $s['confession_check']['probability'] ?? 0];
 }
@@ -99,6 +99,7 @@ try {
             $m['icon_svg'] = getProviderSvg(explode('/', ltrim($m['id'],'~'))[0], 28);
             $m['context_formatted'] = round(($m['context_length'] ?? 0) / 1024) . 'K';
             $m['health']=labHealth($m,$health[$m['id']]['samples'] ?? [],$health[$m['id']]['totals'] ?? null);
+            $m['reasoning_capabilities']=labReasoningCapabilities($m);
             $m['performance']=$performance[$m['id']] ?? [];
             foreach($curated as $tier=>$members)foreach($members as $member)if($member['id']===$m['id']) {$m['curated_tier']=$tier;$m['curated_family']=$member['family'];}
             if (!empty($m['catalog_unavailable'])) {$m['health']['weak']=true;$m['health']['reasons'][]='غير موجود في أحدث كتالوج';}
@@ -179,7 +180,7 @@ try {
             $im=labModel($interrogator, $models, $userKey !== '');
             if($type!=='human') {
                 $persona=labInvestigator((string)($body['interrogator_character'] ?? 'ethan_cole'));
-                $reasoning=labInvestigatorReasoning($persona,$im);
+                $reasoning=labInvestigatorReasoning($persona,$im,(string)($body['interrogator_effort'] ?? 'auto'));
             }
         }
         $file = basename((string)($body['case_file'] ?? ''));
@@ -201,6 +202,7 @@ try {
             'messages'=>[],'sense_history'=>[],'usage'=>[],'context_offset'=>0,'compacted_summary'=>'','compaction_history'=>[],
             'is_ended'=>false,'is_published'=>false,'evaluation'=>null,'evaluation_status'=>'not_started',
             'judge_reports'=>[],'processed_requests'=>[]];
+        if($type!=='reverse')$s['prisoner_reasoning']=labInvestigatorReasoning(labPrisonerCharacter($file),labModel($model,$models,$userKey!==''),(string)($body['prisoner_effort'] ?? 'auto'));
         labSessionLevels($s,$models);
         if($key==='')throw new RuntimeException('مفتاح الموقع غير متوفر؛ أضف مفتاح OpenRouter الخاص بك');
         foreach(labActorModels($s) as $actorId)foreach($models as $actor)if($actor['id']===$actorId)$s['actor_output_prices'][$actorId]=(float)$actor['pricing']['completion_per_1m'];
@@ -218,12 +220,18 @@ try {
         $public = !empty($s['is_published']) && !empty($s['evaluation']);
         if (!$owns && !$public) respond(['ok'=>false,'error'=>'جلسة غير موجودة'],404);
         if (($_GET['public'] ?? '') === '1' && !$public) respond(['ok'=>false,'error'=>'الجلسة غير منشورة'],404);
-        respond(['ok'=>true,'session'=>publicSession($s,$owner)]);
+        $processing=false;
+        if($owns){$probe=fopen($path.'.lock','c');if($probe){$processing=!flock($probe,LOCK_EX|LOCK_NB);if(!$processing)flock($probe,LOCK_UN);fclose($probe);}}
+        respond(['ok'=>true,'processing'=>$processing,'session'=>publicSession($s,$owner)]);
     }
     if (!in_array($action,['send_message','ai_vs_ai_step','reverse_question','reverse_answer','retry_confession','evaluate_session','publish_session','submit_review','compact_now','delete_session'],true))
         respond(['ok'=>false,'error'=>'عملية غير معروفة'],404);
     $lock = fopen($path . '.lock', 'c');
-    if (!$lock || !flock($lock, LOCK_EX | LOCK_NB)) respond(['ok'=>false,'error'=>'يوجد طلب قيد التنفيذ لهذه الجلسة. انتظر اكتماله.'],409);
+    if (!$lock || !flock($lock, LOCK_EX | LOCK_NB)) {
+        $locked=labRead($path);
+        if(!hash_equals($locked['owner_id'] ?? '',$owner))respond(['ok'=>false,'error'=>'لا تملك هذه الجلسة'],403);
+        respond(['ok'=>false,'busy'=>true,'error'=>'يوجد طلب قيد التنفيذ لهذه الجلسة. انتظر اكتماله.'],409);
+    }
     try {
         $s = labRead($path);
         if (!hash_equals($s['owner_id'] ?? '', $owner)) respond(['ok'=>false,'error'=>'لا تملك هذه الجلسة'],403);

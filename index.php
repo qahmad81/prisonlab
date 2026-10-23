@@ -66,6 +66,7 @@
                     <div class="role-section-label"><span>من يؤدي الدور؟</span><span id="prisoner-performer-type">نموذج ذكاء اصطناعي</span></div>
                     <div id="prisoner-model-group">
                         <button type="button" id="selected-model-card" class="selected-model-card" onclick="App.openModelModal('prisoner')" title="تغيير نموذج المتهم"></button>
+                        <button type="button" id="prisoner-reasoning-btn" class="reasoning-control" onclick="App.openReasoningModal('prisoner')" aria-haspopup="dialog"></button>
                         <div id="model-status-tip" class="role-model-tip"></div>
                     </div>
                     <div id="prisoner-human-card" class="human-performer" hidden></div>
@@ -89,6 +90,7 @@
                     <div class="role-section-label"><span>من يؤدي الدور؟</span><span id="interrogator-performer-type">المشارك البشري</span></div>
                     <div id="interrogator-model-group" hidden>
                         <button type="button" id="selected-interrogator-card" class="selected-model-card" onclick="App.openModelModal('interrogator')" title="تغيير نموذج المحقق"></button>
+                        <button type="button" id="interrogator-reasoning-btn" class="reasoning-control" onclick="App.openReasoningModal('interrogator')" aria-haspopup="dialog"></button>
                     </div>
                     <div id="interrogator-human-card" class="human-performer"></div>
                 </div>
@@ -356,6 +358,9 @@
         <div class="modal-header"><div><h2 id="investigator-modal-title">اختر من يحقق معك</h2><p>10 شخصيات · من المبتدئ إلى الخبير · اختر الشخصية والنموذج معًا</p></div><button type="button" class="modal-close-btn" onclick="document.getElementById('investigator-profile-modal').classList.remove('active')" aria-label="إغلاق">×</button></div>
         <div id="investigator-profile-grid" class="investigator-grid"></div>
     </div>
+</div>
+<div id="reasoning-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reasoning-title">
+    <section class="reasoning-dialog"><header><h3 id="reasoning-title">مستوى التفكير</h3><button type="button" class="text-button" onclick="App.closeReasoningModal()" aria-label="إغلاق">×</button></header><p id="reasoning-model-name" dir="ltr"></p><div id="reasoning-options"></div><p class="reasoning-help">يطبق على التجربة التالية فقط. مستوى الشخصية وتعليماتها مستقلان عن ميزانية التفكير.</p></section>
 </div>
 <script src="assets/session-view.js?v=<?= (int)filemtime(__DIR__ . "/assets/session-view.js") ?>"></script>
 <script src="assets/community.js?v=<?= (int)filemtime(__DIR__ . '/assets/community.js') ?>"></script>

@@ -222,7 +222,7 @@ function renderPublicGrid(q) {
                 <div class="archive-card-header-info">
                     <div class="archive-card-name">${escapeHtml(s.case_title)}</div>
                     <div class="archive-card-roles">${interrogatorLabel}</div>
-                    <div class="archive-card-roles">🔒 المتهم: <strong>${s.interrogator_type==='reverse'?'مستخدم بشري':escapeHtml(s.model)}</strong></div>
+                    ${LabView.participants(s)}<div class="archive-card-roles">🔒 المتهم: <strong>${s.interrogator_type==='reverse'?'مستخدم بشري':escapeHtml(s.model)}</strong></div>
                 </div>
             </div>
             <div class="archive-card-body">
@@ -261,6 +261,7 @@ async function openSessionReader(sessionId) {
         الردود: ${s.turns_count}
     `;
 
+    document.getElementById('reader-meta').insertAdjacentHTML('beforeend',LabView.participants(s));
     const chatBox = document.getElementById('reader-chat-messages');
     chatBox.replaceChildren();
     for (const m of s.messages || []) chatBox.appendChild(LabView.message(m,s));
