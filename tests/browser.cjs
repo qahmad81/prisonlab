@@ -22,6 +22,42 @@ if(!chrome && process.platform==='win32') {
         await page.goto(base);await page.waitForFunction(()=>App.models.length>0);
         assert.equal(await page.evaluate(()=>App.models.find(m=>m.id===App.selectedModelId)?.curated_tier),'focus_economic');
         assert.equal(await page.locator('#states-gallery').isVisible(),false);
+        // Investigator cards must render on initial mode changes and after selection.
+        await page.locator('#mode-btn-reverse').click();
+        assert(await page.locator('#selected-interrogator-card').isVisible());
+        assert((await page.locator('#selected-interrogator-card').innerText()).trim().length>0);
+        assert((await page.locator('#selected-investigator-persona').innerText()).includes('Ethan Cole'));
+        await page.locator('#selected-interrogator-card').click();
+        await page.locator('[data-tab="all"]').click();
+        await page.locator('#model-modal-search').fill('google/gemini-2.5-flash-lite');
+        await page.locator('.model-card').first().click();
+        assert((await page.locator('#selected-interrogator-card').innerText()).includes('Gemini 2.5 Flash Lite'));
+        await page.locator('#swap-roles-btn').click();
+        assert.equal(await page.evaluate(()=>App.interrogationMode),'human');
+        assert.equal(await page.evaluate(()=>App.selectedModelId),'google/gemini-2.5-flash-lite');
+        assert.equal(await page.locator('#prisoner-human-card').isVisible(),false);
+        await page.locator('#swap-roles-btn').click();
+        assert.equal(await page.evaluate(()=>App.interrogationMode),'reverse');
+        assert.equal(await page.evaluate(()=>App.selectedInterrogatorId),'google/gemini-2.5-flash-lite');
+        assert(await page.locator('#prisoner-human-card').isVisible());
+        await page.locator('#mode-btn-ai').click();
+        await page.locator('#selected-interrogator-card').click();
+        await page.locator('[data-tab="all"]').click();
+        await page.locator('#model-modal-search').fill('mistralai/mistral-small-3.2-24b-instruct');
+        await page.locator('.model-card').first().click();
+        assert((await page.locator('#selected-interrogator-card').innerText()).includes('Mistral'));
+        const beforeSwap=await page.evaluate(()=>[App.selectedModelId,App.selectedInterrogatorId]);
+        await page.locator('#swap-roles-btn').click();
+        assert.deepEqual(await page.evaluate(()=>[App.selectedModelId,App.selectedInterrogatorId]),beforeSwap.slice().reverse());
+        assert.equal(await page.evaluate(()=>App.interrogationMode),'ai');
+        await page.locator('#swap-roles-btn').click();
+        assert.deepEqual(await page.evaluate(()=>[App.selectedModelId,App.selectedInterrogatorId]),beforeSwap);
+        await page.locator('#selected-investigator-persona').click();
+        await page.locator('.investigator-file').filter({hasText:'Maya Brooks'}).getByRole('button',{name:'اختيار المحقق',exact:true}).click();
+        assert((await page.locator('#selected-investigator-persona').innerText()).includes('Maya Brooks'));
+        await page.screenshot({path:'test-results/role-swap-and-investigator.png',fullPage:true});
+        await page.locator('#mode-btn-human').click();
+
         await page.locator('#selected-model-card').click();
         assert.deepEqual(await page.locator('.model-tab').evaluateAll(els=>els.map(e=>e.dataset.tab)),['focus_economic','focus_medium','focus_high','economic','professional','all','free']);
         assert.equal(await page.evaluate(()=>App.currentModelTab),'focus_economic');
@@ -35,6 +71,10 @@ if(!chrome && process.platform==='win32') {
         await page.locator('.model-card').first().click();
         await page.locator('#start-session-btn').click();
         await page.waitForFunction(()=>App.currentSession && !App.busy);
+        const fixedSession=await page.evaluate(()=>[App.currentSession.session_id,App.currentSession.model,App.currentSession.interrogator_model,App.currentSession.interrogator_type]);
+        await page.locator('#swap-roles-btn').click();await page.locator('#swap-roles-btn').click();
+        assert.deepEqual(await page.evaluate(()=>[App.currentSession.session_id,App.currentSession.model,App.currentSession.interrogator_model,App.currentSession.interrogator_type]),fixedSession,'Setup swap must not mutate the saved experiment');
+
         await page.locator('#user-input').fill('ما الدليل الذي تستند إليه في إنكارك؟');
         await page.locator('#send-btn').click();
         await page.waitForFunction(()=>App.currentSession.turns_count===1 && !App.busy);

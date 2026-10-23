@@ -72,6 +72,12 @@
                 </div>
             </article>
 
+            <div class="role-swap-row">
+                <button type="button" id="swap-roles-btn" class="role-swap-button" onclick="App.swapRoles()" aria-label="تبديل المتهم والمحقق" title="تبديل المتهم والمحقق">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6h2c6 0 10 12 16 12h2M2 18h2C10 18 14 6 20 6h2M18 2l4 4-4 4M18 14l4 4-4 4"/></svg>
+                </button>
+            </div>
+
             <article class="role-card role-card-interrogator" aria-labelledby="interrogator-role-heading">
                 <header class="role-card-header"><h2 id="interrogator-role-heading"><span>02</span> المحقق</h2><span id="interrogator-representation-label" class="role-kind">أنت</span></header>
                 <div class="role-character-section" id="interrogator-persona-group" hidden>
