@@ -126,7 +126,7 @@ try {
         $health = is_file($storage.'/model-health.json') ? labRead($storage.'/model-health.json') : [];
         foreach ($models as $m) {
             $m['is_locked'] = max((float)($m['pricing']['completion_per_1m'] ?? INF), (float)($m['pricing']['prompt_per_1m'] ?? INF)) > 1;
-            $m['icon_svg'] = getProviderSvg(explode('/', $m['id'])[0], 28);
+            $m['icon_svg'] = getProviderSvg(explode('/', ltrim($m['id'],'~'))[0], 28);
             $m['context_formatted'] = round(($m['context_length'] ?? 0) / 1024) . 'K';
             $m['health']=labHealth($m,$health[$m['id']]['samples'] ?? [],$health[$m['id']]['totals'] ?? null);
             $m['performance']=$performance[$m['id']] ?? [];
@@ -234,6 +234,8 @@ try {
             'judge_reports'=>[],'processed_requests'=>[]];
         labSessionLevels($s,$models);
         if($key==='')throw new RuntimeException('مفتاح الموقع غير متوفر؛ أضف مفتاح OpenRouter الخاص بك');
+        foreach(labActorModels($s) as $actorId)foreach($models as $actor)if($actor['id']===$actorId)$s['actor_output_prices'][$actorId]=(float)$actor['pricing']['completion_per_1m'];
+        $s['jury_preview']=labJuryPolicy($s,$models);
         $s=labAccountStart($account,$s,(string)($body['request_id'] ?? ''),$userKey);
         respond(['ok'=>true,'quota'=>labQuota($account),'session'=>publicSession($s,$owner)]);
     }

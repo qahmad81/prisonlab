@@ -1,0 +1,55 @@
+{
+  "shortlist_overrides": {
+    "focus_economic": {
+      "z-ai": "~z-ai/glm-flash-latest",
+      "google": "google/gemini-2.5-flash-lite",
+      "mistralai": "mistralai/mistral-small-2603:batch"
+    },
+    "focus_high": {
+      "openai": "openai/gpt-6.1-sol"
+    }
+  },
+  "shortlist_excluded": {
+    "focus_medium": [
+      "openai",
+      "mistralai"
+    ]
+  },
+  "jury": {
+    "economic": {
+      "seconds": 50,
+      "label_ar": "اقتصادية",
+      "models": [
+        "~deepseek/deepseek-flash-latest",
+        "~z-ai/glm-flash-latest",
+        "anthropic/claude-haiku-5.5",
+        "qwen/qwen3.8-flash",
+        "minimax/minimax-m3.1-flash",
+        "~openai/gpt-luna-latest"
+      ]
+    },
+    "medium": {
+      "seconds": 80,
+      "label_ar": "متوسطة",
+      "models": [
+        "xiaomi/mimo-v2.6-pro",
+        "minimax/minimax-m3",
+        "~z-ai/glm-latest",
+        "anthropic/claude-sonnet-5.5",
+        "deepseek/deepseek-v4-pro",
+        "qwen/qwen3.8-max-0902"
+      ]
+    },
+    "professional": {
+      "seconds": 180,
+      "label_ar": "احترافية",
+      "models": [
+        "openai/gpt-6.1-sol",
+        "anthropic/claude-opus-5.5",
+        "deepseek/deepseek-v4-pro-0813",
+        "~z-ai/glm-latest",
+        "qwen/qwen3.8-max-0902"
+      ]
+    }
+  }
+}

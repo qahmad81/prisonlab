@@ -402,30 +402,40 @@ function labMarketPrices(array $catalog): array {
     return $models;
 }
 
-function labPanel(array $s, array $catalog): array {
-    $pool = ['openai/gpt-4.1-mini', 'google/gemini-2.5-flash', 'qwen/qwen3-235b-a22b-2507',
-        'z-ai/glm-5.3-flash','mistralai/mistral-small-3.2-24b-instruct', 'meta-llama/llama-3.3-70b-instruct','deepseek/deepseek-v4.1-flash'];
-    $healthFile=($GLOBALS['lab_storage'] ?? '').'/model-health.json';
-    $health=is_file($healthFile)?labRead($healthFile):[];
-    $baseOrder=array_flip($pool);
-    usort($pool,function($a,$b)use($health,$baseOrder){
-        $score=function($id)use($health,$baseOrder){
-            $e=$health[$id] ?? []; $t=$e['totals'] ?? labHealthTotals($e['samples'] ?? []);
-            $n=($t['successes'] ?? 0)+($t['failures'] ?? 0);
-            return (($t['successes'] ?? 0)+2)/($n+4) - ($baseOrder[$id]*.005);
-        };
-        return $score($b)<=>$score($a);
-    });
-    $panel = []; $providers = [];
-    foreach ($pool as $id) {
-        if (in_array($id, [$s['model'], $s['interrogator_model']], true)) continue;
-        $provider = explode('/', $id)[0];
-        if (in_array($provider, $providers, true)) continue;
-        try { labModel($id, $catalog, false, 10.0); } catch (Throwable) { continue; }
-        $panel[] = $id; $providers[] = $provider;
-        if (count($panel) === 4) return $panel;
+/** Tier uses the sum of each AI actor's output price per million tokens, not session spend. */
+function labJuryPolicy(array $s,array $catalog):array {
+    $byId=array_column($catalog,null,'id');$sum=0.;
+    foreach(labActorModels($s) as $id) {
+        $price=$byId[$id]['pricing']['completion_per_1m'] ?? $s['actor_output_prices'][$id] ?? null;
+        if(!is_numeric($price) || $price<0)throw new RuntimeException('تعذر تحديد سعر إخراج أحد طرفَي الاختبار');
+        $sum+=(float)$price;
     }
-    throw new RuntimeException('لا تتوفر أربعة نماذج تحكيم مستقلة ضمن سقف 10 دولارات. حدّث الكتالوج.');
+    $tier=$sum<2?'economic':($sum<10?'medium':'professional');
+    $policy=labModelPolicy()['jury'][$tier];
+    return ['version'=>1,'tier'=>$tier,'label_ar'=>$policy['label_ar'],'seconds'=>$policy['seconds'],'output_price_sum'=>round($sum,6)];
+}
+
+function labPanel(array $s,array $catalog):array {
+    $tier=labJuryPolicy($s,$catalog)['tier'];$pool=labModelPolicy()['jury'][$tier]['models'];
+    $byId=array_column($catalog,null,'id');$actors=array_values(labActorModels($s));
+    $pool=array_values(array_filter($pool,function($id)use($byId,$actors){
+        if(in_array($id,$actors,true))return false;
+        try{labModel($id,array_values($byId),true);}catch(Throwable){return false;}
+        foreach($actors as $actor)if(!empty($byId[$id]['canonical_slug']) && $byId[$id]['canonical_slug']===($byId[$actor]['canonical_slug'] ?? null))return false;
+        return true;
+    }));
+    // Random panels stay within the operator-approved pool, with distinct publishers.
+    shuffle($pool);
+    if($tier!=='professional') {
+        $file=($GLOBALS['lab_storage'] ?? '').'/model-health.json';$health=is_file($file)?labRead($file):[];
+        $reliability=function($id)use($health){$e=$health[$id] ?? [];$t=$e['totals'] ?? labHealthTotals($e['samples'] ?? []);
+            return (($t['successes'] ?? 0)+2)/(($t['successes'] ?? 0)+($t['failures'] ?? 0)+4);};
+        usort($pool,fn($a,$b)=>$reliability($b)<=>$reliability($a));
+    }
+    $panel=[];$publishers=[];
+    foreach($pool as $id){$publisher=explode('/',ltrim($id,'~'))[0];if(in_array($publisher,$publishers,true))continue;
+        $panel[]=$id;$publishers[]=$publisher;if(count($panel)===3)return $panel;}
+    throw new RuntimeException('لا تتوفر ثلاثة حكام مستقلين من قائمة هذه الفئة؛ حدّث الكتالوج أو راجع اللجنة.');
 }
 
 function labJudgeMessages(array $s):array {
@@ -453,12 +463,19 @@ function labEvaluate(array &$s, string $key, array $catalog, callable $save): vo
     $s['is_ended'] = true; $s['end_reason'] ??= 'manual'; $s['evaluation_status'] = 'running'; $save($s);
     try {
         $catalog = labMarketPrices($catalog);
-        $panel = $s['judge_models'] ?? [];
-        foreach(labPanel($s,$catalog) as $candidate)if(!in_array($candidate,$panel,true) && count($panel)<4)$panel[]=$candidate;
-        if(count($panel)<4)throw new RuntimeException('تحتاج اللجنة إلى أربعة حكام مستقلين');
-        // Never change judges silently on retry. Recheck the price cap on each attempt.
-        foreach ($panel as $id) labModel($id, $catalog, false, 10.0);
-        $s['judge_models'] = $panel;
+        if(($s['jury_policy']['version'] ?? 0)!==1 || count($s['judge_models'] ?? [])!==3) {
+            if(!empty($s['judge_reports']))$s['archived_judge_reports'][]=['policy'=>'legacy','reports'=>$s['judge_reports']];
+            $s['judge_reports']=[];$s['judge_progress']=[];unset($s['evaluation_quorum']);
+            $s['jury_policy']=labJuryPolicy($s,$catalog);$s['judge_models']=labPanel($s,$catalog);
+            $s['judge_price_caps']=[];
+        }
+        $panel=$s['judge_models'];
+        foreach($panel as $id){$m=labModel($id,$catalog,true);
+            $caps=['prompt'=>(float)$m['pricing']['prompt_per_1m'],'completion'=>(float)$m['pricing']['completion_per_1m']];
+            $prior=$s['judge_price_caps'][$id] ?? $caps;
+            if($caps['prompt']>$prior['prompt']+.000001 || $caps['completion']>$prior['completion']+.000001)throw new RuntimeException('تغير سعر أحد الحكام؛ راجع اللجنة قبل إعادة الطلب');
+            $s['judge_price_caps'][$id]=$caps;
+        }
         foreach($s['judge_reports'] as $id=>$report)if(($report['rubric_version'] ?? '')!==LAB_VERSION) {
             $s['archived_judge_reports'][]=['model'=>$id,'report'=>$report];unset($s['judge_reports'][$id],$s['judge_progress'][$id],$s['evaluation_quorum']);
         }
@@ -467,7 +484,7 @@ function labEvaluate(array &$s, string $key, array $catalog, callable $save): vo
         $verifyAll=!empty($GLOBALS['lab_verify_all_judges']);
         if(empty($s['evaluation_quorum']) || count($s['judge_reports'])<1)labJuryWave($s,$jobs,$key,$save,$verifyAll);
         $received=count($s['judge_reports']);
-        if($received<1)throw new LabProviderException('انتهت مهلة اللجنة دون تقرير صالح بعد محاولة استعادة واحدة لكل طلب منقطع. يمكن إعادة محاولة التقييم يدويًا.',false);
+        if($received<1)throw new LabProviderException('انتهت مهلة فئة التحكيم دون تقرير صالح. يمكن إعادة محاولة التقييم يدويًا؛ لم تُختلق أي علامة.',false);
         $degraded=$received<3;
         $s['evaluation_quorum']=['required'=>$degraded?1:3,'preferred'=>3,'invited'=>count($panel),'received'=>$received,
             'degraded'=>$degraded,'stop_reason'=>$s['jury_wait']['stop_reason'] ?? 'saved_reports'];

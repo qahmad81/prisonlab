@@ -1,11 +1,16 @@
 <?php
 require_once dirname(__DIR__).'/lib/lab.php';
 function check(bool $condition,string $message):void {if(!$condition)throw new RuntimeException($message);}
-check(labJuryStop(4,12)==='all_reports','four reports must finish immediately');
-check(labJuryStop(3,39.99)===null,'three reports must wait for grace period');
-check(labJuryStop(3,40)==='quorum','three reports must finish at forty seconds');
-check(labJuryStop(2,159.99)===null,'recovery must allow two more minutes');
-foreach([0,1,2] as $n)check(labJuryStop($n,160)==='deadline','jury deadline incorrect');
+check(labJuryStop(3,12)==='all_reports','three reports must finish immediately');
+foreach([50,80,180] as $seconds){
+    check(labJuryStop(2,$seconds-.01,$seconds)===null,'partial jury ended before deadline');
+    foreach([0,1,2] as $n)check(labJuryStop($n,$seconds,$seconds)==='deadline','tier deadline incorrect');
+}
+foreach([[1.99,'economic',50],[2,'medium',80],[9.99,'medium',80],[10,'professional',180],[60,'professional',180]] as [$price,$tier,$seconds]){
+    $session=['interrogator_type'=>'ai','model'=>'test/a','interrogator_model'=>'test/b'];
+    $catalog=[['id'=>'test/a','pricing'=>['completion_per_1m'=>$price/2]],['id'=>'test/b','pricing'=>['completion_per_1m'=>$price/2]]];
+    $policy=labJuryPolicy($session,$catalog);check($policy['tier']===$tier && $policy['seconds']===$seconds,'output sum tier boundary wrong');
+}
 $profiles=labInvestigators();check(count($profiles)===10,'missing investigator profiles');
 $easy=labInvestigatorReasoning($profiles[0],['supported_parameters'=>['reasoning'],'reasoning'=>['supported_efforts'=>['high','low','none']]]);
 check($easy['effort']==='none','easy investigator thinking not minimized');
@@ -87,8 +92,8 @@ foreach([['openai/gpt-5.6-luna',1],['openai/gpt-6-luna',99],['openai/gpt-6.1-sol
     $fakeCatalog[]=['id'=>$id,'created'=>time(),'usage_rank'=>$rank,'pricing'=>['prompt_per_1m'=>.1,'completion_per_1m'=>.5]];
 $curated=labCurated($fakeCatalog);
 check($curated['focus_economic'][0]['id']==='openai/gpt-6-luna','older popular generation displaced current economic release');
-check($curated['focus_medium'][0]['id']==='openai/gpt-6.1-sol','family medium tier incorrectly determined by absolute price');
-check($curated['focus_high'][0]['id']==='openai/gpt-6-astra','family flagship tier incorrect');
+check(count($curated['focus_medium'])===0,'GPT must be absent from medium shortlist');
+check($curated['focus_high'][0]['id']==='openai/gpt-6.1-sol','approved high GPT selection incorrect');
 foreach([0=>'green',9=>'green',10=>'yellow',29=>'yellow',30=>'orange',100=>'orange'] as $fail=>$band) {
     $samples=[];for($i=0;$i<100;$i++)$samples[]=['ok'=>$i>=$fail,'retryable'=>true,'seconds'=>1,'output_tokens'=>100,'first_byte_ms'=>100,'at'=>gmdate('c')];
     $h=labHealth(['context_length'=>128000],$samples);check($h['reliability_band']===$band,'failure-rate color boundary incorrect');

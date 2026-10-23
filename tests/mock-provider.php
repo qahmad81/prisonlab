@@ -42,7 +42,7 @@ $GLOBALS['lab_transport'] = function(array $payload, string $key, bool $decision
         if (!empty($_SERVER['HTTP_X_TEST_NO_JUDGES'])) throw new LabProviderException('اختبار: جميع الحكام غير متاحين');
     }
     if (!empty($_SERVER['HTTP_X_TEST_FAIL_JUDGES']) && str_contains($payload['messages'][0]['content'] ?? '','أنت حكم مستقل')
-        && !in_array($payload['model'],['qwen/qwen3-235b-a22b-2507','z-ai/glm-5.3-flash'],true))throw new LabProviderException('اختبار: حكم غير متاح');
+        && $payload['model']===$GLOBALS['test_first_judge'])throw new LabProviderException('اختبار: حكم غير متاح');
     if (!empty($_SERVER['HTTP_X_TEST_FAIL_CONFESSION']) && isset($payload['questions']['confession'])) throw new LabProviderException('اختبار: تعذر فحص الاعتراف');
     if (!empty($_SERVER['HTTP_X_TEST_FAIL_FINAL']) && $decisions && isset($payload['state']['judges'])) throw new LabProviderException('اختبار: تعذر حكم JEV النهائي');
     $base = ['model'=>$payload['model'],'usage'=>['prompt_tokens'=>120,'completion_tokens'=>50,'cost'=>0.0001,'prompt_tokens_details'=>['cached_tokens'=>40]]];

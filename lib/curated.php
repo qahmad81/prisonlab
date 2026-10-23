@@ -1,13 +1,15 @@
 <?php
 declare(strict_types=1);
 
+function labModelPolicy():array {static $policy;return $policy ??= labRead(__DIR__.'/model-policy.json');}
+
 /** Shortlists use publisher namespaces and catalog dates, never guessed product names. */
 function labCurated(array $models):array {
     $families=['openai'=>'GPT','anthropic'=>'Claude','google'=>'Gemini','deepseek'=>'DeepSeek','z-ai'=>'GLM',
         'qwen'=>'Qwen','mistralai'=>'Mistral','x-ai'=>'Grok','xiaomi'=>'MiMo','minimax'=>'MiniMax'];
-    $groups=[];
+    $groups=[];$policy=labModelPolicy();
     foreach($models as $m) {
-        [$publisher,$slug]=array_pad(explode('/',$m['id'],2),2,'');
+        [$publisher,$slug]=array_pad(explode('/',ltrim($m['id'],'~'),2),2,'');
         if(!isset($families[$publisher]) || !empty($m['catalog_unavailable']) || str_contains($slug,':')
             || preg_match('/(?:quant|\bgguf\b|\bfp[48]\b|\bint[48]\b|abliterat|finetun|distill|embed|audio|realtime|image|search|research|coder|codex|computer-use|guard|moderation|safety|ultraspeed|build-)/i',$slug))continue;
         if(($publisher==='openai' && !str_starts_with($slug,'gpt-')) || ($publisher==='google' && !str_starts_with($slug,'gemini-'))
@@ -47,6 +49,11 @@ function labCurated(array $models):array {
                 ?: (($b['created'] ?? 0)<=>($a['created'] ?? 0)) ?: strcmp($a['id'],$b['id']);
         });
         $m=$items[0];$out[$tier][]=['id'=>$m['id'],'family'=>$families[$publisher],'publisher'=>$publisher,'created'=>$m['created'] ?? null];
+    }
+    foreach($policy['shortlist_excluded'] as $tier=>$publishers)$out[$tier]=array_values(array_filter($out[$tier],fn($m)=>!in_array($m['publisher'],$publishers,true)));
+    foreach($policy['shortlist_overrides'] as $tier=>$pins)foreach($pins as $publisher=>$id) {
+        $out[$tier]=array_values(array_filter($out[$tier],fn($m)=>$m['publisher']!==$publisher));
+        foreach($models as $m)if($m['id']===$id && empty($m['catalog_unavailable']))$out[$tier][]=['id'=>$id,'family'=>$families[$publisher],'publisher'=>$publisher,'created'=>$m['created'] ?? null];
     }
     return $out;
 }

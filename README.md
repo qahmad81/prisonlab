@@ -26,7 +26,7 @@ Alternatively run start.bat. Open http://127.0.0.1:8488/. Always use router.php:
 
 ## Jury and final evaluation
 
-Four independent models from different publishers are invited. If all four valid reports arrive before 40 seconds, use all four. At 40 seconds, use three if available and cancel the fourth. With fewer than three, allow 120 more seconds (160 total): leave active requests running and retry a terminated failure once. Three reports during recovery end the wait. At the deadline, use any valid reports, even one, labeling fewer than three as limited participation. No valid report means no grade; manual recovery is available. Cancelling an unneeded judge is not a model failure.
+Three judges are selected from the approved, publisher-diverse pool in lib/model-policy.json. Economic and medium panels prioritize measured connection reliability with randomized ties; professional panels are random. The tier is the sum of output prices per million tokens for both AI actors (only the AI actor in human modes): below $2 is economic (50 seconds), $2 to below $10 is medium (80 seconds), and $10 or above is professional (180 seconds). All three valid reports finish early; otherwise the deadline adopts any valid reports, even one, with limited participation clearly labeled. No valid report means no grade. Failed requests may retry once within the same deadline; active requests are never duplicated. JEV independently verifies the available reports afterward. The live countdown covers the panel's deadline, with a separate finalization state for JEV. Completed historical evaluations are preserved.
 
 Candidate judges include GPT-4.1 Mini, Gemini 2.5 Flash, Qwen3 235B and GLM, with Mistral, Llama and DeepSeek fallbacks. Selection uses measured reliability, excludes the exact actor model IDs and fixes invited IDs per session. Catalog prices are rechecked with a one-hour cache. Both input and output must be at most USD10 per million tokens; provider.max_price also enforces this. A failed judge is not silently replaced during retry.
 
@@ -110,3 +110,9 @@ python tools/panel_report.py
 live_smoke creates one round plus judging; resume_live continues only that fixture's saved evaluation. verify_panel latest reevaluates the latest completed session with backup; suite runs isolated additional cases; quorum probes partial participation. Never run live tools casually on production. Historical limited live results are in [panel reliability](docs/PANEL_RELIABILITY_REVIEW.md).
 
 Update the model catalog with python fetch_models.py (requires requests) and discovery/ranking metadata with python tools/enrich_models.py. Judge selection is labPanel(); scoring is labRubric()/labEvaluate() in lib/lab.php. Agent instructions are in [AGENTS.md](AGENTS.md). English historical reviews under docs/ retain their version context; Arabic cases, UI strings and runtime prompts deliberately remain Arabic.
+
+## Editions and maintenance
+
+The `linkedin` branch hosts the community edition with required LinkedIn sign-in, account histories, publication profiles, leaderboards, LinkedIn sharing and three site-funded new tests per day. A verified personal OpenRouter key bypasses that daily quota; removing it restores the remaining site allowance. The key button displays the lowest known remaining key/account/effective budget, rounded to two decimals. Existing sessions retain their original funding source.
+
+The `main` branch is the standalone edition: no LinkedIn setup, social sharing, account leaderboard or daily session quota. Both branches contain the shared simulation, model-policy, personal-key, jury and interface improvements. See docs/EDITIONS.md before merging changes between branches.

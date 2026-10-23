@@ -118,6 +118,16 @@ const App = {
             this.renderCaseCards();
         });
 
+        const modelDialog=document.getElementById('model-modal'),modelGrid=document.getElementById('modal-models-grid');
+        modelGrid.tabIndex=0;modelGrid.setAttribute('aria-label','قائمة النماذج القابلة للتمرير');
+        modelDialog.addEventListener('wheel',e=>{
+            if(!modelDialog.classList.contains('active') || e.ctrlKey || !e.deltaY)return;
+            let target=e.target.closest('.model-modal-toolbar,.modal-models-grid') || modelGrid;
+            const unit=e.deltaMode===1?18:e.deltaMode===2?target.clientHeight:1;
+            if(target.scrollHeight<=target.clientHeight)target=modelGrid;
+            e.preventDefault();target.scrollTop+=e.deltaY*unit;
+        },{passive:false});
+        modelGrid.addEventListener('pointerdown',e=>{if(!e.target.closest('button,input,select,summary,a'))modelGrid.focus({preventScroll:true});});
         // Model Modal Search
         document.getElementById('model-modal-search').addEventListener('input', (e) => {
             this.modelSearchQuery = e.target.value.trim().toLowerCase();
@@ -395,7 +405,8 @@ const App = {
 
             let cardClass = 'model-card';
             if (isSelected) cardClass += ' active';
-            if (isLocked) cardClass += ' locked';
+            if (isLocked && !this.userApiKey) cardClass += ' locked';
+            if (isLocked && this.userApiKey) cardClass += ' key-funded';
             const quality=m.performance?.[this.modelTarget];
             const bands=[m.health?.reliability_band,quality?.quality_band];
             const band=bands.includes('orange')?'orange':bands.includes('yellow')?'yellow':bands.includes('green')?'green':null;
@@ -491,7 +502,7 @@ const App = {
         if (this.modelTarget === 'interrogator') this.selectedInterrogatorId = modelId;
         else this.selectedModelId = modelId;
         this.renderSelectedModelSummary();
-        this.renderInterrogatorSummary();
+        this.renderSelectedModelSummary();
         this.closeModelModal();
     },
 
@@ -520,12 +531,12 @@ const App = {
             sessionStorage.setItem('user_openrouter_api_key', val);
             this.notify('تم التحقق من مفتاحك. التجارب الجديدة ستكون على نفقتك؛ كل تجربة تحتفظ بمصدر تمويلها عند إنشائها.');
         } else {
-            sessionStorage.removeItem('user_openrouter_api_key');
+            this.keyBalance=null;sessionStorage.removeItem('user_openrouter_api_key');
         }
         this.updateKeyButtonState();
         this.closeKeyModal();
         this.renderSelectedModelSummary();
-        this.renderAccount();
+        this.renderAccount();this.renderInterrogatorSummary();this.renderModalModels();
     },
 
     clearUserKey() {
@@ -536,13 +547,14 @@ const App = {
         this.updateKeyButtonState();
         this.closeKeyModal();
         this.renderSelectedModelSummary();
-        this.renderAccount();this.notify('أُزيل المفتاح. التجارب الجديدة تستخدم حصة الموقع؛ التجارب الشخصية السابقة تحتاج مفتاحها نفسه لمتابعتها.');
+        this.renderAccount();this.renderInterrogatorSummary();this.renderModalModels();this.notify('أُزيل المفتاح. التجارب الجديدة تستخدم حصة الموقع؛ التجارب الشخصية السابقة تحتاج مفتاحها نفسه لمتابعتها.');
     },
 
     updateKeyButtonState() {
         const btn = document.getElementById('open-key-modal-btn');
         if (this.userApiKey) {
-            btn.innerHTML = '🔑 مفتاحي مفعل ✓';
+            const amount=this.keyBalance?.available_to_spend;
+            btn.textContent='🔑 مفتاحي مفعل ✓'+(amount!=null?' '+Number(amount).toFixed(2)+'$':' · الرصيد غير متاح');
             btn.classList.add('has-key');
         } else {
             btn.innerHTML = '🔑 استخدام مفتاحي';
@@ -618,6 +630,7 @@ const App = {
                     this.currentSession=data.session;
                     if(data.session.evaluation_retryable)throw Object.assign(new Error(data.session.evaluation_error),{retryable:true});
                 }
+                if(this.userApiKey && data.session && ['send_message','ai_vs_ai_step','reverse_question','reverse_answer','evaluate_session','compact_now'].includes(action))void this.refreshKeyBalance();
                 return data;
             } catch(e) {
                 if(!canRetry || !e.retryable || attempt===2) {if(canRetry && e.retryable && attempt===2)e.message='فشلت محاولات الاتصال الثلاث. '+e.message;throw e;}
@@ -653,7 +666,7 @@ const App = {
             document.getElementById(role+'-performer-type').textContent=isHuman?'المشارك البشري':'نموذج ذكاء اصطناعي';
             this.renderHumanPerformer(document.getElementById(role+'-human-card'));
         }
-        this.renderInterrogatorSummary();
+        this.renderSelectedModelSummary();
     },
     renderHumanPerformer(container) {
         const profile=this.participantProfile;
@@ -667,7 +680,7 @@ const App = {
         const m=this.models.find(m=>m.id===this.selectedInterrogatorId);
         const card=document.getElementById('selected-interrogator-card');
         card.classList.toggle('connection-weak',!!m?.health?.weak);
-        card.innerHTML=m ? `<span class="selected-model-icon">${m.icon_svg || '🤖'}</span><span class="selected-model-info"><span class="model-summary-heading"><strong class="selected-model-name">${this.escapeHtml(m.name)}</strong><span class="model-change-label">تغيير ↗</span></span><span class="selected-model-meta"><span>${this.escapeHtml(m.context_formatted || '')} سياق</span><span>إدخال $${m.pricing.prompt_per_1m} · إخراج $${m.pricing.completion_per_1m} / مليون</span></span><span class="model-card-badge ${m.is_locked?'badge-locked':'badge-unlocked'}">${m.is_locked?'نموذج احترافي':'خفيف / اقتصادي'}</span></span>` : 'اختر نموذج المحقق';
+        card.innerHTML=m ? `<span class="selected-model-icon">${m.icon_svg || '🤖'}</span><span class="selected-model-info"><span class="model-summary-heading"><strong class="selected-model-name">${this.escapeHtml(m.name)}</strong><span class="model-change-label">تغيير ↗</span></span><span class="selected-model-meta"><span>${this.escapeHtml(m.context_formatted || '')} سياق</span><span>إدخال $${m.pricing.prompt_per_1m} · إخراج $${m.pricing.completion_per_1m} / مليون</span></span><span class="model-card-badge ${m.is_locked && !this.userApiKey?'badge-locked':this.userApiKey?'badge-userkey':'badge-unlocked'}">${m.is_locked?'نموذج احترافي':'خفيف / اقتصادي'}</span></span>` : 'اختر نموذج المحقق';
         const p=this.investigators.find(p=>p.id===this.selectedInvestigatorPersona);
         document.getElementById('selected-investigator-persona').innerHTML=p?`${LabView.investigatorAvatar(p)}<span><strong dir="ltr">${this.escapeHtml(p.name)}</strong><small>المستوى ${p.level}/10 · ${this.escapeHtml(p.level_ar)}</small><small>${this.escapeHtml(p.specialty)}</small></span><span>تغيير ←</span>`:'اختر شخصية المحقق';
     },
@@ -678,7 +691,7 @@ const App = {
             const card=document.createElement('article');card.className='investigator-card';
             card.innerHTML=`${LabView.investigatorAvatar(p,'profile-portrait')}<div class="investigator-file"><span class="investigator-rank">${String(p.number).padStart(2,'0')} · المستوى ${p.level}/10 · ${this.escapeHtml(p.level_ar)}</span><h3 dir="ltr">${this.escapeHtml(p.name)}</h3><p>${p.age} عامًا · ${p.years_experience} سنة خبرة</p><strong>${this.escapeHtml(p.specialty)}</strong><p>${this.escapeHtml(p.bio)}</p><p>${this.escapeHtml(p.style)}</p><div class="investigator-skills">${p.skills.map(s=>`<span>${this.escapeHtml(s)}</span>`).join('')}</div><details><summary>حدود المستوى وتعليمات الشخصية</summary><p>${this.escapeHtml(p.limits)}</p><p>${this.escapeHtml(p.instructions)}</p><small>التفكير المطلوب: ${this.escapeHtml(({none:'معدوم إن أمكن',low:'قليل',medium:'متوسط',high:'مرتفع',highest:'أعلى مستوى متاح'})[p.thinking])} · حسب دعم النموذج.</small></details><button type="button" class="btn btn-secondary" data-investigator-id="${p.id}">${p.id===this.selectedInvestigatorPersona?'✓ المحدد حاليًا':'اختيار المحقق'}</button></div>`;
             const faces=document.createElement('details');faces.innerHTML='<summary>معاينة التعابير الستة</summary><div class="investigator-expressions">'+Object.entries(LabView.investigatorExpressions).map(([id,name])=>`<figure>${LabView.investigatorAvatar(p,'',id)}<figcaption>${name}</figcaption></figure>`).join('')+'</div>';card.querySelector('.investigator-file').insertBefore(faces,card.querySelector('button'));
-            card.querySelector('button').addEventListener('click',()=>{this.selectedInvestigatorPersona=p.id;this.renderInterrogatorSummary();document.getElementById('investigator-profile-modal').classList.remove('active');});
+            card.querySelector('button').addEventListener('click',()=>{this.selectedInvestigatorPersona=p.id;this.renderSelectedModelSummary();document.getElementById('investigator-profile-modal').classList.remove('active');});
             box.appendChild(card);
         }
         document.getElementById('investigator-profile-modal').classList.add('active');
@@ -855,17 +868,42 @@ const App = {
         if(this.currentSession.is_ended)return this.endAndEvaluateSession();
         this.notify('جارٍ إكمال التحقيق من آخر مرحلة محفوظة…');this.generateAiRounds();
     },
+    watchJury(sessionId) {
+        const box=document.getElementById('jury-live-status');let done=false,inFlight=false,wait=null,progress={};
+        box.hidden=false;
+        const draw=()=>{
+            if(done)return;
+            if(!wait){box.textContent='جارٍ تجهيز اللجنة والتحقق من أسعارها…';return;}
+            const remaining=Math.max(0,Math.ceil((wait.deadline_at*1000-Date.now())/1000));
+            const received=Object.values(progress).filter(p=>p.status==='complete').length;
+            box.replaceChildren();
+            const title=document.createElement('strong');title.textContent=`تحكيم ${wait.tier==='economic'?'اقتصادي':wait.tier==='medium'?'متوسط':'احترافي'} · ${received}/3 تقارير`;
+            const timer=document.createElement('bdi');timer.className='jury-countdown';timer.dataset.remaining=remaining;timer.textContent=remaining+' ث';
+            const detail=document.createElement('span');detail.textContent=wait.phase==='finished' || remaining===0?'يحسم JEV التقارير الصالحة ويجهز النتيجة…':'عند انتهاء المهلة تُعتمد التقارير الصالحة ولو كان تقريرًا واحدًا؛ تكتمل اللجنة مبكرًا إذا وصلت الثلاثة.';
+            box.append(title,timer,detail);
+        };
+        const poll=async()=>{
+            if(done || inFlight)return;inFlight=true;
+            try{const d=await this.fetchData('api.php?action=load_session&session_id='+encodeURIComponent(sessionId),{},5000);
+                if(!done){wait=d.session.jury_wait || null;progress=d.session.judge_progress || {};draw();}}
+            catch(e){if(!done && !wait)box.textContent='جارٍ التحكيم؛ تعذر تحديث العداد مؤقتًا. النتيجة ستظهر عند اكتمال الطلب.';}
+            finally{inFlight=false;}
+        };
+        draw();poll();const ticker=setInterval(draw,250),poller=setInterval(poll,1500);
+        return ()=>{done=true;clearInterval(ticker);clearInterval(poller);box.hidden=true;box.replaceChildren();};
+    },
     async endAndEvaluateSession() {
         if(this.generating) {this.stopRequested=true;this.notify('سيتوقف التوليد بعد حفظ الجولة الحالية، ثم تبدأ اللجنة.');return;}
         if(this.busy || !this.currentSession || this.currentSession.read_only)return;
         if(!this.currentSession.turns_count)return this.notify('أكمل جولة واحدة على الأقل قبل التقييم.',true);
-        this.busy=true;this.updateControls();this.notify('بدأت اللجنة: انتظار 40 ثانية، ثم دقيقتان إضافيتان عند الحاجة؛ بعدها يحسم JEV التقارير المتاحة.');
+        this.busy=true;this.updateControls();this.notify('تجهيز لجنة من ثلاثة حكام حسب فئة النماذج، ثم يحسم JEV التقارير الصالحة.');
+        const stopJury=this.watchJury(this.currentSession.session_id);
         try {
             const d=await this.api('evaluate_session',{session_id:this.currentSession.session_id});this.currentSession=d.session;
             this.notify(d.session.evaluation_status==='complete'?'اكتمل التقييم وحُفظ مع الجلسة.':d.session.evaluation_error || 'تعذر التقييم؛ يمكنك إعادة المحاولة.',d.session.evaluation_status!=='complete');
             await this.reloadLogsOnly();
         } catch(e){this.notify(e.message,true);}
-        finally{this.busy=false;this.renderActiveSession();}
+        finally{stopJury();this.busy=false;this.renderActiveSession();}
     },
     async compactNow() {
         if(this.busy || this.generating || !this.currentSession)return;
@@ -916,16 +954,17 @@ const App = {
         }
         const a=document.createElement('a');a.href='public.php?profile='+encodeURIComponent(this.participantProfile.public_id);a.textContent=this.participantProfile.display_name;a.className='account-name';controls.appendChild(a);
         const out=document.createElement('button');out.id='logout-btn';out.className='text-button';out.textContent='خروج';out.disabled=this.busy || this.generating;out.addEventListener('click',()=>this.logout());controls.appendChild(out);
-        const p=document.createElement('p');p.textContent=`تجارب الموقع اليوم: ${this.quota?.remaining ?? 0} من 3 متبقية · تتجدد منتصف الليل بتوقيت القدس.`;notice.appendChild(p);
-        if(this.quota?.remaining===0){const p=document.createElement('p');p.textContent='شكرًا لمساهمتك! ميزانية الموقع محدودة؛ ننتظرك غدًا، أو استخدم مفتاحك الخاص لتجارب غير محدودة على نفقتك.';notice.appendChild(p);}
+        const p=document.createElement('p');p.textContent=this.userApiKey?'مفتاحك مفعل: تجارب غير محدودة على نفقتك، ضمن رصيد المفتاح وحدود مزوده.':`تجارب الموقع اليوم: ${this.quota?.remaining ?? 0} من 3 متبقية · تتجدد منتصف الليل بتوقيت القدس.`;notice.appendChild(p);
+        if(!this.userApiKey && this.quota?.remaining===0){const p=document.createElement('p');p.textContent='شكرًا لمساهمتك! ميزانية الموقع محدودة؛ ننتظرك غدًا، أو استخدم مفتاحك الخاص لتجارب غير محدودة على نفقتك.';notice.appendChild(p);}
         if(this.userApiKey){const balance=document.createElement('p');balance.id='personal-key-balance';
-            const b=this.keyBalance;balance.textContent=b?(b.balance_available?`رصيد حساب OpenRouter: ${LabCommunity.money(b.balance)}`:b.key_remaining!=null?`المتبقي ضمن حد المفتاح: ${LabCommunity.money(b.key_remaining)} (رصيد الحساب غير متاح)`:'رصيد الحساب غير متاح لهذا المفتاح؛ عدم وجود سقف للمفتاح لا يعني رصيدًا غير محدود.'):'جارٍ التحقق من رصيد مفتاحك…';notice.appendChild(balance);
+            const b=this.keyBalance;balance.textContent=b?(b.available_to_spend!=null?`المتاح للإنفاق بهذا المفتاح: ${Number(b.available_to_spend).toFixed(2)}$${b.key_limit!=null?' · سقف المفتاح '+Number(b.key_limit).toFixed(2)+'$':''}`:'الرصيد غير متاح لهذا المفتاح؛ تحقق من حدوده لدى OpenRouter.'):'جارٍ التحقق من رصيد مفتاحك…';notice.appendChild(balance);
             const refresh=document.createElement('button');refresh.className='text-button';refresh.textContent='تحديث الرصيد';refresh.addEventListener('click',()=>this.refreshKeyBalance());notice.appendChild(refresh);
         }
     },
     async refreshKeyBalance() {
         if(!this.participantProfile || !this.userApiKey)return;
-        try{this.keyBalance=(await this.api('key_balance')).balance;this.renderAccount();}
+        const checkedKey=this.userApiKey;
+        try{const balance=(await this.api('key_balance')).balance;if(this.userApiKey!==checkedKey)return;this.keyBalance=balance;this.updateKeyButtonState();this.renderAccount();}
         catch(e){const el=document.getElementById('personal-key-balance');if(el)el.textContent='تعذر تحديث الرصيد: '+e.message;}
     },
     async logout() {

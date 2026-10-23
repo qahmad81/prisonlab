@@ -135,6 +135,14 @@ function labVisitorBalance(string $key):array {
             $out['balance']=max(0,(float)$credits['total_credits']-(float)$credits['total_usage']);$out['balance_available']=true;
         }
     }catch(RuntimeException $e){/* Some keys cannot read account credit totals. Never invent a balance. */}
+    // A key cap (including effective guardrail budgets) takes precedence over account credits.
+    $limits=[];
+    if($out['key_remaining']!==null)$limits[]=$out['key_remaining'];
+    elseif($out['key_limit']!==null && $out['usage']!==null)$limits[]=max(0,$out['key_limit']-$out['usage']);
+    if(is_numeric($data['effective_budget']['remaining_usd'] ?? null))$limits[]=(float)$data['effective_budget']['remaining_usd'];
+    foreach($data['budgets'] ?? [] as $budget)if(is_numeric($budget['remaining_usd'] ?? null))$limits[]=(float)$budget['remaining_usd'];
+    if($out['balance_available'])$limits[]=$out['balance'];
+    $out['available_to_spend']=$limits?max(0,min($limits)):null;
     return $out;
 }
 function labSessionCost(array $s):array {

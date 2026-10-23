@@ -42,7 +42,7 @@ def run(storage):
     assert len(data['investigators'])==10 and [p['level'] for p in data['investigators']]==list(range(1,11))
     for tier,members in data['curated'].items():
         assert len(members)<=10 and len({m['publisher'] for m in members})==len(members)
-        assert all(':' not in m['id'] for m in members)
+        assert all(':' not in m['id'] or m['id']=='mistralai/mistral-small-2603:batch' for m in members)
     assert all(1<=c['difficulty']['level']<=10 for c in data['cases'])
     for path in ['/.env','/logs/session_20261019_110549_3024c.json','/lib/lab.php','/tests/mock-provider.php','/assets/../.env']:
         assert a.get(path)[0]==404,path
@@ -69,17 +69,16 @@ def run(storage):
         status,d=a.step(s,n);assert status==200,d;s=d['session']
     assert s['turns_count']==30 and s['is_ended'] and s['end_reason']=='turn_limit' and len(s['messages'])==60
     assert a.step(s,30)[0]==400
-    status,d=a.post('evaluate_session',session_id=sid,headers={'X-Test-Fail-Model':'google/gemini-2.5-flash'})
+    status,d=a.post('evaluate_session',session_id=sid,headers={})
     assert status==200 and d['session']['evaluation_status']=='complete',d.get('error')
-    assert len(d['session']['judge_reports'])==3 and len(d['session']['judge_models'])==4
-    assert d['session']['judge_progress']['google/gemini-2.5-flash']['status']=='failed'
+    assert len(d['session']['judge_reports'])==3 and len(d['session']['judge_models'])==3
     assert d['session']['evaluation']['quorum']['required']==3
     status,d=a.post('evaluate_session',session_id=sid);assert status==200,d;s=d['session']
     assert s['evaluation_status']=='complete' and len(s['judge_reports'])==3 and len(s['evaluation']['scores'])==9
     assert s['evaluation']['scores']['investigator_emotional'] is None
     assert s['evaluation']['investigator_coverage']==35
     assert s['evaluation']['scores']['prisoner_emotion']>=0
-    calls=json.loads((storage/'test-calls.json').read_text());judge_calls=[x for x in calls if x['model']=='openai/gpt-4.1-mini'];assert len(judge_calls)==1
+    calls=json.loads((storage/'test-calls.json').read_text());judge_calls=[x for x in calls if x['model'] in s['judge_models']];assert len(judge_calls)==3
     count=len(calls);a.post('evaluate_session',session_id=sid);assert len(json.loads((storage/'test-calls.json').read_text()))==count
     status,d=a.post('publish_session',session_id=sid);assert status==200 and d['session']['read_only']
     status,d=b.get('/api.php?action=load_session&public=1&session_id='+sid);assert status==200 and d['session']['read_only']
@@ -89,24 +88,24 @@ def run(storage):
     partial=a.start();status,d=a.step(partial,0);assert status==200
     status,d=a.post('evaluate_session',session_id=partial['session_id'],headers={'X-Test-Fail-Judges':'1'})
     assert status==200 and d['session']['evaluation_status']=='complete' and len(d['session']['judge_reports'])==2
-    assert d['session']['evaluation']['quorum']['degraded'] and d['session']['jury_wait']['elapsed_seconds']>=160
-    assert sorted(d['session']['jury_wait']['attempts'].values())==[1,1,2,2]
+    assert d['session']['evaluation']['quorum']['degraded'] and d['session']['jury_wait']['elapsed_seconds']>=50
+    assert sorted(d['session']['jury_wait']['attempts'].values())==[1,1,2]
     completed=set(d['session']['judge_reports'])
     before_calls=json.loads((storage/'test-calls.json').read_text());before_counts={mid:sum(x['model']==mid for x in before_calls) for mid in completed}
     status,d=a.post('evaluate_session',session_id=partial['session_id']);assert status==200 and d['session']['evaluation_status']=='complete'
     after_calls=json.loads((storage/'test-calls.json').read_text());assert all(sum(x['model']==mid for x in after_calls)==n for mid,n in before_counts.items())
     for scenario,headers,expected in [
-        ('all',{},4),('recover',{'X-Test-Fail-Once':'1'},4),('correct',{'X-Test-Invalid-Once':'1'},4),
+        ('all',{},3),('recover',{'X-Test-Fail-Once':'1'},3),('correct',{'X-Test-Invalid-Once':'1'},3),
         ('one',{'X-Test-Only-Judge':'first'},1),('zero',{'X-Test-No-Judges':'1'},0)]:
         trial=a.start();assert a.step(trial,0)[0]==200
         status,result=a.post('evaluate_session',session_id=trial['session_id'],headers=headers)
         assert status==200,result
         result=result['session'];assert len(result['judge_reports'])==expected,(scenario,result)
         assert result['evaluation_status']==('complete' if expected else 'failed'),(scenario,result)
-        if expected==4:assert result['evaluation']['quorum']['received']==4
+        if expected==3:assert result['evaluation']['quorum']['received']==3
         if scenario in ('recover','correct'):assert all(n==2 for n in result['jury_wait']['attempts'].values())
         if scenario in ('one','zero'):
-            assert result['jury_wait']['elapsed_seconds']>=160
+            assert result['jury_wait']['elapsed_seconds']>=50
             assert max(result['jury_wait']['attempts'].values())==2
         if scenario=='zero':
             assert result['evaluation_retryable'] is False

@@ -149,6 +149,7 @@
 
         <button type="button" id="end-test-btn" class="end-test-button" onclick="App.endAndEvaluateSession()" disabled>إنهاء الاختبار وطلب التحكيم والعلامة ⏹</button>
         <div id="session-notice" class="session-notice" role="status" aria-live="polite"></div>
+        <div id="jury-live-status" class="jury-live-status" hidden></div>
         <details id="memory-notes" class="memory-panel" hidden></details>
         <div id="usage-summary" class="usage-summary"></div>
         <div class="chat-input-bar" id="human-input-bar">

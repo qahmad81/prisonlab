@@ -1716,3 +1716,15 @@ button:focus-visible,a:focus-visible,summary:focus-visible { outline: 2px solid 
 .linkedin-mark { width:23px; height:23px; display:grid; place-items:center; background:#0a66c2; color:white; font:bold 17px Arial,sans-serif; border-radius:3px; align-self:center; }
 .role-card [hidden],.human-performer[hidden] { display:none !important; }
 .session-mode-switch button:focus-visible,.role-card button:focus-visible { outline:2px solid #76c8ff; outline-offset:3px; }
+
+/* Keep model selection scrolling inside the dialog on mouse, touch and keyboard. */
+body:has(.modal-overlay.active) { overflow:hidden; }
+.modal-overlay.active { overscroll-behavior:contain; }
+.modal-models-grid { overscroll-behavior:contain; touch-action:pan-y; scrollbar-gutter:stable; align-content:start; }
+.modal-models-grid:focus-visible { outline:2px solid #60a5fa; outline-offset:3px; }
+#model-modal .model-modal-toolbar { max-height:48%; overflow-y:auto; overscroll-behavior:contain; }
+#model-modal .modal-models-grid { min-height:100px; }
+.model-card.key-funded:not(.reliability-yellow):not(.reliability-orange) { border-color:#24866a; background:#102923; }
+.jury-live-status { display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:12px 18px; background:#10242f; border-bottom:1px solid #355d6f; color:#d5e9ec; font-size:.8rem; }
+.jury-live-status span { flex-basis:100%; color:#aac2ca; }
+.jury-countdown { font-size:1.3rem; font-variant-numeric:tabular-nums; color:#f3cb66; margin-inline-start:auto; }

@@ -84,8 +84,12 @@ def run(storage):
     assert guest.request('/api.php?action=leaderboard')[1]['total']==0
     assert a.start()[0]==400,'Deletion must not restore the daily allowance'
     assert a.start(key='invalid-key')[0]==400
+    balance=a.post('key_balance','sk-or-test-personal')[1]['balance']
+    assert balance['balance']==7.5 and balance['key_remaining']==2.5 and balance['available_to_spend']==2.5,'Key budget must precede account credit'
     status,d=a.start(key='sk-or-test-personal',mode='ai');assert status==200,d;personal=d['session'];pid=personal['session_id']
     assert personal['funding_source']=='personal' and a.init()['quota']['remaining']==0
+    for _ in range(4):assert a.start(key='sk-or-test-personal')[0]==200,'Personal key must bypass daily site quota'
+    assert a.start()[0]==400,'Removing the key must restore site quota'
     assert a.post('ai_vs_ai_step',session_id=pid,request_id=uuid.uuid4().hex,expected_turns=0)[0]==400,'No site-key fallback'
     assert a.post('ai_vs_ai_step','sk-or-other',session_id=pid,request_id=uuid.uuid4().hex,expected_turns=0)[0]==400
     personal=a.grade(personal,'sk-or-test-personal')
@@ -98,7 +102,7 @@ def run(storage):
     uncapped=a.post('key_balance','sk-or-uncapped')[1]['balance'];assert uncapped['balance'] is None and uncapped['key_remaining'] is None
     assert a.post('logout')[0]==200;assert a.init()['participant_profile'] is None and a.start()[0]==401
     a.login('alice');assert a.init()['quota']['remaining']==0
-    assert len(a.init()['logs'])==3
+    assert len(a.init()['logs'])==7
     # A quota bucket rollover is independent of PHP/server timezone.
     account=next(a for a in (json.loads(f.read_text()) for f in (storage/'accounts').glob('*.json')) if a['public_id']==profile['public_id'])
     quota_path=storage/('quota_'+account['id']+'.json')

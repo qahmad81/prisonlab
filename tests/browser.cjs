@@ -50,7 +50,7 @@ if(!chrome && process.platform==='win32') {
         await page.waitForFunction(()=>App.currentSession.evaluation_status==='complete' && !App.busy);
         assert.equal(await page.locator('.duel-scores > div').count(),2);
         assert.equal(await page.locator('.eval-metric-box').count(),9);
-        assert.equal(await page.locator('.judge-evidence').count(),36);
+        assert.equal(await page.locator('.judge-evidence').count(),27);
         assert.equal(await page.locator('.model-review-form').count(),1);
         await page.locator('.model-review-form select').selectOption('1');
         await page.locator('.model-review-form textarea').fill('تكرار ضعيف في هذا الاختبار <img src=x onerror="window.reviewInjected=true">');

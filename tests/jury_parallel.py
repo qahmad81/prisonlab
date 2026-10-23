@@ -12,7 +12,7 @@ REPORT={'scores':dict.fromkeys(AXES,70),'summary':'Local parallel test','inciden
         'evidence':[{'criterion':k,'message_id':'a1','analysis':'Test evidence'} for k in AXES],
         'opportunities':{k:{'observed':False} for k in AXES if k in ['investigator_logic','investigator_emotional','investigator_moral']}}
 
-def scenario(name):
+def scenario(name,seconds=50):
     calls=Counter()
     class Handler(BaseHTTPRequestHandler):
         def log_message(self,*args):pass
@@ -21,11 +21,10 @@ def scenario(name):
             model=payload['model'];calls[model]+=1;attempt=calls[model]
             if name=='recover' and attempt==1:
                 self.connection.shutdown(socket.SHUT_RDWR);self.connection.close();return
-            if name=='one' and model!='judge1':
+            if (name=='one' and model!='judge1') or name=='zero':
                 self.send_response(503);self.end_headers();return
             delay=.1
-            if name=='three' and model=='judge4':delay=6
-            if name=='late':delay={'judge1':.1,'judge2':1.3,'judge3':1.6,'judge4':6}[model]
+            if name=='two' and model=='judge3':delay=8
             time.sleep(delay)
             response={'choices':[{'message':{'content':json.dumps(REPORT)},'finish_reason':'stop'}],
                       'usage':{'completion_tokens':100}}
@@ -37,21 +36,24 @@ def scenario(name):
     thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
     try:
         with tempfile.TemporaryDirectory(prefix='prison-jury-sockets-') as storage:
-            result=subprocess.run(['php',str(ROOT/'tests/jury_driver.php'),f'http://127.0.0.1:{server.server_port}',storage],
+            result=subprocess.run(['php',str(ROOT/'tests/jury_driver.php'),f'http://127.0.0.1:{server.server_port}',storage,str(seconds)],
                                   capture_output=True,text=True,encoding='utf-8',check=True,timeout=15)
             s=json.loads(result.stdout)
-            if name in ('all','recover'):assert len(s['judge_reports'])==4,(name,s)
-            elif name in ('three','late'):
+            if name in ('all','recover'):
                 assert len(s['judge_reports'])==3,(name,s)
-                assert s['judge_progress']['judge4']['status']=='cancelled_quorum'
-                assert s['jury_wait']['elapsed_seconds']>=40
+                assert s['jury_wait']['elapsed_seconds']<seconds
+            elif name=='two':
+                assert len(s['judge_reports'])==2,(name,s)
+                assert s['judge_progress']['judge3']['status']=='cancelled_deadline'
+                assert s['jury_wait']['elapsed_seconds']>=seconds
                 assert all(n==1 for n in calls.values()),'Live requests must not be retried'
             else:
-                assert len(s['judge_reports'])==1 and s['jury_wait']['elapsed_seconds']>=160
-                assert calls['judge1']==1 and all(calls[k]==2 for k in ['judge2','judge3','judge4'])
+                assert len(s['judge_reports'])==(0 if name=='zero' else 1) and s['jury_wait']['elapsed_seconds']>=seconds
+                assert all(calls[k]==2 for k in ['judge2','judge3'])
+                if name=='one':assert calls['judge1']==1
             if name=='recover':assert all(n==2 for n in calls.values())
-            if name=='all':assert s['jury_wait']['elapsed_seconds']<40
             print('PASS parallel jury:',name)
     finally:server.shutdown();server.server_close()
 
-for name in ['all','three','late','recover','one']:scenario(name)
+for name in ['all','two','recover','one','zero']:scenario(name)
+for seconds in [80,180]:scenario('one',seconds)

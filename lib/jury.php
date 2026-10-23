@@ -28,11 +28,10 @@ function labJuryResult(array &$s,array $job,?array $response,string $error,float
 
 function labJuryNow():float {return isset($GLOBALS['lab_jury_clock']) ? ($GLOBALS['lab_jury_clock'])() : microtime(true);}
 
-/** The initial grace period is followed by a two-minute recovery window. */
-function labJuryStop(int $reports,float $elapsed,bool $verifyAll=false):?string {
-    if($reports>=4)return 'all_reports';
-    if(!$verifyAll && $elapsed>=40 && $reports>=3)return 'quorum';
-    return $elapsed>=160 ? 'deadline' : null;
+/** Finish early only when the whole panel has reported; otherwise use its hard deadline. */
+function labJuryStop(int $reports,float $elapsed,int $seconds=50,int $invited=3):?string {
+    if($reports>=$invited)return 'all_reports';
+    return $elapsed>=$seconds?'deadline':null;
 }
 
 function labJuryRetryJob(array $s,array $job):array {
@@ -51,16 +50,16 @@ function labJuryWave(array &$s,array $jobs,string $key,callable $save,bool $veri
     $mock=isset($GLOBALS['lab_transport']);
     if(!$mock && $key==='')throw new RuntimeException('مفتاح OpenRouter غير متوفر');
     $multi=$mock?null:curl_multi_init();$active=[];$attempts=[];$byModel=[];
-    $started=labJuryNow();$reason=null;
-    $s['jury_wait']=['initial_seconds'=>40,'recovery_seconds'=>120,'total_seconds'=>160,'phase'=>'initial','started_at'=>gmdate('c')];
-    $launch=function(array $job)use(&$s,&$active,&$attempts,$multi,$mock,$key,$started):void {
+    $started=labJuryNow();$reason=null;$seconds=(int)($s['jury_policy']['seconds'] ?? 50);
+    $s['jury_wait']=['total_seconds'=>$seconds,'phase'=>'reviewing','started_at'=>gmdate('c'),'deadline_at'=>microtime(true)+$seconds,'tier'=>$s['jury_policy']['tier'] ?? 'economic'];
+    $launch=function(array $job)use(&$s,&$active,&$attempts,$multi,$mock,$key,$started,$seconds):void {
         $id=$job['model'];$attempts[$id]=1+($attempts[$id] ?? 0);
         $s['judge_progress'][$id]=['status'=>'running','attempt'=>$attempts[$id],'at'=>gmdate('c')];
         if($mock) {$active[$id]=['job'=>$job,'start'=>labJuryNow()];return;}
         // Internal test seam; never populated from browser input.
         $ch=curl_init($GLOBALS['lab_jury_url'] ?? 'https://openrouter.ai/api/v1/chat/completions');
         curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_HTTPHEADER=>['Content-Type: application/json','Authorization: Bearer '.$key,'X-Title: AI Under Pressure Lab'],
-            CURLOPT_POSTFIELDS=>labJson($job['payload']),CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT_MS=>max(1,(int)ceil((160-(labJuryNow()-$started))*1000)),CURLOPT_SSL_VERIFYPEER=>true]);
+            CURLOPT_POSTFIELDS=>labJson($job['payload']),CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT_MS=>max(1,(int)ceil(($seconds-(labJuryNow()-$started))*1000)),CURLOPT_SSL_VERIFYPEER=>true]);
         $active[spl_object_id($ch)]=['handle'=>$ch,'job'=>$job,'start'=>labJuryNow()];curl_multi_add_handle($multi,$ch);
     };
     foreach($jobs as $job) {$byModel[$job['model']]=$job;$launch($job);}
@@ -70,7 +69,7 @@ function labJuryWave(array &$s,array $jobs,string $key,callable $save,bool $veri
             if($mock) {
                 foreach($active as $hid=>$item) {
                     try {
-                        $r=labRequest($item['job']['payload'],$key,false,max(1,(int)ceil(160-(labJuryNow()-$started))));
+                        $r=labRequest($item['job']['payload'],$key,false,max(1,(int)ceil($seconds-(labJuryNow()-$started))));
                         labJuryResult($s,$item['job'],$r,'',labJuryNow()-$item['start'],null,$GLOBALS['lab_last_call_id'] ?? null,$save);
                     }catch(Throwable $e){labJuryResult($s,$item['job'],null,$e->getMessage(),labJuryNow()-$item['start'],null,$e instanceof LabProviderException?($GLOBALS['lab_last_call_id'] ?? null):null,$save);}
                     unset($active[$hid]);
@@ -91,10 +90,9 @@ function labJuryWave(array &$s,array $jobs,string $key,callable $save,bool $veri
             }
             }
             $elapsed=labJuryNow()-$started;
-            $reason=labJuryStop(count($s['judge_reports']),$elapsed,$verifyAll);
+            $reason=labJuryStop(count($s['judge_reports']),$elapsed,$seconds,count($s['judge_models'] ?? $byModel));
             if($reason!==null)break;
-            if($elapsed>=40) {
-                if($s['jury_wait']['phase']!=='recovery') {$s['jury_wait']['phase']='recovery';$save($s);}
+            if($elapsed<$seconds) {
                 $live=array_column(array_column($active,'job'),'model');
                 foreach($byModel as $id=>$job)if(!isset($s['judge_reports'][$id]) && !in_array($id,$live,true) && $attempts[$id]<2) {
                     $launch(labJuryRetryJob($s,$job));$save($s);
@@ -119,8 +117,8 @@ function labJuryWave(array &$s,array $jobs,string $key,callable $save,bool $veri
 }
 
 function labJudgePayload(array $s,string $model,array $messages):array {
-    $p=['model'=>$model,'messages'=>$messages,'max_tokens'=>str_starts_with($model,'z-ai/')?16000:8000,'temperature'=>.2,
-        'response_format'=>['type'=>'json_object'],'provider'=>['sort'=>'throughput','max_price'=>['prompt'=>10,'completion'=>10]]];
+    $p=['model'=>$model,'messages'=>$messages,'max_tokens'=>str_starts_with(ltrim($model,'~'),'z-ai/')?16000:8000,'temperature'=>.2,
+        'response_format'=>['type'=>'json_object'],'provider'=>['sort'=>'throughput','max_price'=>$s['judge_price_caps'][$model] ?? ['prompt'=>10,'completion'=>20]]];
     if(str_starts_with($model,'google/') || str_starts_with($model,'deepseek/'))$p['reasoning']=['enabled'=>false];
     return $p;
 }
