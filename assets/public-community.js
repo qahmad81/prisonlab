@@ -35,8 +35,9 @@ const PublicCommunity={
                 tr.children[2].appendChild(LabCommunity.operator(r));
                 const a=document.createElement('a');a.href='public.php?session_id='+encodeURIComponent(r.session_id);a.textContent=r.case_title;tr.children[3].appendChild(a);
                 const p=document.createElement('p');p.textContent=`${r.role==='prisoner'?'المتهم':'المحقق'} · مستوى ${r.level ?? '—'}/10 · الطرف المقابل ${r.opponent_level==null?'محقق بشري':r.opponent_level+'/10'} · معيار ${r.rubric}`;tr.children[3].appendChild(p);
+                tr.children[3].insertAdjacentHTML('beforeend',LabView.participants(r));
                 tr.children[4].textContent=LabCommunity.cost(r);body.appendChild(tr);
-            });status.textContent=data.total?`${data.total} نتائج منشورة${data.total>data.limit?'؛ تُعرض أعلى '+data.limit+' نتيجة. استخدم المرشحات.':''}`:'لا توجد نتائج منشورة ضمن هذه المرشحات.';
+            });status.textContent=data.total?`${data.total} نتائج منشورة · راعِ اختلاف مستويات التفكير المعروضة${data.total>data.limit?'؛ تُعرض أعلى '+data.limit+' نتيجة. استخدم المرشحات.':''}`:'لا توجد نتائج منشورة ضمن هذه المرشحات.';
         }catch(e){if(this.serial===serial)status.textContent='تعذر تحميل الترتيب: '+e.message;}
     }
 };
