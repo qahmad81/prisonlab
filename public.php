@@ -169,15 +169,13 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
 let publishedSessions = [];
 
 async function loadPublicData() {
-    const res = await fetch('api.php?action=public_sessions');
-    const data = await res.json();
-    if (!data.ok) return;
+    const data = await LabCommunity.fetchJson('api.php?action=public_sessions');
 
     publishedSessions = (data.logs || []).filter(l => l.is_published);
     PublicCommunity.setup(publishedSessions);
     const requestedProfile=new URLSearchParams(location.search).get('profile');
     if(requestedProfile){
-        const p=await (await fetch('api.php?action=public_profile&profile_id='+encodeURIComponent(requestedProfile))).json();
+        let p;try{p=await LabCommunity.fetchJson('api.php?action=public_profile&profile_id='+encodeURIComponent(requestedProfile));}catch(e){p={ok:false};}
         PublicCommunity.profile(p);publishedSessions=p.ok?p.logs:[];
     }
     document.getElementById('stat-published-count').textContent = publishedSessions.length;
@@ -271,9 +269,7 @@ function renderPublicGrid(q) {
 }
 
 async function openSessionReader(sessionId) {
-    const res = await fetch(`api.php?action=load_session&public=1&session_id=${encodeURIComponent(sessionId)}`);
-    const data = await res.json();
-    if (!data.ok) return alert('تعذر تحميل الجلسة');
+    let data;try{data=await LabCommunity.fetchJson(`api.php?action=load_session&public=1&session_id=${encodeURIComponent(sessionId)}`);}catch(e){return alert('تعذر تحميل الجلسة: '+e.message);}
 
     const s = data.session;
     const imgSlug = s.character_slug || s.gender || 'char_1';
@@ -318,7 +314,7 @@ document.getElementById('public-search').addEventListener('input', (e) => {
     renderPublicGrid(e.target.value);
 });
 
-window.addEventListener('DOMContentLoaded', loadPublicData);
+window.addEventListener('DOMContentLoaded',()=>loadPublicData().catch(e=>{document.getElementById('public-grid').textContent='تعذر تحميل التجارب: '+e.message;document.getElementById('board-status').textContent='تعذر تحميل الترتيب: '+e.message;}));
 </script>
 </body>
 </html>

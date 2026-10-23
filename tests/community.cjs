@@ -45,6 +45,13 @@ try{
     // Only the disposable private fixture is deleted. The public fixture must remain.
     page.on('dialog',d=>d.accept());await page.getByRole('button',{name:'حذف المحادثة نهائيًا'}).click();
     await page.waitForFunction(()=>!App.currentSession && App.logs.length===1);
+    // A dropped transport must end with a bounded error, not permanent loading.
+    const errorPage=await ctx.newPage();await errorPage.route('**/api.php?action=init_data',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({ok:false,error:'تعذر تحميل البيانات (اختبار)'})}));
+    await errorPage.goto(base);await errorPage.waitForSelector('#connection-toast.is-error');
+    assert(await errorPage.getByRole('link',{name:'الدخول عبر LinkedIn',exact:true}).isVisible());
+    await publicPage.route('**/api.php?timeout_fixture=1',async route=>{await new Promise(r=>setTimeout(r,250));await route.abort().catch(()=>{});});
+    const timeout=await publicPage.evaluate(()=>LabCommunity.fetchJson('api.php?timeout_fixture=1',40).then(()=>false,e=>e.message));
+    assert(timeout.includes('انتهت مهلة الاتصال'));
     assert.deepEqual(errors,[]);console.log('PASS community UI: sign-in gate, mock OAuth, authenticated performer, private rank, key balance, public-only profile/leaderboard, safe share link, mobile layout, deletion.');
 }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

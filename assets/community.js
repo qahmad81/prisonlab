@@ -1,5 +1,12 @@
 /* Shared account/public UI. All untrusted strings are inserted as text or escaped. */
 const LabCommunity = {
+    async fetchJson(url,timeoutMs=30000) {
+        const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
+        try{const response=await fetch(url,{signal:controller.signal});const data=await response.json();
+            if(!data.ok)throw new Error(data.error || 'تعذر تحميل البيانات');return data;
+        }catch(e){if(e.name==='AbortError')throw new Error('انتهت مهلة الاتصال. أعد المحاولة؛ سجلاتك محفوظة.');throw e;}
+        finally{clearTimeout(timer);}
+    },
     money(value) {return Number.isFinite(Number(value))?'$'+Number(value).toFixed(5):'غير متاح';},
     cost(s) {
         const c=s.cost;if(!c)return 'التكلفة غير متاحة';

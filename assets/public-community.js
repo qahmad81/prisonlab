@@ -27,7 +27,7 @@ const PublicCommunity={
     async load(){const serial=this.serial=(this.serial || 0)+1;const params=new URLSearchParams({action:'leaderboard'});
         for(const [id,param] of [['model','model'],['role','role'],['case','case_file'],['level','level'],['opponent-level','opponent_level'],['rubric','rubric']])params.set(param,document.getElementById('board-'+id).value);
         const status=document.getElementById('board-status');status.textContent='جارٍ تحميل النتائج…';
-        try{const data=await(await fetch('api.php?'+params)).json();if(this.serial!==serial)return;if(!data.ok)throw Error(data.error);
+        try{const data=await LabCommunity.fetchJson('api.php?'+params);if(this.serial!==serial)return;
             const body=document.getElementById('board-rows');body.replaceChildren();let previous=null,rank=0;
             data.rows.forEach((r,i)=>{if(r.score!==previous)rank=i+1;previous=r.score;const tr=document.createElement('tr');
                 for(let n=0;n<5;n++)tr.appendChild(document.createElement('td'));
