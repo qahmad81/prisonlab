@@ -313,7 +313,7 @@ const App = {
             }
         } else {
             statusBadge = '<span class="model-card-badge badge-unlocked">⚡ خفيف / اقتصادي</span>';
-            tip.innerHTML = '<span style="color:#94a3b8;">✓ موديول خفيف متاح مجاناً على نفقة المنصة.</span>';
+            tip.innerHTML = this.userApiKey ? '<span style="color:#10b981;">✓ سيُستخدم مفتاحك الشخصي لهذا النموذج؛ لا يوجد حد يومي للتجارب.</span>' : '<span style="color:#94a3b8;">✓ موديول خفيف متاح على نفقة المشغّل.</span>';
         }
 
         container.innerHTML = `
