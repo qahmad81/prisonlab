@@ -1,0 +1,6 @@
+Options -Indexes
+RewriteEngine On
+RewriteRule ^(?:index\.php|public\.php|api\.php|favicon\.svg)$ - [END]
+RewriteRule ^assets/(?:[a-zA-Z0-9_-]+/)*[a-zA-Z0-9_.-]+\.(?:js|css|jpg|jpeg|png|webp|svg)$ - [END]
+RewriteRule ^$ index.php [END]
+RewriteRule ^ - [F,END]

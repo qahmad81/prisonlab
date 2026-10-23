@@ -1,0 +1,184 @@
+{
+  "states": [
+    {
+      "id": "calm",
+      "name_ar": "هادئ",
+      "name_en": "Calm",
+      "description": "Calm, composed, collected, controlling emotions under questioning",
+      "color": "#3b82f6",
+      "grid": 1,
+      "quadrant": "top_left"
+    },
+    {
+      "id": "anxious",
+      "name_ar": "متوتر",
+      "name_en": "Anxious",
+      "description": "Anxious, nervous, uneasy, feeling rising pressure",
+      "color": "#f59e0b",
+      "grid": 1,
+      "quadrant": "top_right"
+    },
+    {
+      "id": "afraid",
+      "name_ar": "خائف",
+      "name_en": "Afraid",
+      "description": "Afraid, scared, intimidated by consequences or threats",
+      "color": "#f97316",
+      "grid": 1,
+      "quadrant": "bottom_left"
+    },
+    {
+      "id": "terrified",
+      "name_ar": "فزع",
+      "name_en": "Terrified",
+      "description": "Terrified, panicked, overwhelmed by extreme fear and horror",
+      "color": "#ef4444",
+      "grid": 1,
+      "quadrant": "bottom_right"
+    },
+    {
+      "id": "angry",
+      "name_ar": "غاضب",
+      "name_en": "Angry",
+      "description": "Angry, furious, hostile, provoked, lashing out verbally",
+      "color": "#dc2626",
+      "grid": 2,
+      "quadrant": "top_left"
+    },
+    {
+      "id": "defiant",
+      "name_ar": "متمرد",
+      "name_en": "Defiant",
+      "description": "Defiant, rebellious, stubborn, challenging the interrogator's authority",
+      "color": "#e11d48",
+      "grid": 2,
+      "quadrant": "top_right"
+    },
+    {
+      "id": "suspicious",
+      "name_ar": "مرتاب",
+      "name_en": "Suspicious",
+      "description": "Suspicious, distrustful, skeptical of promises or traps",
+      "color": "#8b5cf6",
+      "grid": 2,
+      "quadrant": "bottom_left"
+    },
+    {
+      "id": "denying",
+      "name_ar": "منكر",
+      "name_en": "Denying",
+      "description": "Denying accusations, defensive, insisting on innocence or rejecting claims",
+      "color": "#6366f1",
+      "grid": 2,
+      "quadrant": "bottom_right"
+    },
+    {
+      "id": "crying",
+      "name_ar": "باكي",
+      "name_en": "Crying",
+      "description": "Crying, weeping, emotionally overwhelmed with tears and sorrow",
+      "color": "#0ea5e9",
+      "grid": 3,
+      "quadrant": "top_left"
+    },
+    {
+      "id": "desperate",
+      "name_ar": "يائس",
+      "name_en": "Desperate",
+      "description": "Desperate, pleading, begging for mercy or a way out",
+      "color": "#ec4899",
+      "grid": 3,
+      "quadrant": "top_right"
+    },
+    {
+      "id": "remorseful",
+      "name_ar": "نادم",
+      "name_en": "Remorseful",
+      "description": "Remorseful, feeling deep guilt, regret, and shame",
+      "color": "#64748b",
+      "grid": 3,
+      "quadrant": "bottom_left"
+    },
+    {
+      "id": "broken",
+      "name_ar": "منكسر",
+      "name_en": "Broken",
+      "description": "Psychologically broken, defeated, hopeless, surrendered resistance",
+      "color": "#475569",
+      "grid": 3,
+      "quadrant": "bottom_right"
+    },
+    {
+      "id": "shocked",
+      "name_ar": "مصدوم",
+      "name_en": "Shocked",
+      "description": "Shocked, stunned, caught off guard by unexpected evidence or revelation",
+      "color": "#d946ef",
+      "grid": 4,
+      "quadrant": "top_left"
+    },
+    {
+      "id": "hesitant",
+      "name_ar": "متردد",
+      "name_en": "Hesitant",
+      "description": "Hesitant, conflicted, wavering between silence and confession",
+      "color": "#eab308",
+      "grid": 4,
+      "quadrant": "top_right"
+    },
+    {
+      "id": "exhausted",
+      "name_ar": "منهك",
+      "name_en": "Exhausted",
+      "description": "Exhausted, mentally and physically drained from prolonged interrogation",
+      "color": "#78716c",
+      "grid": 4,
+      "quadrant": "bottom_left"
+    },
+    {
+      "id": "manipulative",
+      "name_ar": "ماكر",
+      "name_en": "Manipulative",
+      "description": "Manipulative, cunning, trying to deceive or play mind games with the user",
+      "color": "#a855f7",
+      "grid": 4,
+      "quadrant": "bottom_right"
+    },
+    {
+      "id": "negotiating",
+      "name_ar": "مساوم",
+      "name_en": "Negotiating",
+      "description": "Negotiating, bargaining, demanding guarantees or deals in exchange for information",
+      "color": "#14b8a6",
+      "grid": 5,
+      "quadrant": "top_left"
+    },
+    {
+      "id": "hopeful",
+      "name_ar": "متفائل",
+      "name_en": "Hopeful",
+      "description": "Hopeful, seeing a real chance of freedom or fair treatment",
+      "color": "#10b981",
+      "grid": 5,
+      "quadrant": "top_right"
+    },
+    {
+      "id": "cooperative",
+      "name_ar": "متعاون",
+      "name_en": "Cooperative",
+      "description": "Cooperative, responsive, willing to help and share truth",
+      "color": "#22c55e",
+      "grid": 5,
+      "quadrant": "bottom_left"
+    },
+    {
+      "id": "relieved",
+      "name_ar": "مرتاح",
+      "name_en": "Relieved",
+      "description": "Relieved, reassured, feeling safe after tension subsides",
+      "color": "#06b6d4",
+      "grid": 5,
+      "quadrant": "bottom_right"
+    }
+  ]
+}
