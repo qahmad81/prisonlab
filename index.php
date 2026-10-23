@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=<?= (int)filemtime(__DIR__ . "/assets/style.css") ?>">
 </head>
 <body>
 <div id="connection-toast" class="connection-toast" role="status" aria-live="polite" hidden></div>
@@ -344,7 +344,7 @@
         <div id="investigator-profile-grid" class="investigator-grid"></div>
     </div>
 </div>
-<script src="assets/session-view.js"></script>
-<script src="assets/app.js"></script>
+<script src="assets/session-view.js?v=<?= (int)filemtime(__DIR__ . "/assets/session-view.js") ?>"></script>
+<script src="assets/app.js?v=<?= (int)filemtime(__DIR__ . "/assets/app.js") ?>"></script>
 </body>
 </html>
