@@ -34,7 +34,7 @@ const App = {
         const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
         try{const response=await fetch(url,{...options,signal:controller.signal});const data=await response.json();
             if(!data.ok)throw new Error(data.error || 'تعذر تحميل البيانات؛ أعد المحاولة.');return data;
-        }catch(e){if(e.name==='AbortError')throw new Error('انتهت مهلة الاتصال بالخادم. أعد تحميل الصفحة أو حاول الدخول مجددًا.');throw e;}
+        }catch(e){if(e.name==='AbortError')throw new Error('انتهت مهلة الاتصال بالخادم. أعد تحميل الصفحة أو حاول مجددًا.');throw e;}
         finally{clearTimeout(timer);}
     },
 
