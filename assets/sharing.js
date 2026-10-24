@@ -11,6 +11,7 @@ const LabSharing={
         b.addEventListener('click',async e=>{e.stopPropagation();try{await navigator.clipboard.writeText(url);b.textContent='✓ نُسخ الرابط';}catch{const a=this.link('افتح رابط المشاركة وانسخه',url);b.replaceWith(a);}});return b;
     },
     setupLinks(){
-        for(const [id,url,label] of [['case-share-link',this.case(App.selectedCaseFilename),'رابط القضية والشخصية ↗'],['prisoner-share-link',this.model(App.selectedModelId,'prisoner'),'نتائج نموذج المتهم ↗'],['interrogator-share-link',this.model(App.selectedInterrogatorId,'interrogator'),'نتائج نموذج المحقق ↗'],['investigator-share-link',this.investigator(App.selectedInvestigatorPersona),'رابط شخصية المحقق ↗']]){const a=document.getElementById(id);if(a){a.href=url;a.textContent=label;}}
+        for(const [id,url,label] of [['case-share-link',this.case(App.selectedCaseFilename),'رابط القضية والشخصية ↗'],['prisoner-share-link',this.model(App.selectedModelId,'prisoner'),'نتائج نموذج المتهم ↗'],['interrogator-share-link',this.model(App.selectedInterrogatorId,'interrogator'),'نتائج نموذج المحقق ↗'],['investigator-share-link',this.investigator(App.selectedInvestigatorPersona),'رابط شخصية المحقق ↗']]){const a=document.getElementById(id);if(a){a.hidden=false;a.href=url;a.textContent=label;}}
+        for(const role of ['prisoner','interrogator']){const actor=typeof MCPUI!=='undefined'?MCPUI.selections[role]:null,a=document.getElementById(role+'-share-link');if(a && actor){a.hidden=!actor.id;if(actor.id)a.href=this.model(actor.id,role);}}
     }
 };

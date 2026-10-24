@@ -53,7 +53,11 @@ const MCPUI={
                 row.append(label,input,copy,renew,revoke);document.getElementById('mcp-gates').appendChild(row);
             }
         }
-        for(const role of roles){const row=document.querySelector('.mcp-gate-row[data-role="'+role+'"]');row.querySelector('input').value=this.urls[s.session_id+role] || '';for(const b of row.querySelectorAll('button'))b.disabled=!!s.is_ended;}
+        for(const role of roles){const row=document.querySelector('.mcp-gate-row[data-role="'+role+'"]');row.querySelector('input').value=this.urls[s.session_id+role] || '';for(const b of row.querySelectorAll('button'))b.disabled=!!s.is_ended;
+            let status=row.querySelector('.mcp-gate-status');if(!status){status=document.createElement('small');status.className='mcp-gate-status';row.appendChild(status);}
+            const state=s.mcp_status?.[role],recent=state?.connected_at && Date.now()-Date.parse(state.connected_at)<35000;
+            status.textContent=!state?'الرابط صالح 24 ساعة؛ تجديده يبطل السابق.':!state.active?'البوابة غير مفعلة أو منتهية؛ أنشئ رابطًا جديدًا.':(recent?'✓ الوكيل متصل حديثًا':'لا اتصال حديث من الوكيل')+' · '+({not_requested:'لم تُطلب المهمة بعد',processed:'حُفظ الرد',reply_received:'وصل الرد وينتظر معالجة المختبر',waiting_agent:'بانتظار رد الوكيل'})[state.task_state];
+        }
         document.getElementById('mcp-wait-state').textContent=s.is_ended?'أُغلقت أدوار التحقيق.':this.waiting?'بانتظار الوكيل الخارجي؛ يمكنك نسخ الرابط أثناء الانتظار.':'جاهز · يبدأ الوكيل باستدعاء prisonlab_wait ثم يرسل prisonlab_reply.';
         document.getElementById('mcp-pause-btn').hidden=!this.waiting;
     },

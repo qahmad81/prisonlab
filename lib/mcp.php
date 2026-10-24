@@ -123,3 +123,12 @@ function labMcpDelete(array $s):void {
     foreach(array_keys($s['mcp_actors'] ?? []) as $role)labMcpLocked($s['session_id'],$role,function(&$g){$g=[];});
     foreach(array_keys($s['mcp_actors'] ?? []) as $role){$p=labMcpPath($s['session_id'],$role);if(is_file($p))unlink($p);}
 }
+function labMcpStatus(array $s):array {
+    $out=[];
+    foreach(array_keys($s['mcp_actors'] ?? []) as $role){
+        $p=labMcpPath($s['session_id'],$role);$g=is_file($p)?labRead($p):[];
+        $out[$role]=['active'=>!empty($g['gate_hash']) && ($g['expires_at'] ?? 0)>time(),'expires_at'=>$g['expires_at'] ?? null,
+            'connected_at'=>$g['connected_at'] ?? null,'task_state'=>empty($g['task'])?'not_requested':(!empty($g['task']['consumed'])?'processed':(isset($g['task']['response'])?'reply_received':'waiting_agent'))];
+    }
+    return $out;
+}

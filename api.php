@@ -23,6 +23,7 @@ function publicSession(array $s, string $owner): array {
     $s['can_review']=hash_equals($s['owner_id'] ?? '',$owner) && !empty($s['is_ended']) && labTurns($s)>0;
     $s['user_reviews']=labSessionReviews($s);
     $s['read_only'] = !hash_equals($s['owner_id'] ?? '', $owner) || !empty($s['is_published']);
+    if(!$s['read_only'])$s['mcp_status']=labMcpStatus($s);else unset($s['mcp_status']);
     if($s['read_only'] || !empty($s['is_ended']))unset($s['awaiting_question']);
     if (!$s['read_only'] && isset($s['pending_turn']['text'])) $s['pending_question'] = $s['pending_turn']['text'];
     $s['turns_count'] = labTurns($s); $s['max_turns'] = LAB_MAX_TURNS;
