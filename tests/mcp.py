@@ -102,10 +102,17 @@ def run(storage):
     calls=json.loads((storage/'test-calls.json').read_text());assert not any(c['model'].startswith('mcp/') for c in calls)
     assert owner.post('evaluate_session','sk-or-test-personal',session_id=sid)[1]['session']['evaluation_status']=='complete'
     assert task('prisoner')['status']=='ended'
+    assert owner.post('publish_session',session_id=sid)[0]==200
+    assert rpc(tokens['prisoner'],'ping')[0]==401,'Publication disables every gate'
+    pub=other.request('/api.php?action=load_session&session_id='+sid)[1]['session']
+    assert 'mcp_status' not in pub and tokens['prisoner'].split('.')[-1] not in json.dumps(pub)
     assert owner.post('delete_session',session_id=sid,confirm=sid)[0]==200
     assert rpc(tokens['prisoner'],'ping')[0]==401 and not list((storage/'mcp').glob(sid+'*.json'))
     # Human investigator / MCP prisoner.
     s=start('human',{'prisoner':actors['prisoner']});tokens={'prisoner':gate(s,'prisoner')};rid=uuid.uuid4().hex
+    assert owner.post('mcp_gate',session_id=s['session_id'],role='prisoner',revoke=True)[0]==200
+    assert rpc(tokens['prisoner'],'ping')[0]==401
+    tokens['prisoner']=gate(s,'prisoner')
     assert step(s,rid=rid)[1]['mcp_wait'];t=task('prisoner');reply('prisoner',t,{'reply':'لم أنقل الملفات بنفسي.'})
     assert step(s,rid=rid)[1]['session']['turns_count']==1
     # MCP investigator / human accused retains canonical user/assistant schema.
