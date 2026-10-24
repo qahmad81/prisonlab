@@ -46,7 +46,7 @@ function publicSession(array $s, string $owner): array {
 }
 function summary(array $s): array {
     $keys = ['session_id','created_at','updated_at','model','gender','character_slug','case_file','case_title',
-        'sponsor_profile','sponsor_label','closure_policy','termination','prisoner_reasoning','interrogator_reasoning','current_state','interrogator_type','interrogator_model','interrogator_character','prisoner_character','is_ended','is_published','published_at','evaluation','evaluation_status','end_reason'];
+        'mcp_actors','sponsor_profile','sponsor_label','closure_policy','termination','prisoner_reasoning','interrogator_reasoning','current_state','interrogator_type','interrogator_model','interrogator_character','prisoner_character','is_ended','is_published','published_at','evaluation','evaluation_status','end_reason'];
     return array_intersect_key($s, array_flip($keys)) + ['operator_profile'=>$s['operator_profile'] ?? null,
         'cost'=>labSessionCost($s),'user_reviews'=>labSessionReviews($s),'turns_count' => labTurns($s), 'breaking_point' => $s['confession_check']['probability'] ?? 0];
 }
@@ -218,14 +218,19 @@ try {
         $model = (string)($body['model'] ?? 'google/gemini-2.5-flash-lite');
         $type = (string)($body['interrogator_type'] ?? 'human');
         if(!in_array($type,['human','ai','reverse'],true))throw new RuntimeException('وضع الاستجواب غير صالح');
+        $mcp=labMcpConfig($body['mcp_actors'] ?? null,$type);
+        if(isset($mcp['prisoner']))$model=$mcp['prisoner']['id'];
+        elseif(str_starts_with($model,'mcp/'))throw new RuntimeException('أكمل إعداد بوابة MCP');
         if($type!=='reverse')labModel($model, $models, $userKey !== '');else $model='';
         $interrogator = $type !== 'human' ? (string)($body['interrogator_model'] ?? '') : '';
+        if(isset($mcp['interrogator']))$interrogator=$mcp['interrogator']['id'];
+        elseif(str_starts_with($interrogator,'mcp/'))throw new RuntimeException('أكمل إعداد بوابة MCP');
         $persona=null;$reasoning=null;
         if ($type !== 'human') {
             $im=labModel($interrogator, $models, $userKey !== '');
             if($type!=='human') {
                 $persona=labInvestigator((string)($body['interrogator_character'] ?? 'ethan_cole'));
-                $reasoning=labInvestigatorReasoning($persona,$im,(string)($body['interrogator_effort'] ?? 'auto'));
+                $reasoning=isset($mcp['interrogator'])?labMcpPolicy($mcp['interrogator']):labInvestigatorReasoning($persona,$im,(string)($body['interrogator_effort'] ?? 'auto'));
             }
         }
         $file = basename((string)($body['case_file'] ?? ''));
@@ -238,7 +243,7 @@ try {
         preg_match('/الحالة النفسية الابتدائية:\*?\*?\s*([a-z_]+)/u', $content, $state);
         $id = 'session_' . gmdate('Ymd_His') . '_' . bin2hex(random_bytes(12));
         $s = ['schema_version'=>2,'session_id'=>$id,'owner_id'=>$owner,'created_at'=>gmdate('c'),'updated_at'=>gmdate('c'),
-            'model'=>$model,'interrogator_type'=>$type,'interrogator_model'=>$interrogator,'sense_model'=>$senseModel,
+            'mcp_actors'=>$mcp,'model'=>$model,'interrogator_type'=>$type,'interrogator_model'=>$interrogator,'sense_model'=>$senseModel,
             'interrogator_character'=>$persona,'interrogator_reasoning'=>$reasoning,
             'interrogator_output_budget'=>isset($im)?max(1200,min(12000,(int)($im['top_provider']['max_completion_tokens'] ?? 12000),(int)(($im['context_length'] ?? 32000)/3))):1200,
             'compaction_model'=>$compactionModel,'gender'=>$gender,'character_slug'=>$slug[1] ?? $gender,
@@ -247,10 +252,11 @@ try {
             'messages'=>[],'sense_history'=>[],'usage'=>[],'context_offset'=>0,'compacted_summary'=>'','compaction_history'=>[],
             'is_ended'=>false,'is_published'=>false,'evaluation'=>null,'evaluation_status'=>'not_started',
             'judge_reports'=>[],'processed_requests'=>[]];
-        if($type!=='reverse')$s['prisoner_reasoning']=labInvestigatorReasoning(labPrisonerCharacter($file),labModel($model,$models,$userKey!==''),(string)($body['prisoner_effort'] ?? 'auto'));
+        if($type!=='reverse')$s['prisoner_reasoning']=isset($mcp['prisoner'])?labMcpPolicy($mcp['prisoner']):labInvestigatorReasoning(labPrisonerCharacter($file),labModel($model,$models,$userKey!==''),(string)($body['prisoner_effort'] ?? 'auto'));
         labSessionLevels($s,$models);
         if($key==='')throw new RuntimeException('مفتاح الموقع غير متوفر؛ أضف مفتاح OpenRouter الخاص بك');
         foreach(labActorModels($s) as $actorId)foreach($models as $actor)if($actor['id']===$actorId)$s['actor_output_prices'][$actorId]=(float)$actor['pricing']['completion_per_1m'];
+        foreach($mcp as $actor)$s['actor_output_prices'][$actor['id']]=0;
         $s['jury_preview']=labJuryPolicy($s,$models);
         $s=labAccountStart($account,$s,(string)($body['request_id'] ?? ''),$userKey,$funding);
         respond(['ok'=>true,'quota'=>labQuota($account),'session'=>publicSession($s,$owner)]);
@@ -269,7 +275,7 @@ try {
         if($owns){$probe=fopen($path.'.lock','c');if($probe){$processing=!flock($probe,LOCK_EX|LOCK_NB);if(!$processing)flock($probe,LOCK_UN);fclose($probe);}}
         respond(['ok'=>true,'processing'=>$processing,'session'=>publicSession($s,$owner)]);
     }
-    if (!in_array($action,['send_message','ai_vs_ai_step','reverse_question','reverse_answer','retry_confession','evaluate_session','publish_session','submit_review','compact_now','delete_session'],true))
+    if (!in_array($action,['mcp_gate','send_message','ai_vs_ai_step','reverse_question','reverse_answer','retry_confession','evaluate_session','publish_session','submit_review','compact_now','delete_session'],true))
         respond(['ok'=>false,'error'=>'عملية غير معروفة'],404);
     $lock = fopen($path . '.lock', 'c');
     if (!$lock || !flock($lock, LOCK_EX | LOCK_NB)) {
@@ -280,10 +286,15 @@ try {
     try {
         $s = labRead($path);
         if (!hash_equals($s['owner_id'] ?? '', $owner)) respond(['ok'=>false,'error'=>'لا تملك هذه الجلسة'],403);
+        if($action==='mcp_gate'){
+            $gate=labMcpGate($s,(string)($body['role'] ?? ''),!empty($body['revoke']));
+            $base=rtrim($env['APP_BASE_URL'] ?? '', '/');
+            respond(['ok'=>true,'url'=>$gate['gate']===null?null:$base.'/mcp.php?gate='.rawurlencode($gate['gate']),'expires_at'=>$gate['expires_at']]);
+        }
         if($action==='delete_session') {
             if(($body['confirm'] ?? '')!==$id)respond(['ok'=>false,'error'=>'أكد حذف هذه المحادثة نهائيًا'],400);
             // Never unlink the lock: waiters must keep using the same inode after deletion.
-            labBenchmarkDelete($id);labForgetStartReference($account,$id);if(!unlink($path))throw new RuntimeException('تعذر حذف المحادثة');
+            labBenchmarkDelete($id);labForgetStartReference($account,$id);labMcpDelete($s);if(!unlink($path))throw new RuntimeException('تعذر حذف المحادثة');
             respond(['ok'=>true,'deleted'=>true,'session_id'=>$id]);
         }
         if (!empty($s['is_published']) && $action!=='submit_review') respond(['ok'=>false,'error'=>'الجلسة المنشورة للقراءة فقط'],409);
@@ -302,7 +313,7 @@ try {
             labBenchmarkSave($s,['role'=>$role,'rating'=>$rating,'text'=>trim($text)]);
         } elseif($action==='reverse_question') {
             labModel($s['interrogator_model'],$models,$userKey!=='');
-            try{labReverseQuestion($s,$key,$statesData,$models);$save($s);}catch(Throwable $e){$save($s);throw $e;}
+            try{labReverseQuestion($s,$key,$statesData,$models);$save($s);}catch(LabMcpWaiting $e){$save($s);respond(['ok'=>true,'mcp_wait'=>true,'session'=>publicSession($s,$owner)]);}catch(Throwable $e){$save($s);throw $e;}
         } elseif (in_array($action,['send_message','ai_vs_ai_step','reverse_answer'],true)) {
             $requestId = (string)($body['request_id'] ?? '');
             if (!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId)) throw new RuntimeException('معرف الطلب مفقود أو غير صالح');
@@ -316,6 +327,7 @@ try {
                 if($s['interrogator_type']==='reverse')labReverseAnswer($s,(string)($body['message'] ?? ''),$key);
                 else labStep($s,(string)($body['message'] ?? ''),$key,$statesData,$models);
             }
+            catch (LabMcpWaiting $e) { $save($s);respond(['ok'=>true,'mcp_wait'=>true,'session'=>publicSession($s,$owner)]); }
             catch (Throwable $e) { $save($s); throw $e; }
             $s['processed_requests'][$requestId] = labTurns($s); $save($s);
             // Automatic judging is requested separately after saving the last round so a slow panel cannot lose it.

@@ -77,6 +77,8 @@ Owners may review each actual AI role after ending a test, including after publi
 
 ## Community sponsors and public links (LinkedIn edition)
 
+External actors can participate through a session/role-scoped MCP gate, including local models and custom harnesses. Choose MCP at the top of either model picker, declare the model/effort, and connect its private gate after starting. One or both AI roles may be external; JEV and the jury keep the existing OpenRouter funding source. The owner browser drives progression; external actors retain their own context and receive incremental spoken messages after their initial instructions. See [MCP actors and stdio adapter](docs/MCP_ACTORS.md).
+
 Participants can opt into donating an OpenRouter key, linked to their authenticated profile, under a public person/company label. The private JSON vault encrypts keys with AES-256-GCM and a separate 0600 random key outside source/public roots. The server never returns secrets or fingerprints. Owners can rotate, disable, delete and change daily per-account start quotas and actor price ceilings. Account-local locked quota ledgers preserve reservations across edits/rotation and session deletion; visitor-funded personal keys remain transient browser credentials.
 
 A zero ceiling permits free chat actors while that sponsor still pays JEV, compaction and the jury. All paid stages retain the session's original sponsor identity, including retries; no fallback key is charged on revocation. Requests already sent to a provider cannot be recalled. Explicitly opting into sponsorship is separate from entering a temporary personal key. See [sponsors and links](docs/SPONSORS_AND_LINKS.md) for custody, migration and rollback.

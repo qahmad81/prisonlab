@@ -303,6 +303,7 @@ const App = {
     },
 
     renderSelectedModelSummary() {
+        if(typeof MCPUI!=='undefined' && MCPUI.renderSelection('prisoner'))return;
         const m = this.getSelectedModel();
         const container = document.getElementById('selected-model-card');
         const tip = document.getElementById('model-status-tip');
@@ -518,6 +519,7 @@ const App = {
 
         if (this.modelTarget === 'interrogator') this.selectedInterrogatorId = modelId;
         else this.selectedModelId = modelId;
+        if(typeof MCPUI!=='undefined')delete MCPUI.selections[this.modelTarget];
         this.renderSelectedModelSummary();
         this.renderInterrogatorSummary();
         this.closeModelModal();
@@ -656,6 +658,14 @@ const App = {
                     attempt--;continue;
                 }
                 if(!data.ok)throw Object.assign(new Error(data.error || 'تعذر تنفيذ الطلب'),{retryable:!!data.retryable || [502,503,504].includes(res.status)});
+                if(data.mcp_wait && typeof MCPUI!=='undefined'){
+                    MCPUI.waiting=true;this.currentSession=data.session;this.renderActiveSession();
+                    this.notify('بانتظار وكيل MCP. افتح بوابات الجلسة وانسخ رابط الدور لوكيلك؛ المراحل المكتملة محفوظة.');
+                    await this.retryWait(2000);
+                    if(MCPUI.pauseRequested){MCPUI.waiting=false;MCPUI.pauseRequested=false;throw new Error('أُوقف انتظار MCP. يمكنك إكمال التحقيق من المرحلة المحفوظة.');}
+                    attempt--;continue;
+                }
+                if(typeof MCPUI!=='undefined')MCPUI.waiting=false;
                 if(action==='evaluate_session' && data.session?.evaluation_status==='failed') {
                     this.currentSession=data.session;
                     if(data.session.evaluation_retryable)throw Object.assign(new Error(data.session.evaluation_error),{retryable:true});
@@ -692,6 +702,7 @@ const App = {
         button.title='إعداد التجربة التالية؛ لا يغيّر الجلسة الحالية';
     },
     openReasoningModal(role) {
+        if(typeof MCPUI!=='undefined' && MCPUI.selections[role])return MCPUI.configure(role);
         const id=role==='prisoner'?this.selectedModelId:this.selectedInterrogatorId,m=this.models.find(m=>m.id===id);
         const efforts=m?.reasoning_capabilities?.efforts || [];if(!efforts.length)return;
         this.reasoningReturnFocus=document.activeElement;
@@ -741,6 +752,7 @@ const App = {
     },
     swapRoles() {
         if(this.busy || this.generating)return;
+        if(typeof MCPUI!=='undefined')[MCPUI.selections.prisoner,MCPUI.selections.interrogator]=[MCPUI.selections.interrogator,MCPUI.selections.prisoner];
         [this.reasoningSelections.prisoner,this.reasoningSelections.interrogator]=[this.reasoningSelections.interrogator,this.reasoningSelections.prisoner];
         [this.selectedModelId,this.selectedInterrogatorId]=[this.selectedInterrogatorId,this.selectedModelId];
         this.setInterrogationMode(this.interrogationMode==='ai'?'ai':this.interrogationMode==='human'?'reverse':'human');
@@ -760,6 +772,7 @@ const App = {
         card.classList.toggle('connection-weak',!!m?.health?.weak);
         card.innerHTML=m ? `<span class="selected-model-icon">${m.icon_svg || '🤖'}</span><span class="selected-model-info"><span class="model-summary-heading"><strong class="selected-model-name">${this.escapeHtml(m.name)}</strong><span class="model-change-label">تغيير ↗</span></span><span class="selected-model-meta"><span>${this.escapeHtml(m.context_formatted || '')} سياق</span><span>إدخال $${m.pricing.prompt_per_1m} · إخراج $${m.pricing.completion_per_1m} / مليون</span></span><span class="model-card-badge ${this.modelLocked(m)?'badge-locked':!m.is_locked?'badge-unlocked':'badge-userkey'}">${m.is_locked?'نموذج احترافي':'خفيف / اقتصادي'}</span></span>` : 'اختر نموذج المحقق';
         this.renderReasoningControl('interrogator',m);LabSharing.setupLinks();
+        if(typeof MCPUI!=='undefined')MCPUI.renderSelection('interrogator');
         const p=this.investigators.find(p=>p.id===this.selectedInvestigatorPersona);
         document.getElementById('selected-investigator-persona').innerHTML=p?`${LabView.investigatorAvatar(p)}<span><strong dir="ltr">${this.escapeHtml(p.name)}</strong><small>المستوى ${p.level}/10 · ${this.escapeHtml(p.level_ar)}</small><small>${this.escapeHtml(p.specialty)}</small></span><span>تغيير ←</span>`:'اختر شخصية المحقق';
     },
@@ -791,8 +804,10 @@ const App = {
             const c=this.getSelectedCase();
             this.startRequestId ||= this.requestId();
             const data=await this.api('start_session',{request_id:this.startRequestId,case_file:c.filename,model:this.selectedModelId,
+                mcp_actors:typeof MCPUI!=='undefined'?MCPUI.startConfig():{},
                 sponsor_id:this.selectedSponsorId,interrogator_type:this.interrogationMode,interrogator_model:this.selectedInterrogatorId,interrogator_character:this.selectedInvestigatorPersona,prisoner_effort:this.reasoningSelection('prisoner'),interrogator_effort:this.reasoningSelection('interrogator')});
             this.generation++; this.currentSession=data.session; this.stopRequested=false;this.aiPaused=false;
+            if(typeof MCPUI!=='undefined')await MCPUI.started(data.session);
             this.startRequestId=null;this.quota=data.quota;this.renderAccount();
             this.renderActiveSession(); await this.reloadLogsOnly(); this.notify('بدأت الجلسة. حد الاستجواب 30 ردًا للسجين.');
         } catch(e) {this.notify(e.message,true);}
@@ -810,6 +825,7 @@ const App = {
             const d=await (await fetch('api.php?action=load_session&session_id='+encodeURIComponent(id))).json();
             if(!d.ok) throw Error(d.error);
             this.currentSession=d.session;this.generation++;this.currentCharacterSlug=d.session.character_slug;
+            if(typeof MCPUI!=='undefined')MCPUI.selections=structuredClone(d.session.mcp_actors || {});
             this.aiPaused=d.session.interrogator_type==='ai' && !d.session.is_ended;
             this.currentGender=d.session.gender;this.selectedModelId=d.session.model;
             this.renderStatesGallery(d.session.current_state);
@@ -838,6 +854,8 @@ const App = {
         document.getElementById('reverse-resume-btn').hidden=!reverse || !!ended || !!ro || !!s?.awaiting_question?.sense;
         document.getElementById('reverse-resume-btn').disabled=this.busy;
         document.getElementById('compact-btn').disabled=!s || this.busy || this.generating || !!ended || !!ro;
+        if(s && Object.keys(s.mcp_actors || {}).length===(s.interrogator_type==='ai'?2:1))document.getElementById('compact-btn').disabled=true;
+        if(typeof MCPUI!=='undefined')MCPUI.renderSession();
         const end=document.getElementById('end-session-btn');
         end.disabled=!s || this.busy || !!ro || s.evaluation_status==='complete';
         const endTest=document.getElementById('end-test-btn');endTest.disabled=end.disabled;endTest.hidden=!!s?.evaluation;
@@ -1020,7 +1038,7 @@ const App = {
         if(!logs.length){box.textContent='لا توجد جلسات مطابقة.';return;}
         for(const s of logs){
             const card=document.createElement('div');card.className='archive-card';card.tabIndex=0;card.setAttribute('role','button');
-            card.innerHTML=`<div class="archive-card-top"><img class="archive-card-avatar" src="${LabView.face(s.character_slug,s.current_state)}" alt=""><div class="archive-card-header-info"><div class="archive-card-name">${this.escapeHtml(s.case_title)}</div><div class="archive-card-roles">المحقق: ${this.escapeHtml(s.interrogator_type!=='human'?(s.interrogator_character?.name || '')+' · '+s.interrogator_model:'بشري')}</div><div class="archive-card-roles">السجين: ${this.escapeHtml(s.interrogator_type==='reverse'?'أنت · متهم بشري':s.model)}</div></div></div><div class="archive-card-body"><span>${s.turns_count} / 30 جولة · ${s.is_ended?'منتهية':'قيد التحقيق'}</span><progress max="30" value="${s.turns_count}"></progress>${s.evaluation?`<strong>السجين ${s.evaluation.prisoner_score ?? s.evaluation.overall_score} · المحقق ${s.evaluation.investigator_score ?? '—'}</strong>`:''}</div>`;
+            card.innerHTML=`<div class="archive-card-top"><img class="archive-card-avatar" src="${LabView.face(s.character_slug,s.current_state)}" alt=""><div class="archive-card-header-info"><div class="archive-card-name">${this.escapeHtml(s.case_title)}</div><div class="archive-card-roles">المحقق: ${this.escapeHtml(s.interrogator_type!=='human'?(s.interrogator_character?.name || '')+' · '+LabView.actorName(s,'interrogator'):'بشري')}</div><div class="archive-card-roles">السجين: ${this.escapeHtml(s.interrogator_type==='reverse'?'أنت · متهم بشري':LabView.actorName(s,'prisoner'))}</div></div></div><div class="archive-card-body"><span>${s.turns_count} / 30 جولة · ${s.is_ended?'منتهية':'قيد التحقيق'}</span><progress max="30" value="${s.turns_count}"></progress>${s.evaluation?`<strong>السجين ${s.evaluation.prisoner_score ?? s.evaluation.overall_score} · المحقق ${s.evaluation.investigator_score ?? '—'}</strong>`:''}</div>`;
             card.insertAdjacentHTML('beforeend',LabView.participants(s));
             const cost=document.createElement('p');cost.className='archive-cost';cost.textContent=LabCommunity.cost(s);card.appendChild(cost);
             const open=()=>this.loadSession(s.session_id);card.addEventListener('click',open);card.addEventListener('keydown',e=>{if(e.target===card && (e.key==='Enter' || e.key===' ')){e.preventDefault();open();}});

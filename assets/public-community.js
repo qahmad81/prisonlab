@@ -56,7 +56,7 @@ const PublicCommunity={
             const body=document.getElementById('board-rows');body.replaceChildren();let previous=null,rank=0;
             data.rows.forEach((r,i)=>{if(r.score!==previous)rank=i+1;previous=r.score;const tr=document.createElement('tr');
                 for(let n=0;n<5;n++)tr.appendChild(document.createElement('td'));
-                tr.children[0].textContent=rank;tr.children[1].appendChild(LabSharing.link(r.model_id,LabSharing.model(r.model_id,r.role)));tr.children[1].append(' · '+r.score+'/100');
+                tr.children[0].textContent=rank;tr.children[1].appendChild(LabSharing.link(LabView.actorName(r,r.role),LabSharing.model(r.model_id,r.role)));tr.children[1].append(' · '+r.score+'/100');
                 tr.children[2].appendChild(LabCommunity.operator(r));
                 const a=document.createElement('a');a.href='public.php?session_id='+encodeURIComponent(r.session_id);a.textContent=r.case_title;tr.children[3].appendChild(a);
                 const p=document.createElement('p');p.textContent=`${r.role==='prisoner'?'المتهم':'المحقق'} · مستوى ${r.level ?? '—'}/10 · الطرف المقابل ${r.opponent_level==null?'محقق بشري':r.opponent_level+'/10'} · معيار ${r.rubric}`;tr.children[3].appendChild(p);

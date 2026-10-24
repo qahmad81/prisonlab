@@ -9,6 +9,7 @@ require_once __DIR__ . '/benchmark.php';
 require_once __DIR__ . '/curated.php';
 require_once __DIR__ . '/output.php';
 require_once __DIR__ . '/closure.php';
+require_once __DIR__ . '/mcp.php';
 const LAB_VERSION = '2.6';
 const LAB_MAX_TURNS = 30;
 
@@ -121,6 +122,7 @@ function labChat(array &$s, string $purpose, string $model, array $messages, str
         $events=array_filter($s['output_events'] ?? [],fn($e)=>$e['role']===$purpose && $e['turn']===labTurns($s)+1 && in_array($e['kind'],['visible_limit','token_limit'],true));
         if($events)$payload['messages'][]=['role'=>'system','content'=>'المحاولة السابقة تجاوزت ميزانية الإخراج. لا تعِد النص السابق؛ أجب بأقل من نصف الحد وأغلق JSON، واختصر الملاحظة الاختيارية أو احذفها.'.labOutputInstruction($purpose)];
     }
+    if(isset($s['mcp_actors'][$purpose]))return labMcpChat($s,$purpose,$payload['messages']);
     $r = labRequest($payload, $key, false, in_array($purpose,['interrogator','prisoner'],true) ? 300 : ($purpose === 'judge' ? 180 : 65));
     labUsage($s, $purpose, $r, $model);
     if (($r['choices'][0]['finish_reason'] ?? '') === 'length') {
@@ -140,6 +142,7 @@ function labObject(string $text): array {
 }
 
 function labModel(string $id, array $models, bool $userKey, float $cap = 1.0): array {
+    if(preg_match('~^mcp/[a-f0-9]{24}$~D',$id))return ['id'=>$id,'context_length'=>2000000,'pricing'=>['prompt_per_1m'=>0,'completion_per_1m'=>0],'supported_parameters'=>[]];
     $cap=$GLOBALS['lab_actor_price_cap'] ?? $cap;
     foreach ($models as $m) if ($m['id'] === $id) {
         $p = $m['pricing'] ?? [];
@@ -156,6 +159,7 @@ function labContext(array $s): array {
 }
 
 function labCompact(array &$s, string $key, string $model): bool {
+    if(count($s['mcp_actors'] ?? [])===count(labActorModels($s)))return false;
     $context = labContext($s);
     if (count($context) <= 6) return false;
     $older = array_slice($context, 0, -6);
@@ -193,6 +197,7 @@ function labEnsureContext(array &$s, string $key, array $models): void {
     if ($s['interrogator_type'] === 'ai') $ids[] = $s['interrogator_model'];
     $limit = PHP_INT_MAX;
     foreach ($ids as $id) {
+        if(str_starts_with($id,'mcp/'))continue;
         $m = labModel($id, $models, true);
         $limit = min($limit, (int)($m['context_length'] ?? 4096));
     }

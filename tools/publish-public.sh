@@ -8,7 +8,7 @@ if [[ "$app" != "$domain/private/app" || "$public" != "$domain/public_html" || !
     echo 'Refusing an unexpected source/public path' >&2
     exit 1
 fi
-for entry in index.php api.php public.php privacy.php auth.php; do
+for entry in index.php api.php public.php privacy.php auth.php mcp.php; do
     printf "<?php\nrequire dirname(__DIR__) . '/private/app/%s';\n" "$entry" > "$public/.$entry.deploy"
     chmod 0644 "$public/.$entry.deploy"
     mv -- "$public/.$entry.deploy" "$public/$entry"

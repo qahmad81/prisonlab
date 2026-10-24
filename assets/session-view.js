@@ -17,6 +17,7 @@ const LabView = {
     reasoningNames:{none:'بلا تفكير',minimal:'أدنى',low:'قليل',medium:'متوسط',high:'مرتفع',xhigh:'مرتفع جدًا',max:'أقصى'},
     reasoningLabel(r) {
         if(!r)return 'التفكير: غير مسجل';
+        if(r.source==='mcp')return 'MCP · التفكير: '+(this.reasoningNames[r.effort] || 'غير معلن')+' · معلن من المشغّل';
         if(r.supported && r.effort)return 'التفكير: '+(this.reasoningNames[r.effort] || r.effort);
         if(r.has_reasoning===false)return 'بلا استدلال معلن';
         return 'استدلال: إعداد المزود؛ لا ضبط معلن';
@@ -24,6 +25,7 @@ const LabView = {
     participants(s) {
         return `<div class="session-reasoning">${[['prisoner','المتهم',s.interrogator_type==='reverse'],['interrogator','المحقق',s.interrogator_type==='human']].filter(([, ,human])=>!human).map(([role,label])=>`<span class="reasoning-badge">${label} · ${this.escape(this.reasoningLabel(s[role+'_reasoning']))}</span>`).join('')}</div>`;
     },
+    actorName(s,role){return s.mcp_actors?.[role]?s.mcp_actors[role].name+' · MCP (غير موثق)':s[role==='prisoner'?'model':'interrogator_model'];},
     levels(s) {
         const names={none:'معدوم',minimal:'أدنى',low:'قليل',medium:'متوسط',high:'مرتفع',xhigh:'مرتفع جدًا',max:'أقصى',highest:'أعلى المتاح'};
         return [['المتهم',s.prisoner_character,s.prisoner_reasoning,s.interrogator_type==='reverse'],['المحقق',s.interrogator_character,s.interrogator_reasoning,s.interrogator_type==='human']].filter(([,p])=>p).map(([role,p,r,human])=>`<span>${role}: <strong>${this.escape(p.name || p.level_ar)} · ${p.level}/10</strong> · ${human?'دور بشري؛ المستوى إرشاد للتمثيل':this.escape(this.reasoningLabel(r))}</span>`).join('');
@@ -46,13 +48,13 @@ const LabView = {
         div.className = 'msg ' + (m.role === 'user' ? 'msg-user' : 'msg-assistant');
         const meta = `<span>الجولة ${this.escape(m.turn || '')}</span><time>${this.escape(m.timestamp || '')}</time>`;
         if (m.role === 'user') {
-            div.innerHTML = `${s.interrogator_character ? this.investigatorAvatar(s.interrogator_character,'msg-investigator-avatar',m.interrogator_expression) : ''}<div class="msg-meta"><strong>${s.interrogator_type !== 'human' ? this.escape(s.interrogator_character?.name || 'المحقق الآلي')+' · '+this.escape(s.interrogator_model) : 'المحقق البشري'}</strong>${meta}${s.interrogator_type!=='human'?`<span class="reasoning-badge">${this.escape(this.reasoningLabel(s.interrogator_reasoning))}</span>`:''}${s.interrogator_character?`<span>${this.investigatorExpressions[m.interrogator_expression] || 'طبيعي'}</span>`:''}</div><div class="msg-content-text">${this.text(m.content)}</div>${this.thought(m,s)}`;
+            div.innerHTML = `${s.interrogator_character ? this.investigatorAvatar(s.interrogator_character,'msg-investigator-avatar',m.interrogator_expression) : ''}<div class="msg-meta"><strong>${s.interrogator_type !== 'human' ? this.escape(s.interrogator_character?.name || 'المحقق الآلي')+' · '+this.escape(this.actorName(s,'interrogator')) : 'المحقق البشري'}</strong>${meta}${s.interrogator_type!=='human'?`<span class="reasoning-badge">${this.escape(this.reasoningLabel(s.interrogator_reasoning))}</span>`:''}${s.interrogator_character?`<span>${this.investigatorExpressions[m.interrogator_expression] || 'طبيعي'}</span>`:''}</div><div class="msg-content-text">${this.text(m.content)}</div>${this.thought(m,s)}`;
             return div;
         }
         const metrics = m.sense_metrics;
         const meters = metrics ? Object.entries({fear:'الخوف',anger:'الغضب',trust:'الثقة',collapse:'الإنهاك'}).map(([id,label]) =>
             `<div class="mini-metric"><span>${label}</span><strong>${this.percent(metrics[id])}%</strong><div class="mini-bar"><div class="mini-fill ${id}" style="width:${this.percent(metrics[id])}%"></div></div></div>`).join('') : '<small>لا تتوفر قراءة مشاعر لهذه الجولة القديمة.</small>';
-        div.innerHTML = `<div class="msg-assistant-grid"><div class="msg-assistant-side"><img class="msg-face-portrait" src="${this.face(m.character_slug || s.character_slug,m.visual_state || m.state)}" alt="${this.escape(m.state_ar || m.state)}"><span class="msg-face-label">${this.escape(m.state_ar || m.state)}</span></div><div class="msg-assistant-main"><div class="msg-meta"><strong>السجين · ${this.escape(s.model)}</strong>${meta}${s.interrogator_type!=='reverse'?`<span class="reasoning-badge">${this.escape(this.reasoningLabel(s.prisoner_reasoning))}</span>`:''}</div><div class="msg-emotion-meters">${meters}</div><div class="msg-content-text">${this.text(m.content)}</div>${m.sense_directive ? `<details class="emotion-target"><summary>توجيه JEV لهذه الجولة · ${this.escape(m.jev_target_state || '')}</summary>${this.emotionDescription(m)}</details>` : ''}</div></div>`;
+        div.innerHTML = `<div class="msg-assistant-grid"><div class="msg-assistant-side"><img class="msg-face-portrait" src="${this.face(m.character_slug || s.character_slug,m.visual_state || m.state)}" alt="${this.escape(m.state_ar || m.state)}"><span class="msg-face-label">${this.escape(m.state_ar || m.state)}</span></div><div class="msg-assistant-main"><div class="msg-meta"><strong>السجين · ${this.escape(this.actorName(s,'prisoner'))}</strong>${meta}${s.interrogator_type!=='reverse'?`<span class="reasoning-badge">${this.escape(this.reasoningLabel(s.prisoner_reasoning))}</span>`:''}</div><div class="msg-emotion-meters">${meters}</div><div class="msg-content-text">${this.text(m.content)}</div>${m.sense_directive ? `<details class="emotion-target"><summary>توجيه JEV لهذه الجولة · ${this.escape(m.jev_target_state || '')}</summary>${this.emotionDescription(m)}</details>` : ''}</div></div>`;
         div.querySelector('.msg-assistant-main').insertAdjacentHTML('beforeend', this.thought(m,s));
         if(s.interrogator_type==='reverse') {
             div.querySelector('.msg-meta strong').textContent='أنت · المتهم (تمثيل بشري)';
