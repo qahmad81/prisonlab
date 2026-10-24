@@ -17,3 +17,7 @@ The reviewed tools/publish-public.sh validates the private/app and public_html r
 Before updating a standalone installation, record its commit, inspect local changes and back up source/public/configuration without conversation/account/benchmark data. Pull main using fast-forward-only Git. Preserve .env, application ownership and data. Lint PHP and JavaScript, then run the unit, integration, browser, standalone identity and parallel-jury tests against isolated mock providers. No migrations or test fixtures belong on production.
 
 Use valid HTTPS, secure cookies, correct PHP-FPM permissions and timeouts sufficient for the professional panel's 180-second deadline plus JEV verification. Check home, init_data, private-path denial and public gallery after deployment. For rollback, restore the reviewed previous source/public/configuration and recheck runtime configuration; do not replace private user histories with test or developer data.
+
+## MCP endpoint
+
+Expose the reviewed mcp.php wrapper with other public entries. Keep LAB_DATA_DIR/mcp private and excluded from deployment backups. Disable MCP access logging or redact its query arguments; its gate URL is a credential. Retain multiworker PHP-FPM for renewable 15-second polls. See docs/MCP_ACTORS.md.

@@ -159,6 +159,7 @@
         <button type="button" id="end-test-btn" class="end-test-button" onclick="App.endAndEvaluateSession()" disabled>إنهاء الاختبار وطلب التحكيم والعلامة ⏹</button>
         <div id="session-notice" class="session-notice" role="status" aria-live="polite"></div>
         <div id="jury-live-status" class="jury-live-status" hidden></div>
+        <details id="mcp-session-panel" class="memory-panel mcp-session-panel" hidden><summary>بوابات MCP الخاصة بهذه الجلسة</summary><p>أضف رابط الدور إلى وكيلك كخادم MCP عبر HTTP. البوابة سرية وتسمح بتأدية هذا الدور فقط؛ لا تشاركها مع الجمهور. أبقِ هذه الصفحة مفتوحة لتشغيل JEV والتحكيم. لا يُرسل السياق كاملًا بعد المهمة الأولى، ولا يُضغط سياق طرف MCP؛ يحتفظ به الهارنس.</p><div id="mcp-gates"></div><p id="mcp-wait-state" role="status"></p><button id="mcp-pause-btn" type="button" class="btn btn-secondary" onclick="MCPUI.pauseRequested=true" hidden>إيقاف انتظار الوكيل</button></details>
         <details id="memory-notes" class="memory-panel" hidden></details>
         <div id="usage-summary" class="usage-summary"></div>
         <div class="chat-input-bar" id="human-input-bar">
@@ -283,6 +284,7 @@
             <button type="button" class="modal-close-btn" onclick="App.closeModelModal()">✕</button>
         </div>
         <div class="model-modal-toolbar">
+            <button type="button" class="mcp-connect-option" onclick="MCPUI.configure()"><strong dir="ltr">MCP ↗</strong><span>استخدم وكيلك أو نموذجك المحلي</span><small>Claude Code · Codex · OpenCode · أي هارنس متوافق</small></button>
             <input type="text" id="model-modal-search" placeholder="ابحث باسم النموذج أو الشركة (DeepSeek, GPT, Claude, Gemini, Qwen, Mistral, Llama)...">
             <div class="model-tabs">
                 <button type="button" class="model-tab active" data-tab="focus_economic" onclick="App.filterModelTab('focus_economic')">مختارة · اقتصادية (<span id="tab-count-focus_economic">0</span>)</button>
@@ -363,8 +365,10 @@
 <div id="reasoning-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reasoning-title">
     <section class="reasoning-dialog"><header><h3 id="reasoning-title">مستوى التفكير</h3><button type="button" class="text-button" onclick="App.closeReasoningModal()" aria-label="إغلاق">×</button></header><p id="reasoning-model-name" dir="ltr"></p><div id="reasoning-options"></div><p class="reasoning-help">يطبق على التجربة التالية فقط. مستوى الشخصية وتعليماتها مستقلان عن ميزانية التفكير.</p></section>
 </div>
+<div id="mcp-config-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="mcp-role-title"><section class="reasoning-dialog mcp-config-dialog"><header><h2 id="mcp-role-title">ربط وكيل MCP</h2><button type="button" class="text-button" aria-label="إغلاق إعداد MCP" onclick="document.getElementById('mcp-config-modal').classList.remove('active')">×</button></header><p>الهارنس يتولى تشغيل النموذج وذاكرته. المختبر يرسل المهمة ويقيّم الرد؛ لا يتحكم في إعداد التفكير الفعلي خارج الموقع.</p><form id="mcp-config-form"><label for="mcp-name">اسم النموذج / الوكيل</label><input id="mcp-name" required minlength="2" maxlength="100" placeholder="اسم النموذج وإصداره" dir="auto"><label for="mcp-effort">مستوى التفكير الفعلي في الهارنس</label><select id="mcp-effort"><option value="unknown">غير معلن</option><option value="none">بلا تفكير</option><option value="minimal">أدنى</option><option value="low">قليل</option><option value="medium">متوسط</option><option value="high">مرتفع</option><option value="xhigh">مرتفع جدًا</option><option value="max">أقصى</option></select><p>تحصل على رابط الدور بعد بدء التجربة. الاسم والتفكير غير موثقين، وتظهر النتائج تحت فئة MCP مستقلة. تكلفة النموذج الخارجي غير معروفة؛ تبقى تكلفة JEV والتحكيم على جهة التمويل المحددة.</p><button type="submit" class="btn btn-primary">اعتماد وكيل MCP لهذا الدور</button></form></section></div>
 <script src="assets/session-view.js?v=<?= (int)filemtime(__DIR__ . "/assets/session-view.js") ?>"></script>
 <script src="assets/community.js?v=<?= (int)filemtime(__DIR__ . '/assets/community.js') ?>"></script>
 <script src="assets/app.js?v=<?= (int)filemtime(__DIR__ . "/assets/app.js") ?>"></script>
+<script src="assets/mcp.js?v=<?= (int)filemtime(__DIR__.'/assets/mcp.js') ?>"></script>
 </body>
 </html>

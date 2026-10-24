@@ -24,6 +24,8 @@ Prisonlab is a PHP 8.3.36+ / vanilla JavaScript Arabic RTL benchmarking applicat
 - Check domain ownership and configured roots before any deployment. Back up the domain's previous files/configuration; use fast-forward-only pulls. Do not change unrelated sites or disable TLS verification.
 - No database or migration system is used. Do not run migrations.
 
+- MCP gates are revocable single-session/single-role capabilities, never account or funding credentials. Keep gate hashes/mailboxes private, do not log gate URLs, and delete mailboxes with the conversation. External model names/efforts are self-reported in a separate mcp/ namespace. Send stable role context once, then only the latest opposing spoken message and that role's trusted directives; never forward spectator notes or raw reasoning. External actors own their harness memory and are excluded from app compaction. Waiting must not rebuy successful stages or consume provider retries.
+
 ## Verification
 
 Run php tests/unit.php, python -X utf8 tests/integration.py and python -X utf8 tests/browser.py for affected behavior. tests/jury_parallel.py covers real parallel cURL behavior with a local test provider. Check PHP/JS syntax. Deterministic tests do not consume provider credit. Live tools consume the configured key and must stay within the authorized task; never publish their fixtures as user sessions.

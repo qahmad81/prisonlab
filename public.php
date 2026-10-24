@@ -208,7 +208,7 @@ function renderPublicGrid(q) {
 
         const isAI = (s.interrogator_type !== 'human');
         const interrogatorLabel = isAI
-            ? `🤖 ${escapeHtml(s.interrogator_character?.name || 'المحقق الذكي')}: <strong>${escapeHtml(s.interrogator_model || 'AI')}</strong>`
+            ? `🤖 ${escapeHtml(s.interrogator_character?.name || 'المحقق الذكي')}: <strong>${escapeHtml(LabView.actorName(s,'interrogator') || 'AI')}</strong>`
             : `🕵️‍♂️ المحقق: <strong>مستخدم بشري</strong>`;
 
         const evalScore = s.evaluation ? s.evaluation.overall_score : s.breaking_point;
@@ -222,7 +222,7 @@ function renderPublicGrid(q) {
                 <div class="archive-card-header-info">
                     <div class="archive-card-name">${escapeHtml(s.case_title)}</div>
                     <div class="archive-card-roles">${interrogatorLabel}</div>
-                    ${LabView.participants(s)}<div class="archive-card-roles">🔒 المتهم: <strong>${s.interrogator_type==='reverse'?'مستخدم بشري':escapeHtml(s.model)}</strong></div>
+                    ${LabView.participants(s)}<div class="archive-card-roles">🔒 المتهم: <strong>${s.interrogator_type==='reverse'?'مستخدم بشري':escapeHtml(LabView.actorName(s,'prisoner'))}</strong></div>
                 </div>
             </div>
             <div class="archive-card-body">

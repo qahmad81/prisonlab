@@ -85,6 +85,10 @@ There is no daily session quota with either the operator key or a personal key. 
 
 Publication is explicit and allowed only after completed evaluation. Published sessions are read-only and appear in the gallery at public.php, including provider-reported costs and reviews. No account profiles, model leaderboards or social share integration are included in main. Private assessments stay visible only to their owning browser. Owners may delete private or public conversations, removing their transcript, publication and benchmark/review entries. Deployment backups exclude runtime conversation data.
 
+## External MCP actors
+
+Choose MCP at the top of either model picker to connect a local/custom harness to one or both AI roles. Declare its model name and thinking effort, then copy the private role gate after starting. JEV and judging still use the selected OpenRouter funding source. Keep the browser open for progression; the harness maintains its own context. See [MCP actors and stdio adapter](docs/MCP_ACTORS.md).
+
 ## Verification and maintenance
 
 ```powershell
