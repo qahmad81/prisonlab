@@ -1207,7 +1207,7 @@ select option.model-unlocked {
     justify-content: space-between;
     font-size: 0.7rem;
     color: #64748b;
-    margin-top: auto;
+    margin-top: 6px;
 }
 
 .model-card-price {
