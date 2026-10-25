@@ -470,7 +470,10 @@ const App = {
                 </div>
             `;
 
-            card.appendChild(LabSharing.link('نتائج النموذج ورابطه ↗',LabSharing.model(m.id,this.modelTarget)));
+            const name=card.querySelector('.model-card-name');
+            const link=LabSharing.link(m.name,LabSharing.model(m.id,this.modelTarget));
+            link.className='model-card-name model-card-name-link';link.title=m.id;link.dir='auto';
+            name.replaceWith(link);
             card.addEventListener('click', e => {if(!e.target.closest('details,a,button'))this.selectModalModel(m.id);});
             container.appendChild(card);
         });
