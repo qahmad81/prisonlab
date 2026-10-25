@@ -455,7 +455,11 @@ const App = {
                 </div>
             `;
 
-            card.addEventListener('click', e => {if(!e.target.closest('details'))this.selectModalModel(m.id);});
+            const name=card.querySelector('.model-card-name'),link=document.createElement('a');
+            link.className='model-card-name model-card-name-link';link.textContent=m.name;link.title=m.id;link.dir='auto';
+            link.href='https://openrouter.ai/'+m.id;link.target='_blank';link.rel='noopener';
+            name.replaceWith(link);
+            card.addEventListener('click', e => {if(!e.target.closest('details,a,button'))this.selectModalModel(m.id);});
             container.appendChild(card);
         });
     },
