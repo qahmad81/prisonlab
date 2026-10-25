@@ -45,6 +45,25 @@ if(!chrome && process.platform==='win32') {
         assert((await page.locator('#selected-interrogator-card').innerText()).trim().length>0);
         assert((await page.locator('#selected-investigator-persona').innerText()).includes('Ethan Cole'));
         await page.locator('#selected-interrogator-card').click();
+        await page.locator('[data-tab="focus_medium"]').click();
+        assert((await page.locator('#modal-models-grid').innerText()).includes('Kimi K3'));
+        const modelName=page.locator('.model-card-name').first();
+        assert.equal(await modelName.evaluate(el=>getComputedStyle(el).whiteSpace),'normal');
+        assert(await modelName.evaluate(el=>el.scrollWidth<=el.clientWidth+1));
+        assert.equal(await page.getByRole('link',{name:'نتائج النموذج ورابطه ↗',exact:true}).count(),0);
+        if(await page.locator('a.model-card-name').count()){
+            const selected=await page.evaluate(()=>App.selectedInterrogatorId),nameLink=page.locator('a.model-card-name').first();
+            const href=await nameLink.getAttribute('href');assert.equal(await nameLink.getAttribute('target'),'_blank');
+            assert((await nameLink.getAttribute('title')).includes('/'));
+            if(href.startsWith('https://openrouter.ai/'))await page.context().route('https://openrouter.ai/**',route=>route.fulfill({body:'Official model page fixture'}));
+            const popup=page.waitForEvent('popup');await nameLink.click();const opened=await popup;
+            await opened.waitForURL(href);await opened.close();
+            assert.equal(await page.evaluate(()=>App.selectedInterrogatorId),selected,'A model-name link must not select the model');
+            assert(await page.locator('#model-modal.active').isVisible());
+        }
+        await page.screenshot({path:'test-results/model-picker-refined.png',fullPage:true});
+        await page.locator('[data-tab="focus_high"]').click();
+        assert((await page.locator('#modal-models-grid').innerText()).includes('Kimi K3.1 Pro'));
         await page.locator('[data-tab="all"]').click();
         await page.locator('#model-modal-search').fill('google/gemini-2.5-flash-lite');
         await page.locator('.model-card').first().click();

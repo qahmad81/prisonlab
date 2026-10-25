@@ -6,7 +6,11 @@
       "mistralai": "mistralai/mistral-small-2603:batch"
     },
     "focus_high": {
-      "openai": "openai/gpt-6.1-sol"
+      "openai": "openai/gpt-6.1-sol",
+      "moonshotai": "moonshotai/kimi-k3.1-pro"
+    },
+    "focus_medium": {
+      "moonshotai": "moonshotai/kimi-k3"
     }
   },
   "shortlist_excluded": {

@@ -1123,19 +1123,24 @@ select option.model-unlocked {
 
 .model-card-header-row {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
 }
 
 .model-card-name {
     font-size: 0.86rem;
     font-weight: 700;
     color: #f1f5f9;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.6;
+    max-width: 100%;
+    text-decoration: none;
 }
+
+.model-card-name-link:hover { color:#7dd3fc; text-decoration:underline; text-underline-offset:4px; }
+.model-card-name-link:focus-visible { outline:2px solid #38bdf8; outline-offset:4px; border-radius:2px; }
 
 .model-card-badge {
     font-size: 0.67rem;
@@ -1176,6 +1181,8 @@ select option.model-unlocked {
 
 .model-card-footer {
     display: flex;
+    flex-wrap: wrap;
+    gap: 7px 10px;
     align-items: center;
     justify-content: space-between;
     font-size: 0.7rem;
@@ -1187,6 +1194,10 @@ select option.model-unlocked {
     font-family: monospace;
     font-weight: 600;
     color: #cbd5e1;
+    flex-basis: 100%;
+    direction: ltr;
+    text-align: right;
+    unicode-bidi: isolate;
 }
 
 .model-card-context {

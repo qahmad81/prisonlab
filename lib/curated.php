@@ -6,7 +6,7 @@ function labModelPolicy():array {static $policy;return $policy ??= labRead(__DIR
 /** Shortlists use publisher namespaces and catalog dates, never guessed product names. */
 function labCurated(array $models):array {
     $families=['openai'=>'GPT','anthropic'=>'Claude','google'=>'Gemini','deepseek'=>'DeepSeek','z-ai'=>'GLM',
-        'qwen'=>'Qwen','mistralai'=>'Mistral','x-ai'=>'Grok','xiaomi'=>'MiMo','minimax'=>'MiniMax'];
+        'qwen'=>'Qwen','mistralai'=>'Mistral','x-ai'=>'Grok','xiaomi'=>'MiMo','minimax'=>'MiniMax','moonshotai'=>'Kimi'];
     $groups=[];$policy=labModelPolicy();
     foreach($models as $m) {
         [$publisher,$slug]=array_pad(explode('/',ltrim($m['id'],'~'),2),2,'');
@@ -28,6 +28,7 @@ function labCurated(array $models):array {
             'qwen'=>preg_match('/flash|turbo/',$slug)?'focus_economic':(str_contains($slug,'max')?'focus_high':'focus_medium'),
             'x-ai'=>preg_match('/fast|mini/',$slug)?'focus_economic':(preg_match('/heavy|expert/',$slug)?'focus_high':'focus_medium'),
             'xiaomi','minimax'=>str_contains($slug,'flash')?'focus_economic':(preg_match('/max|ultra|omni/',$slug)?'focus_high':'focus_medium'),
+            'moonshotai'=>str_contains($slug,'pro')?'focus_high':'focus_medium',
             default=>'focus_medium'
         };
         $groups[$tier][$publisher][]=$m;

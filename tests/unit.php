@@ -178,3 +178,6 @@ $premature['role']='prisoner';$premature['message_ids']=['a1'];$rejected=false;
 try{labValidateIncidents([$premature],$protected);}catch(RuntimeException){$rejected=true;}
 check($rejected,'protected prisoner exit received a premature_exit incident');
 echo "PASS closure: contextual cues, strict evidence references, early timing caps, late protected rights and closing statements.\n";
+$kimiCurated=labCurated(labRead(__DIR__.'/../models.json')['models']);
+check(in_array('moonshotai/kimi-k3',array_column($kimiCurated['focus_medium'],'id'),true),'Kimi K3 missing from medium shortlist');
+check(in_array('moonshotai/kimi-k3.1-pro',array_column($kimiCurated['focus_high'],'id'),true),'Kimi K3.1 Pro missing from premium shortlist');

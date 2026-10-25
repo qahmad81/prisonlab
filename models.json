@@ -1,6 +1,6 @@
 {
   "updated_at": "2026-10-22 22:49:48",
-  "count": 449,
+  "count": 450,
   "models": [
     {
       "provider_slug": "aion-labs",
@@ -10485,7 +10485,7 @@
     },
     {
       "provider_slug": "moonshotai",
-      "description_ar": "نموذج MoonshotAI: Kimi K3 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
+      "description_ar": "نموذج Kimi K3 للمحادثة والاستدلال والسياقات الطويلة من Moonshot AI.",
       "usage_rank": 20,
       "usage_tokens_7d": 1825053894200,
       "id": "moonshotai/kimi-k3",
@@ -10502,9 +10502,9 @@
       "context_length": 1048576,
       "pricing": {
         "prompt_per_token": "0.000000239",
-        "completion_per_token": "0.000011936",
+        "completion_per_token": "0.0000108",
         "prompt_per_1m": 0.239,
-        "completion_per_1m": 11.936
+        "completion_per_1m": 10.8
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -10522,8 +10522,10 @@
         "include_reasoning",
         "logit_bias",
         "logprobs",
+        "max_completion_tokens",
         "max_tokens",
         "min_p",
+        "parallel_tool_calls",
         "presence_penalty",
         "reasoning",
         "reasoning_effort",
@@ -10615,6 +10617,62 @@
           "none"
         ],
         "default_effort": "max"
+      }
+    },
+    {
+      "id": "moonshotai/kimi-k3.1-pro",
+      "created": 1792778188,
+      "canonical_slug": "moonshotai/kimi-k3.1-pro-20261023",
+      "top_provider": {
+        "context_length": 1048576,
+        "max_completion_tokens": 943718,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "MoonshotAI: Kimi K3.1 Pro",
+      "description": "Kimi K3.1 Pro is Moonshot AI's flagship open-weight multimodal reasoning model and a post-trained successor to Kimi K3, with a 1M-token context window. It is built for long-horizon coding, 3D...",
+      "context_length": 1048576,
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "max_tokens",
+        "presence_penalty",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "stop",
+        "structured_outputs",
+        "tool_choice",
+        "tools"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true,
+        "supported_efforts": [
+          "max",
+          "high",
+          "low",
+          "none"
+        ],
+        "default_effort": "max"
+      },
+      "description_ar": "نموذج Kimi K3.1 Pro المتقدم للاستدلال والمهام المعقدة، بسياق يصل إلى مليون توكن.",
+      "pricing": {
+        "prompt_per_token": "0.000002",
+        "completion_per_token": "0.00001",
+        "prompt_per_1m": 2.0,
+        "completion_per_1m": 10.0
+      },
+      "architecture": {
+        "modality": "text+image+video->text",
+        "input_modalities": [
+          "text",
+          "image",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ]
       }
     },
     {
