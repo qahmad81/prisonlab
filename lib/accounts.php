@@ -103,7 +103,7 @@ function labQuota(?array $a):array {
         'resets_at'=>$now->modify('tomorrow')->setTime(0,0)->format(DateTimeInterface::ATOM)];
 }
 /** Serialize starts for one account. Keep reservations after deletion to prevent quota evasion. */
-function labAccountStart(array $account,array $s,string $requestId,string $userKey,?array $funding=null):array {
+function labAccountStart(array $account,array $s,string $requestId,string $userKey,?array $funding=null,?array $freeFunding=null):array {
     if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException('معرّف إنشاء الجلسة مفقود');
     $file=$GLOBALS['lab_storage'].'/quota_'.$account['id'].'.json';$lock=fopen($file.'.lock','c');
     if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException('تعذر حجز التجربة');
@@ -118,6 +118,9 @@ function labAccountStart(array $account,array $s,string $requestId,string $userK
         if($userKey!=='')labVisitorBalance($userKey);
         if(!empty($funding['sponsor_id']))labReserveSponsor($account,$s,$requestId,$funding,$q);
         else $s['funding_source']=$userKey!==''?'personal':'site';
+        if($freeFunding && $freeFunding['sponsor_id']!==($funding['sponsor_id'] ?? '')){
+            $secondary=$s;labReserveSponsor($account,$secondary,$requestId,$freeFunding,$q);
+        }
         if($userKey!=='')$s['key_fingerprint']=hash('sha256',$userKey);
         $s['operator_profile']=labAccountProfile($account);
         $q['requests'][$requestId]=$s['session_id'];if($userKey==='' && (empty($funding['sponsor_id']) || $funding['source']==='site'))$q['used']=1+(int)($q['used'] ?? 0);
@@ -151,8 +154,10 @@ function labVisitorBalance(string $key):array {
 function labSessionCost(array $s):array {
     $total=0.;$reported=0;$calls=count($s['usage'] ?? []);
     foreach($s['usage'] ?? [] as $u)if(is_numeric($u['usage']['cost'] ?? null)){$total+=(float)$u['usage']['cost'];$reported++;}
+    $parts=[];foreach($s['usage'] ?? [] as $u){$part=$u['funding_part'] ?? 'primary';$parts[$part] ??= ['total_usd'=>0.,'reported_calls'=>0,'recorded_calls'=>0];$parts[$part]['recorded_calls']++;if(is_numeric($u['usage']['cost'] ?? null)){$parts[$part]['total_usd']+=(float)$u['usage']['cost'];$parts[$part]['reported_calls']++;}}
+    foreach($parts as &$part)$part['total_usd']=round($part['total_usd'],8);unset($part);
     return ['total_usd'=>round($total,8),'reported_calls'=>$reported,'recorded_calls'=>$calls,'complete'=>$reported===$calls,
-        'funding_source'=>$s['funding_source'] ?? 'legacy','sponsor_label'=>$s['sponsor_label'] ?? null,'sponsor_profile'=>$s['sponsor_profile'] ?? null,'scope'=>'provider_reported'];
+        'funding_source'=>$s['funding_source'] ?? 'legacy','sponsor_label'=>$s['sponsor_label'] ?? null,'sponsor_profile'=>$s['sponsor_profile'] ?? null,'free_sponsor'=>$s['free_sponsor'] ?? null,'by_funding_part'=>$parts,'scope'=>'provider_reported'];
 }
 function labPublicSessions():array {
     $out=[];foreach(glob($GLOBALS['lab_storage'].'/session_*.json') as $file){$s=labReadSessionIfPresent($file);if(!$s)continue;

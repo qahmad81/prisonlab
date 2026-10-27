@@ -71,6 +71,18 @@ function labFunding(string $id,string $personal,array $env):array {
     return labSponsorLocked(function($v)use($id){$r=$v['sponsors'][$id] ?? null;if(!$r || !$r['active'])throw new RuntimeException('هذا الراعي غير متاح أو أوقف مفتاحه؛ اختر تمويلًا آخر لتجربة جديدة');
         return ['key'=>labSponsorDecrypt($r),'source'=>$r['is_site']?'site':'sponsor','cap'=>$r['price_cap'],'sponsor_id'=>$r['id'],'revision'=>$r['revision'],'profile'=>$r['profile'],'label'=>$r['label']];});
 }
+/** An operator explicitly selects one existing, active vault sponsor by ID. */
+function labFreeSponsorInfo(array $env,?array $account):?array {
+    $id=trim((string)(getenv('OPENROUTER_FREE_SPONSOR_ID') ?: ($env['OPENROUTER_FREE_SPONSOR_ID'] ?? '')));
+    if(!preg_match('/^sp_[a-f0-9]{24}$/D',$id))return null;
+    return labSponsorLocked(function($v)use($id,$account){$r=$v['sponsors'][$id] ?? null;
+        return $r && !empty($r['active'])?labSponsorPublic($r,$v,$account):null;});
+}
+function labBindFreeFunding(array $funding):void {
+    $GLOBALS['lab_free_actor_key']=$funding['key'];
+    $GLOBALS['lab_free_sponsor_id']=$funding['sponsor_id'];
+    $GLOBALS['lab_free_sponsor_revision']=$funding['revision'];
+}
 function labUseFunding(array $f):void {$GLOBALS['lab_user_key']=$f['source']==='personal';$GLOBALS['lab_actor_price_cap']=$f['cap'] ?? 1.;$GLOBALS['lab_funding_sponsor_id']=$f['sponsor_id'];$GLOBALS['lab_funding_revision']=$f['revision'] ?? 0;}
 
 /** Called under the account-start lock. Reservations survive deletion, rotation and limit edits. */
@@ -87,8 +99,9 @@ function labReserveSponsor(array $a,array &$s,string $requestId,array $funding,a
 }
 
 function labGuardFunding():void {
-    $id=$GLOBALS['lab_funding_sponsor_id'] ?? '';if($id==='')return;
-    labSponsorLocked(function($v)use($id){$r=$v['sponsors'][$id] ?? null;if(!$r || !$r['active'] || $r['revision']!==($GLOBALS['lab_funding_revision'] ?? 0))throw new RuntimeException('تغير مفتاح الراعي أو توقف؛ المراحل المكتملة محفوظة. حدّث الجلسة قبل المتابعة.');});
+    $ids=[];foreach(['funding','free'] as $kind){$id=$GLOBALS['lab_'.$kind.'_sponsor_id'] ?? '';if($id!=='')$ids[$id]=$GLOBALS['lab_'.$kind.'_'.($kind==='funding'?'revision':'sponsor_revision')] ?? 0;}
+    if(!$ids)return;
+    labSponsorLocked(function($v)use($ids){foreach($ids as $id=>$revision){$r=$v['sponsors'][$id] ?? null;if(!$r || !$r['active'] || $r['revision']!==$revision)throw new RuntimeException('تغير مفتاح الراعي أو توقف؛ المراحل المكتملة محفوظة. حدّث الجلسة قبل المتابعة.');}});
 }
 
 function labSponsorSiteQuota(?array $a):?array {

@@ -35,7 +35,7 @@ try{
     await page.locator('#sponsor-form [type=submit]').click();await page.waitForFunction(()=>App.sponsors.some(r=>r.label==='UI Support <safe>'));
     assert.equal(await page.locator('#sponsor-form [name=key]').inputValue(),'');assert.equal(await page.locator('#sponsor-list safe').count(),0);
     await page.screenshot({path:'test-results/sponsors-management.png',fullPage:true});
-    await page.getByRole('button',{name:'استخدام تمويل هذا الراعي',exact:true}).click();
+    await page.locator('.sponsor-card').filter({hasText:'UI Support <safe>'}).getByRole('button',{name:'استخدام تمويل هذا الراعي',exact:true}).click();
     assert.equal(await page.evaluate(()=>App.fundingCap()),0);assert(await page.evaluate(()=>App.modelLocked(App.models.find(m=>m.id==='openai/gpt-6.1-sol'))));
     assert.equal(await page.evaluate(()=>App.currentSession.funding_source),'personal','Funding picker changed the saved experiment');
     assert((await page.locator('#active-sponsor-label').innerText()).includes('UI Support <safe>'));
@@ -108,6 +108,20 @@ try{
     // Only the disposable private fixture is deleted. The public fixture must remain.
     page.on('dialog',d=>d.accept());await page.getByRole('button',{name:'حذف المحادثة نهائيًا'}).click();
     await page.waitForFunction(()=>!App.currentSession && App.logs.length===1);
+    // Actual session attribution is separate from the next-session funding selector.
+    const attribution=await page.evaluate(async()=>{
+        App.selectedSponsorId='';const selected=App.selectedSponsorId;
+        const free=App.models.find(m=>!m.catalog_unavailable && Number(m.pricing.prompt_per_token)===0 && Number(m.pricing.completion_per_token)===0).id;
+        const base={case_file:'char_1_victor_vance.md',sponsor_id:'',model:free,request_id:crypto.randomUUID()};
+        const full=(await App.api('start_session',{...base,interrogator_type:'human'})).session;
+        App.currentSession=full;App.renderActiveSession();const fullLabel=document.getElementById('session-funding-label').textContent;
+        const mixed=(await App.api('start_session',{...base,request_id:crypto.randomUUID(),interrogator_type:'ai',interrogator_model:'google/gemini-2.5-flash-lite'})).session;
+        App.currentSession=mixed;App.renderActiveSession();const mixedLabel=document.getElementById('session-funding-label').textContent;
+        App.env.free_models_available=false;const before=App.selectedModelId;App.selectModalModel(free);
+        return {fullLabel,mixedLabel,selected,after:App.selectedSponsorId,before,afterModel:App.selectedModelId,toast:document.getElementById('connection-toast').textContent};
+    });
+    assert(attribution.fullLabel.includes('Fixture Free'));assert(attribution.mixedLabel.includes('الدور المجاني: Fixture Free'));
+    assert.equal(attribution.selected,attribution.after);assert.equal(attribution.before,attribution.afterModel);assert(attribution.toast.includes('غير متاح'));
     // A dropped transport must end with a bounded error, not permanent loading.
     const errorPage=await ctx.newPage();await errorPage.route('**/api.php?action=init_data',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({ok:false,error:'تعذر تحميل البيانات (اختبار)'})}));
     await errorPage.goto(base);await errorPage.waitForSelector('#connection-toast.is-error');

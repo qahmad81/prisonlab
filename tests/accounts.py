@@ -118,6 +118,7 @@ def run(storage):
 
 if __name__=='__main__':
     with tempfile.TemporaryDirectory(prefix='prisonlab-accounts-') as tmp:
+        subprocess.run(['php',str(ROOT/'tests/free_sponsor_fixture.php'),tmp],check=True)
         storage=Path(tmp);env={**os.environ,'LAB_DATA_DIR':tmp,'LAB_TEST_LEGACY_IDENTITY':'0'}
         with (storage/'server.log').open('w') as log:
             p=subprocess.Popen(['php','-d','auto_prepend_file='+str(ROOT/'tests/mock-provider.php'),'-S','127.0.0.1:8494','router.php'],cwd=ROOT,env=env,stdout=log,stderr=log,creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)

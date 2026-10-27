@@ -51,7 +51,7 @@ def run(storage):
         calls=json.loads((storage/'test-calls.json').read_text())[before:]
         for call in calls:
             is_free_actor=not call['decisions'] and call['model']==free
-            assert call['test_key_hash']==hashlib.sha256(('free-test-key' if is_free_actor else 'sk-or-test').encode()).hexdigest(),call
+            assert call['test_key_hash']==hashlib.sha256(('free-test-key' if is_free_actor or prisoner==investigator==free else 'sk-or-test').encode()).hexdigest(),call
             if is_free_actor:assert call['price_caps']=={'prompt':0,'completion':0}
         assert a.post('delete_session',session_id=trial['session_id'],confirm=trial['session_id'])[0]==200
     for mode in ['human','reverse']:
@@ -63,7 +63,7 @@ def run(storage):
         assert status==200,d
         calls=json.loads((storage/'test-calls.json').read_text())[before:]
         assert any(x['model']==free and x['test_key_hash']==hashlib.sha256(b'free-test-key').hexdigest() and x['price_caps']=={'prompt':0,'completion':0} for x in calls)
-        assert all(x['test_key_hash']==hashlib.sha256(b'sk-or-test').hexdigest() for x in calls if x['decisions'])
+        assert all(x['test_key_hash']==hashlib.sha256(b'free-test-key').hexdigest() for x in calls if x['decisions'])
         assert a.post('delete_session',session_id=trial['session_id'],confirm=trial['session_id'])[0]==200
 
     assert len(data['investigators'])==10 and [p['level'] for p in data['investigators']]==list(range(1,11))
@@ -317,6 +317,7 @@ def run(storage):
 
 if __name__=='__main__':
     with tempfile.TemporaryDirectory(prefix='ai-prison-tests-') as tmp:
+        subprocess.run(['php',str(ROOT/'tests/free_sponsor_fixture.php'),tmp],check=True)
         storage=Path(tmp);env={**os.environ,'LAB_DATA_DIR':tmp,'LAB_TEST_LEGACY_IDENTITY':'1'}
         flags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0
         with (storage/'server.log').open('w') as log:

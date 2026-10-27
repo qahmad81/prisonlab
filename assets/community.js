@@ -11,7 +11,9 @@ const LabCommunity = {
     cost(s) {
         const c=s.cost;if(!c)return 'التكلفة غير متاحة';
         const source=c.funding_source==='sponsor'?'على نفقة الراعي '+(c.sponsor_label || c.sponsor_profile?.display_name || ''):({site:'على نفقة الموقع',personal:'بالمفتاح الشخصي',legacy:'تجربة سابقة'})[c.funding_source] || '';
-        return `التكلفة ${this.money(c.total_usd)} · ${source}${c.complete?'':' *'}${Object.keys(s.mcp_actors || {}).length?' · تكلفة MCP غير مقاسة':''}`;
+        const part=p=>p?.recorded_calls ? (p.reported_calls?this.money(p.total_usd)+(p.reported_calls<p.recorded_calls?' *':''):'غير متاح') : 'لا استدعاءات';
+        const extra=c.free_sponsor && c.by_funding_part ? ` · ${c.free_sponsor.label}: ${part(c.by_funding_part.free_actor)} · التمويل الأصلي: ${part(c.by_funding_part.primary)}` : '';
+        return `التكلفة ${this.money(c.total_usd)} · ${source}${extra}${c.complete?'':' *'}${Object.keys(s.mcp_actors || {}).length?' · تكلفة MCP غير مقاسة':''}`;
     },
     publicUrl(s) {return new URL('public.php?session_id='+encodeURIComponent(s.session_id),location.href).href;},
     operator(s) {
