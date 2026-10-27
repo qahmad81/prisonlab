@@ -74,8 +74,12 @@ try{
     assert.equal(await page.locator('#jury-live-status').isVisible(),false);
     const publicPage=await ctx.newPage();publicPage.on('pageerror',e=>errors.push(e.message));
     await publicPage.goto(base+'/public.php?profile='+process.env.TEST_PROFILE_ID);await publicPage.waitForFunction(()=>publishedSessions.length===1);
-    assert.equal(await publicPage.locator('[role=tab]').count(),3);await publicPage.getByRole('tab',{name:/محاكاة بين النماذج/}).click();assert.equal(await publicPage.locator('#public-grid .archive-card').count(),1);assert(!(await publicPage.locator('body').innerText()).includes('PRIVATE UI SENTINEL'));
+    assert.equal(await publicPage.locator('[role=tab]').count(),4);assert.equal(await publicPage.locator('#public-grid .test-card').count(),1);await publicPage.getByRole('tab',{name:/محاكاة بين النماذج/}).click();assert.equal(await publicPage.locator('#public-grid .archive-card').count(),1);assert(!(await publicPage.locator('body').innerText()).includes('PRIVATE UI SENTINEL'));
     assert((await publicPage.locator('#public-profile-heading').innerText()).includes('Test Operator <safe>'));
+    await publicPage.goto(base+'/public.php?profile='+process.env.TEST_PROFILE_ID+'&tab=investigator');await publicPage.waitForSelector('#public-grid .test-card');assert(new URL(publicPage.url()).searchParams.get('tab')==='all');
+    assert.equal(await publicPage.locator('.share-link-button').count(),1);assert.equal(await publicPage.locator('.share-link-button').innerText(),'');assert(await publicPage.locator('.share-link-button').getAttribute('title'));assert.equal(await publicPage.locator('.brand-home').getAttribute('href'),'index.php');
+    const pageShare=new URL(await publicPage.locator('.page-linkedin-share').getAttribute('href'));assert.equal(pageShare.searchParams.get('url'),publicPage.url());
+    assert.equal(await publicPage.locator('#public-grid .test-investigator-portrait').count(),1);
     await publicPage.locator('#show-leaderboard').click();await publicPage.waitForSelector('#board-rows .test-card');
     assert.equal(await publicPage.locator('#public-grid').isVisible(),false);assert.equal(await publicPage.locator('#board-rows .test-card').count(),1);
     await publicPage.locator('#board-role').selectOption('interrogator');await publicPage.waitForSelector('#board-rows .test-card .test-actor:last-child a[href*="mistralai%2F"]');

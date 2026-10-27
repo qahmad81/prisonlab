@@ -18,7 +18,7 @@
 
 <header class="top-bar">
     <div class="brand">
-        <img class="brand-logo" src="assets/branding/prisonlab-128.png" alt="" width="48" height="48">
+        <a class="brand-home" href="index.php" aria-label="الرئيسية · PrisonLab" title="العودة للرئيسية"><img class="brand-logo" src="assets/branding/prisonlab-128.png" alt="PrisonLab" width="48" height="48"></a>
         <div class="brand-copy"><span class="brand-name" dir="ltr">PrisonLab</span><h1>مختبر أداء نماذج الذكاء الاصطناعي</h1></div>
     </div>
     <div class="header-actions">

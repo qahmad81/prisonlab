@@ -106,7 +106,7 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
 
 <header class="top-bar">
     <div class="brand">
-        <img class="brand-logo" src="assets/branding/prisonlab-128.png" alt="" width="48" height="48">
+        <a class="brand-home" href="index.php" aria-label="الرئيسية · PrisonLab" title="العودة للرئيسية"><img class="brand-logo" src="assets/branding/prisonlab-128.png" alt="PrisonLab" width="48" height="48"></a>
         <div class="brand-copy"><span class="brand-name" dir="ltr">PrisonLab</span><h1>التجارب المنشورة · نتائج يشاركها المجتمع</h1></div>
     </div>
     <div class="header-actions">
@@ -135,9 +135,9 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
         </div>
     </section>
 
-    <section id="public-context-heading" class="profile-heading" hidden></section><div id="public-directory" class="community-filters"></div><div id="public-share-control" class="public-toolbar"></div>
+    <section id="public-context-heading" class="profile-heading" hidden></section><div id="public-directory" class="community-filters"></div>
     <section id="public-profile-heading" hidden></section>
-    <div class="public-toolbar"><button class="btn btn-secondary" id="show-gallery">المحادثات المنشورة</button><button class="btn btn-secondary" id="show-leaderboard">ترتيب النماذج · Leaderboard</button><a href="public.php" id="all-profiles-link" hidden>جميع المشاركين</a></div>
+    <div class="public-toolbar public-browse-toolbar"><div class="public-view-switch"><button class="btn btn-secondary" id="show-gallery">المحادثات المنشورة</button><button class="btn btn-secondary" id="show-leaderboard">ترتيب النماذج · Leaderboard</button><a href="public.php" id="all-profiles-link" hidden>جميع المشاركين</a></div><div id="public-share-control" class="public-share-actions"></div></div>
     <section id="community-leaderboard" class="community-board" hidden>
         <h2>التجارب الأعلى تقييمًا مع كل موديل</h2><p class="community-notice">المحادثات المنشورة فقط. الدرجة تخص أداء الموديل في دوره، وليست تقييمًا للشخص. استخدم المرشحات لمقارنة نفس القضية والمستوى والمعيار؛ اختلاف هذه العوامل يؤثر في النتائج.</p>
         <div class="community-filters">
