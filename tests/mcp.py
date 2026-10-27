@@ -137,7 +137,16 @@ def run(storage):
     assert step(s,rid=rid)[1]['session']['turns_count']==1
     calls=json.loads((storage/'test-calls.json').read_text())[before:]
     assert any(c['model']==free and c['test_key_hash']==hashlib.sha256(b'free-test-key').hexdigest() and c['price_caps']=={'prompt':0,'completion':0} for c in calls)
-    assert all(c['test_key_hash']==hashlib.sha256(b'sk-or-test-personal').hexdigest() for c in calls if c['decisions'])
+    assert all(c['test_key_hash']==hashlib.sha256(b'free-test-key').hexdigest() for c in calls if c['decisions'])
+    # Free OpenRouter prisoner with MCP investigator also funds auxiliary stages from free.
+    code,d=owner.post('start_session','sk-or-test-personal',request_id=uuid.uuid4().hex,model=free,interrogator_type='ai',interrogator_model='mistralai/mistral-small-3.2-24b-instruct',case_file='char_1_victor_vance.md',mcp_actors={'interrogator':actors['interrogator']});assert code==200,d
+    s=d['session'];tokens={'interrogator':gate(s,'interrogator')};rid=uuid.uuid4().hex
+    before=len(json.loads((storage/'test-calls.json').read_text()))
+    assert step(s,rid=rid)[1]['mcp_wait'];t=task('interrogator');reply('interrogator',t,{'question':'ما سبب وجود الملف في حسابك؟'})
+    assert step(s,rid=rid)[1]['session']['turns_count']==1
+    calls=json.loads((storage/'test-calls.json').read_text())[before:]
+    assert any(c['model']==free and c['test_key_hash']==hashlib.sha256(b'free-test-key').hexdigest() and c['price_caps']=={'prompt':0,'completion':0} for c in calls)
+    assert all(c['test_key_hash']==hashlib.sha256(b'free-test-key').hexdigest() for c in calls if c['decisions'])
     print('PASS MCP: HTTP initialize/tools, role isolation, rotation, deletion, delta context, spectator isolation, idempotent stages/replies, output correction, both external actors, mixed provider and both human modes, OpenRouter-only auxiliary funding.')
 
 if __name__=='__main__':

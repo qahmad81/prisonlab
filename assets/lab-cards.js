@@ -22,7 +22,7 @@ const LabCards={
     },
     funding(s){const c=s.cost || {},source=c.funding_source || s.funding_source;
         const profile=c.sponsor_profile || s.sponsor_profile || (source==='personal'?s.operator_profile:null);
-        const name=c.sponsor_label || s.sponsor_label || profile?.display_name || (source==='personal'?'المشغّل':source==='site'?'الموقع':'غير مسجل');
+        const name=c.sponsor_label || s.sponsor_label || profile?.display_name || (source==='personal'?'المشغّل':source==='site'?'الموقع':source==='free'?'تمويل النماذج المجانية':'غير مسجل');
         const sid=s.sponsor_id || c.sponsor_id;
         const url=typeof LabSharing==='undefined'?null:sid?LabSharing.url({sponsor:sid}):profile?.public_id?LabSharing.url({funder:profile.public_id,funding:source}):LabSharing.url({funding:source});
         return {profile,name,url,source};

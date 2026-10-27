@@ -10,8 +10,10 @@ const LabCommunity = {
     money(value) {return Number.isFinite(Number(value))?'$'+Number(value).toFixed(3):'غير متاح';},
     cost(s) {
         const c=s.cost;if(!c)return 'التكلفة غير متاحة';
-        const source=({site:'على نفقة الموقع',personal:'بالمفتاح الشخصي',legacy:'تجربة سابقة'})[c.funding_source] || '';
-        return `التكلفة ${this.money(c.total_usd)} · ${source}${c.complete?'':' *'}${Object.keys(s.mcp_actors || {}).length?' · MCP: تكلفة خارجية غير مقاسة':''}`;
+        const source=({site:'على نفقة الموقع',personal:'بالمفتاح الشخصي',free:'تمويل النماذج المجانية',legacy:'تجربة سابقة'})[c.funding_source] || '';
+        const part=p=>p?.recorded_calls ? (p.reported_calls?this.money(p.total_usd)+(p.reported_calls<p.recorded_calls?' *':''):'غير متاح') : 'لا استدعاءات';
+        const extra=c.free_funding_mode==='mixed'?` · الدور المجاني: ${part(c.by_funding_part?.free_actor)} · التمويل الأصلي: ${part(c.by_funding_part?.primary)}`:'';
+        return `التكلفة ${this.money(c.total_usd)} · ${source}${extra}${c.complete?'':' *'}${Object.keys(s.mcp_actors || {}).length?' · MCP: تكلفة خارجية غير مقاسة':''}`;
     },
     operator() {const label=document.createElement('span');label.className='operator-line';label.textContent='تجربة في النسخة المستقلة';return label;},
     result(s) {
