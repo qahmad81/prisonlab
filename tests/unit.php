@@ -2,6 +2,30 @@
 require_once dirname(__DIR__).'/lib/lab.php';
 function check(bool $condition,string $message):void {if(!$condition)throw new RuntimeException($message);}
 check(labJuryStop(3,12)==='all_reports','three reports must finish immediately');
+
+// Distinct credentials and zero provider caps are enforced per actor, not per session.
+$GLOBALS['lab_catalog_models']=[
+    ['id'=>'test/free','pricing'=>['prompt_per_token'=>'0','completion_per_token'=>'0']],
+    ['id'=>'test/paid','pricing'=>['prompt_per_token'=>'0.00000000001','completion_per_token'=>'0']],
+];
+$GLOBALS['lab_free_actor_key']='fixture-free'; $GLOBALS['lab_user_key']=true;
+$routed=[]; $GLOBALS['lab_transport']=function($payload,$key,$decisions)use(&$routed){
+    $routed[]=[$payload,$key];return ['choices'=>[['message'=>['content'=>'ok'],'finish_reason'=>'stop']]];
+};
+$routeSession=['messages'=>[],'usage'=>[]];
+labChat($routeSession,'prisoner','test/free',[],'fixture-paid');
+labChat($routeSession,'interrogator','test/paid',[],'fixture-paid');
+labChat($routeSession,'compaction','test/free',[],'fixture-paid');
+check($routed[0][1]==='fixture-free' && $routed[0][0]['provider']['max_price']===['prompt'=>0,'completion'=>0],'free actor routing or zero cap failed');
+check($routed[1][1]==='fixture-paid' && $routed[2][1]==='fixture-paid','paid actor or support stage changed payer');
+$routeSession['free_actor_models']=['prisoner'=>'test/free']; $GLOBALS['lab_catalog_models']=[];
+labChat($routeSession,'prisoner','test/free',[],'fixture-paid');
+check($routed[3][1]==='fixture-free' && $routed[3][0]['provider']['max_price']['completion']===0,'saved free role changed after catalog refresh');
+unset($GLOBALS['lab_free_actor_key']);
+try { labChat($routeSession,'prisoner','test/free',[],'fixture-paid'); throw new RuntimeException('missing free key fell back'); }
+catch (RuntimeException $e) { check(str_contains($e->getMessage(),'المجانية'),'wrong missing free key error'); }
+unset($GLOBALS['lab_catalog_models'],$GLOBALS['lab_user_key'],$GLOBALS['lab_transport']);
+
 foreach([50,80,180] as $seconds){
     check(labJuryStop(2,$seconds-.01,$seconds)===null,'partial jury ended before deadline');
     foreach([0,1,2] as $n)check(labJuryStop($n,$seconds,$seconds)==='deadline','tier deadline incorrect');
