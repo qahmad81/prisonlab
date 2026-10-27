@@ -1,4 +1,5 @@
 <?php
+putenv('OPENROUTER_FREE_API_KEY=free-test-key');
 // Used only by the isolated test server through auto_prepend_file; production never includes this file.
 $GLOBALS['lab_test_env']=['APP_BASE_URL'=>'http://127.0.0.1:8494','LINKEDIN_CLIENT_ID'=>'test-client','LINKEDIN_CLIENT_SECRET'=>'test-secret',
     'LINKEDIN_REDIRECT_URI'=>'http://127.0.0.1:8494/auth.php?action=callback','OPENROUTER_API_KEY'=>'site-test-key'];

@@ -132,3 +132,7 @@ Update the model catalog with python fetch_models.py (requires requests) and dis
 The `linkedin` branch hosts the community edition with required LinkedIn sign-in, account histories, publication profiles, leaderboards, LinkedIn sharing and three site-funded new tests per day. A verified personal OpenRouter key bypasses that daily quota; removing it restores the remaining site allowance. The key button displays the lowest known remaining key/account/effective budget, rounded to two decimals. Existing sessions retain their original funding source.
 
 The `main` branch is the standalone edition: no LinkedIn setup, social sharing, account leaderboard or daily session quota. Both branches contain the shared simulation, model-policy, personal-key, jury and interface improvements. See docs/EDITIONS.md before merging changes between branches.
+
+## Free actor account
+
+Set `OPENROUTER_FREE_API_KEY` privately for the separate OpenRouter account configured for free-model data policies. Catalog-confirmed zero-price OpenRouter actors use this key with provider prompt and completion price caps of zero; missing configuration fails without falling back to another key. Paid actors and support stages (JEV, compaction and jury) retain the session's original funding source. MCP actors never use this key. The account's data policy is controlled in OpenRouter, and provider availability is not guaranteed.

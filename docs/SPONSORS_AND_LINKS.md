@@ -12,7 +12,7 @@ Daily quotas count new tests per donor and LinkedIn account, using Asia/Jerusale
 
 The session stores a sponsor ID, public owner snapshot, label, initial revision and price ceiling. Every subsequent request resolves that same sponsor; a visitor header or new selection cannot change the payer. Each provider launch checks whether the selected revision is still active. Already-transmitted calls can finish; future stages stop after a revision change until the session is reloaded/resumed using its original donor's current key. A removed or disabled donor never falls through to another key. Lower actor limits apply on resume. Changing the funding selector only affects a new test.
 
-Price zero enforces provider prompt/completion price caps of zero for chat actors. JEV decisions, compaction and the normal price-capped jury still use that donor key, as explicitly requested by the owner. Personal visitor keys remain in sessionStorage and headers only, with their existing fingerprint binding and unlimited site quota. The sponsor picker can override a stored personal key for a new test without exposing it or bypassing donor limits.
+Free OpenRouter chat actors use the separately configured `OPENROUTER_FREE_API_KEY` with provider prompt/completion price caps of zero. The donor remains the bound source for JEV decisions, compaction and the normal price-capped jury. Sponsor revocation still blocks every stage, including free actor calls. Personal visitor keys remain in sessionStorage and headers only, with their existing fingerprint binding and unlimited site quota. The sponsor picker can override a stored personal key for a new test without exposing it or bypassing donor limits.
 
 ## Initial site-key migration
 

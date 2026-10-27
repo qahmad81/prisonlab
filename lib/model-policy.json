@@ -10,12 +10,12 @@
       "moonshotai": "moonshotai/kimi-k3.1-pro"
     },
     "focus_medium": {
-      "moonshotai": "moonshotai/kimi-k3"
+      "moonshotai": "moonshotai/kimi-k3",
+      "openai": "openai/gpt-6.1-terra"
     }
   },
   "shortlist_excluded": {
     "focus_medium": [
-      "openai",
       "mistralai"
     ]
   },

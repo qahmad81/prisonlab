@@ -53,7 +53,6 @@ function summary(array $s): array {
 }
 
 try {
-    $env = labEnv(__DIR__ . '/.env');
     $storage = getenv('LAB_DATA_DIR') ?: ($env['LAB_DATA_DIR'] ?? dirname(__DIR__) . '/.ai_prison_game-data');
     if (!is_dir($storage) && !mkdir($storage, 0700, true)) throw new RuntimeException('تعذر إنشاء مجلد البيانات الخاص');
     $GLOBALS['lab_storage'] = $storage;
@@ -67,6 +66,8 @@ try {
     $statesData = labRead(__DIR__ . '/states.json')['states'];
     $statesById = array_column($statesData, null, 'id');
     $catalog = labRead(__DIR__ . '/models.json'); $models=$catalog['models'];
+    $GLOBALS['lab_catalog_models']=$models;
+    $GLOBALS['lab_free_actor_key']=trim((string)(getenv('OPENROUTER_FREE_API_KEY') ?: ($env['OPENROUTER_FREE_API_KEY'] ?? '')));
     $action = $_GET['action'] ?? '';
     $body = [];
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -259,6 +260,9 @@ try {
         if($type!=='reverse')$s['prisoner_reasoning']=isset($mcp['prisoner'])?labMcpPolicy($mcp['prisoner']):labInvestigatorReasoning(labPrisonerCharacter($file),labModel($model,$models,$userKey!==''),(string)($body['prisoner_effort'] ?? 'auto'));
         labSessionLevels($s,$models);
         if($key==='')throw new RuntimeException('مفتاح الموقع غير متوفر؛ أضف مفتاح OpenRouter الخاص بك');
+        $s['free_actor_models']=[];
+        foreach(labActorModels($s) as $role=>$actorId)if(!isset($mcp[$role]) && labFreeActor($actorId))$s['free_actor_models'][$role]=$actorId;
+        if ($s['free_actor_models'] && $GLOBALS['lab_free_actor_key']==='') throw new RuntimeException('مفتاح النماذج المجانية غير مهيأ حاليًا؛ اختر نموذجًا آخر.');
         foreach(labActorModels($s) as $actorId)foreach($models as $actor)if($actor['id']===$actorId)$s['actor_output_prices'][$actorId]=(float)$actor['pricing']['completion_per_1m'];
         foreach($mcp as $actor)$s['actor_output_prices'][$actor['id']]=0;
         $s['jury_preview']=labJuryPolicy($s,$models);

@@ -38,7 +38,8 @@ def run(storage):
     assert any(u['purpose']=='compaction' for u in d['session']['usage'])
     status,d=c.post('evaluate_session',session_id=zero['session_id']);assert status==200,d
     graded=d['session'];calls=json.loads((storage/'test-calls.json').read_text())[before:]
-    assert graded['evaluation_status']=='complete' and all(x['test_key_hash']==hashlib.sha256(b'sk-or-sponsor-b').hexdigest() for x in calls),'Funding changed between actors/JEV/compaction/jury'
+    assert graded['evaluation_status']=='complete'
+    assert all(x['test_key_hash']==hashlib.sha256((b'free-test-key' if not x['decisions'] and x['model']==free else b'sk-or-sponsor-b')).hexdigest() for x in calls),'Actor or support funding changed'
     actor=next(x for x in calls if not x['decisions'] and x['model']==free);assert actor['price_caps']==dict(prompt=0,completion=0)
     assert any('confession' in x['question_ids'] for x in calls) and any(x['question_ids']==[] and x['model']!=free for x in calls)
     assert c.post('publish_session',session_id=zero['session_id'])[0]==200
