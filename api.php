@@ -47,13 +47,12 @@ function publicSession(array $s, string $owner): array {
 }
 function summary(array $s): array {
     $keys = ['session_id','created_at','updated_at','model','gender','character_slug','case_file','case_title',
-        'mcp_actors','sponsor_id','sponsor_profile','sponsor_label','closure_policy','termination','prisoner_reasoning','interrogator_reasoning','current_state','interrogator_type','interrogator_model','interrogator_character','prisoner_character','is_ended','is_published','published_at','evaluation','evaluation_status','end_reason'];
+        'mcp_actors','sponsor_id','sponsor_profile','sponsor_label','free_sponsor','free_funding_mode','closure_policy','termination','prisoner_reasoning','interrogator_reasoning','current_state','interrogator_type','interrogator_model','interrogator_character','prisoner_character','is_ended','is_published','published_at','evaluation','evaluation_status','end_reason'];
     return array_intersect_key($s, array_flip($keys)) + ['operator_profile'=>$s['operator_profile'] ?? null,
         'cost'=>labSessionCost($s),'user_reviews'=>labSessionReviews($s),'turns_count' => labTurns($s), 'breaking_point' => $s['confession_check']['probability'] ?? 0];
 }
 
 try {
-    $env = labEnv(__DIR__ . '/.env');
     $storage = getenv('LAB_DATA_DIR') ?: ($env['LAB_DATA_DIR'] ?? dirname(__DIR__) . '/.ai_prison_game-data');
     if (!is_dir($storage) && !mkdir($storage, 0700, true)) throw new RuntimeException('تعذر إنشاء مجلد البيانات الخاص');
     $GLOBALS['lab_storage'] = $storage;
@@ -67,6 +66,8 @@ try {
     $statesData = labRead(__DIR__ . '/states.json')['states'];
     $statesById = array_column($statesData, null, 'id');
     $catalog = labRead(__DIR__ . '/models.json'); $models=$catalog['models'];
+    $GLOBALS['lab_catalog_models']=$models;
+    $freeSponsorInfo=labFreeSponsorInfo($env,$account);
     $action = $_GET['action'] ?? '';
     $body = [];
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -213,22 +214,34 @@ try {
         $authReady=false;try{labOAuthConfig($env);$authReady=true;}catch(RuntimeException $e){}
         respond(['ok'=>true,'sponsors'=>labSponsors($account),'participant_profile'=>$account?labAccountProfile($account):null,'auth_ready'=>$authReady,'quota'=>labQuota($account),'csrf_token'=>$csrf,'curated'=>$curated,'investigators'=>labInvestigators(),'cases'=>$cases,'states'=>$statesData,'models'=>$processedModels,'discovery_meta'=>$catalog['discovery_meta'] ?? [],
             'logs'=>$logs,'published_logs'=>$published,'rubric'=>labRubric(),'env'=>['sense_model'=>$senseModel,
-            'compaction_model'=>$compactionModel,'max_turns'=>LAB_MAX_TURNS]]);
+            'compaction_model'=>$compactionModel,'free_models_available'=>(bool)($freeSponsorInfo && $freeSponsorInfo['remaining']>0),'free_sponsor'=>$freeSponsorInfo,'max_turns'=>LAB_MAX_TURNS]]);
     }
     if ($action === 'start_session') {
         $prior=labExistingAccountStart($account,(string)($body['request_id'] ?? ''));if($prior)respond(['ok'=>true,'quota'=>labQuota($account),'duplicate'=>true,'session'=>publicSession($prior,$owner)]);
-        $funding=labFunding((string)($body['sponsor_id'] ?? ''),$userKey,$env);labUseFunding($funding);$key=$funding['key'];if($funding['source']!=='personal')$userKey='';
-        if($funding['sponsor_id']!==''){$balance=labVisitorBalance($key);if($balance['available_to_spend']!==null && $balance['available_to_spend']<=0)throw new RuntimeException('رصيد مفتاح الراعي غير متاح الآن؛ اختر راعيًا آخر أو مفتاحك الشخصي');}
         $model = (string)($body['model'] ?? 'google/gemini-2.5-flash-lite');
         $type = (string)($body['interrogator_type'] ?? 'human');
         if(!in_array($type,['human','ai','reverse'],true))throw new RuntimeException('وضع الاستجواب غير صالح');
         $mcp=labMcpConfig($body['mcp_actors'] ?? null,$type);
         if(isset($mcp['prisoner']))$model=$mcp['prisoner']['id'];
         elseif(str_starts_with($model,'mcp/'))throw new RuntimeException('أكمل إعداد بوابة MCP');
-        if($type!=='reverse')labModel($model, $models, $userKey !== '');else $model='';
+        if($type==='reverse')$model='';
         $interrogator = $type !== 'human' ? (string)($body['interrogator_model'] ?? '') : '';
         if(isset($mcp['interrogator']))$interrogator=$mcp['interrogator']['id'];
         elseif(str_starts_with($interrogator,'mcp/'))throw new RuntimeException('أكمل إعداد بوابة MCP');
+        $openRouterActors=[];
+        if($type!=='reverse' && !isset($mcp['prisoner']))$openRouterActors['prisoner']=$model;
+        if($type!=='human' && !isset($mcp['interrogator']))$openRouterActors['interrogator']=$interrogator;
+        $freeActors=array_filter($openRouterActors,fn($id)=>labFreeActor($id));
+        $mode=$freeActors?(count($freeActors)===count($openRouterActors)?'full':'mixed'):'';
+        $freeFunding=null;
+        if($mode!=='') {
+            if(!$freeSponsorInfo)throw new RuntimeException('تمويل النماذج المجانية غير متاح حاليًا.');
+            $freeFunding=labFunding($freeSponsorInfo['id'],'',$env);labBindFreeFunding($freeFunding);
+        }
+        $funding=$mode==='full'?$freeFunding:labFunding((string)($body['sponsor_id'] ?? ''),$userKey,$env);
+        labUseFunding($funding);$key=$funding['key'];if($funding['source']!=='personal')$userKey='';
+        if($funding['sponsor_id']!==''){$balance=labVisitorBalance($key);if($balance['available_to_spend']!==null && $balance['available_to_spend']<=0)throw new RuntimeException('رصيد مفتاح الراعي غير متاح الآن؛ اختر تمويلًا آخر');}
+        if($type!=='reverse')labModel($model,$models,$userKey!=='');
         $persona=null;$reasoning=null;
         if ($type !== 'human') {
             $im=labModel($interrogator, $models, $userKey !== '');
@@ -259,10 +272,13 @@ try {
         if($type!=='reverse')$s['prisoner_reasoning']=isset($mcp['prisoner'])?labMcpPolicy($mcp['prisoner']):labInvestigatorReasoning(labPrisonerCharacter($file),labModel($model,$models,$userKey!==''),(string)($body['prisoner_effort'] ?? 'auto'));
         labSessionLevels($s,$models);
         if($key==='')throw new RuntimeException('مفتاح الموقع غير متوفر؛ أضف مفتاح OpenRouter الخاص بك');
+        $s['free_actor_models']=$freeActors;
+        if($mode!=='')$s['free_funding_mode']=$mode;
+        if($mode==='mixed')$s['free_sponsor']=['id'=>$freeFunding['sponsor_id'],'label'=>$freeFunding['label'],'profile'=>$freeFunding['profile']];
         foreach(labActorModels($s) as $actorId)foreach($models as $actor)if($actor['id']===$actorId)$s['actor_output_prices'][$actorId]=(float)$actor['pricing']['completion_per_1m'];
         foreach($mcp as $actor)$s['actor_output_prices'][$actor['id']]=0;
         $s['jury_preview']=labJuryPolicy($s,$models);
-        $s=labAccountStart($account,$s,(string)($body['request_id'] ?? ''),$userKey,$funding);
+        $s=labAccountStart($account,$s,(string)($body['request_id'] ?? ''),$userKey,$funding,$mode==='mixed'?$freeFunding:null);
         respond(['ok'=>true,'quota'=>labQuota($account),'session'=>publicSession($s,$owner)]);
     }
     $id = (string)($body['session_id'] ?? $_GET['session_id'] ?? '');
@@ -303,9 +319,15 @@ try {
         }
         if (!empty($s['is_published']) && $action!=='submit_review') respond(['ok'=>false,'error'=>'الجلسة المنشورة للقراءة فقط'],409);
         if(!in_array($action,['publish_session','submit_review'],true)) {
+            if(($s['free_funding_mode'] ?? '')==='full' && (!is_string($s['sponsor_id'] ?? null) || !preg_match('/^sp_[a-f0-9]{24}$/D',$s['sponsor_id'])))throw new RuntimeException('تمويل التجربة المجانية غير متاح؛ المراحل المكتملة محفوظة.');
             if(($s['funding_source'] ?? '')==='personal') {
                 if($userKey==='' || !hash_equals($s['key_fingerprint'] ?? '',hash('sha256',$userKey)))throw new RuntimeException('هذه التجربة على نفقتك؛ أعد إدخال مفتاح OpenRouter نفسه لمتابعتها');
             }else {$funding=labFunding($s['sponsor_id'] ?? '','',$env);labUseFunding($funding);$key=$funding['key'];$userKey='';}
+            if(($s['free_funding_mode'] ?? '')==='full')labBindFreeFunding($funding);
+            elseif(($s['free_funding_mode'] ?? '')==='mixed') {
+                $freeId=$s['free_sponsor']['id'] ?? '';if(!is_string($freeId) || !preg_match('/^sp_[a-f0-9]{24}$/D',$freeId))throw new RuntimeException('تمويل الدور المجاني غير متاح؛ المراحل المكتملة محفوظة.');
+                labBindFreeFunding(labFunding($freeId,'',$env));
+            }
         }
         $save = function(array $value) use ($path): void { labWrite($path,$value); };
         $GLOBALS['lab_checkpoint'] = $save;

@@ -9,7 +9,7 @@ const SponsorUI={
     selection(){
         const label=document.getElementById('active-sponsor-label');if(!label)return;
         const r=App.sponsors.find(r=>r.id===App.selectedSponsorId) || App.sponsors.find(r=>r.is_site);
-        label.textContent=App.personalFunding()?'أنت برعاية '+(App.participantProfile?.display_name || 'نفسك')+' · مفتاحك':'أنت برعاية '+(r?.label || 'الموقع');
+        label.textContent=App.personalFunding()?'اختيار التجربة التالية: '+(App.participantProfile?.display_name || 'نفسك')+' · مفتاحك':'اختيار التجربة التالية: '+(r?.label || 'الموقع');
     },
     render(){
         this.selection();const grid=document.getElementById('sponsor-list');if(!grid)return;grid.replaceChildren();

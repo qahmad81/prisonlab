@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-10-22 22:49:48",
-  "count": 450,
+  "updated_at": "2026-10-27T14:56:52.251132+00:00",
+  "count": 455,
   "models": [
     {
       "provider_slug": "aion-labs",
@@ -128,8 +128,8 @@
       "pricing": {
         "prompt_per_token": "0.0000008",
         "completion_per_token": "0.0000016",
-        "prompt_per_1m": 0.8,
-        "completion_per_1m": 1.6
+        "prompt_per_1m": 0.7999999999999999,
+        "completion_per_1m": 1.5999999999999999
       },
       "architecture": {
         "modality": "text->text",
@@ -266,8 +266,8 @@
       "pricing": {
         "prompt_per_token": "0.0000008",
         "completion_per_token": "0.0000016",
-        "prompt_per_1m": 0.8,
-        "completion_per_1m": 1.6
+        "prompt_per_1m": 0.7999999999999999,
+        "completion_per_1m": 1.5999999999999999
       },
       "architecture": {
         "modality": "text->text",
@@ -479,8 +479,8 @@
       "pricing": {
         "prompt_per_token": "0.0000008",
         "completion_per_token": "0.0000032",
-        "prompt_per_1m": 0.8,
-        "completion_per_1m": 3.2
+        "prompt_per_1m": 0.7999999999999999,
+        "completion_per_1m": 3.1999999999999997
       },
       "architecture": {
         "modality": "text+image->text",
@@ -917,7 +917,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000005",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.5
       },
       "architecture": {
@@ -977,7 +977,7 @@
       "pricing": {
         "prompt_per_token": "0.00000005",
         "completion_per_token": "0.00000025",
-        "prompt_per_1m": 0.05,
+        "prompt_per_1m": 0.049999999999999996,
         "completion_per_1m": 0.25
       },
       "architecture": {
@@ -1036,7 +1036,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000005",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.5
       },
       "architecture": {
@@ -2298,7 +2298,7 @@
       "top_provider": {
         "context_length": 1000000,
         "max_completion_tokens": 128000,
-        "is_moderated": false
+        "is_moderated": true
       },
       "expiration_date": null,
       "name": "Anthropic: Claude Sonnet 5.5",
@@ -2507,7 +2507,8 @@
       ],
       "reasoning": {
         "mandatory": true
-      }
+      },
+      "catalog_unavailable": true
     },
     {
       "provider_slug": "bytedance-seed",
@@ -2801,8 +2802,8 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000004",
-        "prompt_per_1m": 0.1,
-        "completion_per_1m": 0.4
+        "prompt_per_1m": 0.09999999999999999,
+        "completion_per_1m": 0.39999999999999997
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -2861,8 +2862,8 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000002",
-        "prompt_per_1m": 0.1,
-        "completion_per_1m": 0.2
+        "prompt_per_1m": 0.09999999999999999,
+        "completion_per_1m": 0.19999999999999998
       },
       "architecture": {
         "modality": "text+image->text",
@@ -3194,10 +3195,10 @@
       "description": "This model always redirects to the latest model in the DeepSeek Flash family.",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.00000007",
-        "completion_per_token": "0.0000005",
-        "prompt_per_1m": 0.07,
-        "completion_per_1m": 0.5
+        "prompt_per_token": "0.000000017",
+        "completion_per_token": "0.0000006",
+        "prompt_per_1m": 0.017,
+        "completion_per_1m": 0.6
       },
       "architecture": {
         "modality": "text+image->text",
@@ -3263,9 +3264,9 @@
       "description": "This model always redirects to the latest model in the DeepSeek Pro family.",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.0000001307",
+        "prompt_per_token": "0.0000001259",
         "completion_per_token": "0.000008",
-        "prompt_per_1m": 0.1307,
+        "prompt_per_1m": 0.1259,
         "completion_per_1m": 8.0
       },
       "architecture": {
@@ -3381,7 +3382,7 @@
         "prompt_per_token": "0.00000029",
         "completion_per_token": "0.00000114",
         "prompt_per_1m": 0.29,
-        "completion_per_1m": 1.14
+        "completion_per_1m": 1.1400000000000001
       },
       "architecture": {
         "modality": "text->text",
@@ -3630,8 +3631,8 @@
       "created": 1777000666,
       "canonical_slug": "deepseek/deepseek-v4-flash-20260423",
       "top_provider": {
-        "context_length": 1048575,
-        "max_completion_tokens": 943717,
+        "context_length": 1048576,
+        "max_completion_tokens": 943718,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -3639,10 +3640,10 @@
       "description": "DeepSeek V4 Flash is an efficiency-optimized Mixture-of-Experts model from DeepSeek with 284B total parameters and 13B activated parameters, supporting a 1M-token context window. It is designed for fast inference and...",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.000000091",
-        "completion_per_token": "0.000000182",
-        "prompt_per_1m": 0.091,
-        "completion_per_1m": 0.182
+        "prompt_per_token": "0.0000000449",
+        "completion_per_token": "0.00000045",
+        "prompt_per_1m": 0.044899999999999995,
+        "completion_per_1m": 0.44999999999999996
       },
       "architecture": {
         "modality": "text->text",
@@ -3697,7 +3698,7 @@
       "canonical_slug": "deepseek/deepseek-v4-flash-20260731",
       "top_provider": {
         "context_length": 1048576,
-        "max_completion_tokens": 131072,
+        "max_completion_tokens": 943718,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -3705,10 +3706,10 @@
       "description": "DeepSeek V4 Flash 0731 is a sparse mixture-of-experts model from DeepSeek, with 13B active parameters out of 284B total. This re-post-trained revision is suited for coding, reasoning, and agent workflows....",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.00000004444",
-        "completion_per_token": "0.00000013332",
-        "prompt_per_1m": 0.0444,
-        "completion_per_1m": 0.1333
+        "prompt_per_token": "0.000000119",
+        "completion_per_token": "0.000000238",
+        "prompt_per_1m": 0.119,
+        "completion_per_1m": 0.238
       },
       "architecture": {
         "modality": "text->text",
@@ -3774,9 +3775,9 @@
       "context_length": 1048576,
       "pricing": {
         "prompt_per_token": "0.0000000422",
-        "completion_per_token": "0.0000001729",
+        "completion_per_token": "0.0000001694",
         "prompt_per_1m": 0.0422,
-        "completion_per_1m": 0.1729
+        "completion_per_1m": 0.1694
       },
       "architecture": {
         "modality": "text->text",
@@ -3843,7 +3844,7 @@
       "pricing": {
         "prompt_per_token": "0.0000002156",
         "completion_per_token": "0.0000006468",
-        "prompt_per_1m": 0.2156,
+        "prompt_per_1m": 0.21559999999999999,
         "completion_per_1m": 0.6468
       },
       "architecture": {
@@ -3908,10 +3909,10 @@
       "description": "DeepSeek V4 Pro is a large-scale Mixture-of-Experts model from DeepSeek with 1.6T total parameters and 49B activated parameters, supporting a 1M-token context window. It is designed for advanced reasoning, coding,...",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.000000442656",
-        "completion_per_token": "0.000000885312",
-        "prompt_per_1m": 0.4427,
-        "completion_per_1m": 0.8853
+        "prompt_per_token": "0.000000883746",
+        "completion_per_token": "0.000001767492",
+        "prompt_per_1m": 0.883746,
+        "completion_per_1m": 1.767492
       },
       "architecture": {
         "modality": "text->text",
@@ -3976,7 +3977,7 @@
         "prompt_per_token": "0.00000066",
         "completion_per_token": "0.00000198",
         "prompt_per_1m": 0.66,
-        "completion_per_1m": 1.98
+        "completion_per_1m": 1.9800000000000002
       },
       "architecture": {
         "modality": "text->text",
@@ -4030,7 +4031,7 @@
       "canonical_slug": "deepseek/deepseek-v4.1-flash-20260910",
       "top_provider": {
         "context_length": 1048576,
-        "max_completion_tokens": 943718,
+        "max_completion_tokens": 131072,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -4038,10 +4039,10 @@
       "description": "DeepSeek V4.1 Flash is a sparse mixture-of-experts model from DeepSeek, and the first built on the company's Causal Encoder-Decoder (CED) architecture. It activates 8B parameters on input and 16B on...",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.0000003",
-        "completion_per_token": "0.0000012",
-        "prompt_per_1m": 0.3,
-        "completion_per_1m": 1.2
+        "prompt_per_token": "0.00000014",
+        "completion_per_token": "0.00000042",
+        "prompt_per_1m": 0.14,
+        "completion_per_1m": 0.42
       },
       "architecture": {
         "modality": "text+image->text",
@@ -4072,6 +4073,7 @@
         "temperature",
         "tool_choice",
         "tools",
+        "top_a",
         "top_k",
         "top_logprobs",
         "top_p"
@@ -4108,7 +4110,7 @@
       "pricing": {
         "prompt_per_token": "0.00000005",
         "completion_per_token": "0.00000015",
-        "prompt_per_1m": 0.05,
+        "prompt_per_1m": 0.049999999999999996,
         "completion_per_1m": 0.15
       },
       "architecture": {
@@ -4245,7 +4247,7 @@
         "prompt_per_token": "0.0000005",
         "completion_per_token": "0.00000215",
         "prompt_per_1m": 0.5,
-        "completion_per_1m": 2.15
+        "completion_per_1m": 2.1500000000000004
       },
       "architecture": {
         "modality": "text->text",
@@ -4581,8 +4583,8 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000004",
-        "prompt_per_1m": 0.1,
-        "completion_per_1m": 0.4
+        "prompt_per_1m": 0.09999999999999999,
+        "completion_per_1m": 0.39999999999999997
       },
       "architecture": {
         "modality": "text+image+file+audio+video->text",
@@ -5717,7 +5719,7 @@
       "pricing": {
         "prompt_per_token": "0.000000825",
         "completion_per_token": "0.000004125",
-        "prompt_per_1m": 0.825,
+        "prompt_per_1m": 0.8250000000000001,
         "completion_per_1m": 4.125
       },
       "architecture": {
@@ -6123,7 +6125,7 @@
       "pricing": {
         "prompt_per_token": "0.00000005",
         "completion_per_token": "0.00000015",
-        "prompt_per_1m": 0.05,
+        "prompt_per_1m": 0.049999999999999996,
         "completion_per_1m": 0.15
       },
       "architecture": {
@@ -6217,7 +6219,7 @@
       "canonical_slug": "google/gemma-3-4b-it",
       "top_provider": {
         "context_length": 131072,
-        "max_completion_tokens": 117964,
+        "max_completion_tokens": 16384,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -6225,10 +6227,10 @@
       "description": "Gemma 3 introduces multimodality, supporting vision-language input and text outputs. It handles context windows up to 128k tokens, understands over 140 languages, and offers improved math, reasoning, and chat capabilities,...",
       "context_length": 131072,
       "pricing": {
-        "prompt_per_token": "0.00000004",
-        "completion_per_token": "0.00000005",
-        "prompt_per_1m": 0.04,
-        "completion_per_1m": 0.05
+        "prompt_per_token": "0.00000005",
+        "completion_per_token": "0.0000001",
+        "prompt_per_1m": 0.049999999999999996,
+        "completion_per_1m": 0.09999999999999999
       },
       "architecture": {
         "modality": "text+image->text",
@@ -6276,10 +6278,10 @@
       "description": "Gemma 4 26B A4B IT is an instruction-tuned Mixture-of-Experts (MoE) model from Google DeepMind. Despite 25.2B total parameters, only 3.8B activate per token during inference — delivering near-31B quality at...",
       "context_length": 262144,
       "pricing": {
-        "prompt_per_token": "0.0000000765",
-        "completion_per_token": "0.000000255",
-        "prompt_per_1m": 0.0765,
-        "completion_per_1m": 0.255
+        "prompt_per_token": "0.00000009",
+        "completion_per_token": "0.0000003",
+        "prompt_per_1m": 0.09,
+        "completion_per_1m": 0.3
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -6297,6 +6299,7 @@
         "include_reasoning",
         "logit_bias",
         "logprobs",
+        "max_completion_tokens",
         "max_tokens",
         "min_p",
         "presence_penalty",
@@ -6388,8 +6391,8 @@
       "pricing": {
         "prompt_per_token": "0.0000002",
         "completion_per_token": "0.0000004",
-        "prompt_per_1m": 0.2,
-        "completion_per_1m": 0.4
+        "prompt_per_1m": 0.19999999999999998,
+        "completion_per_1m": 0.39999999999999997
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -6583,7 +6586,8 @@
         "top_k",
         "top_logprobs",
         "top_p"
-      ]
+      ],
+      "catalog_unavailable": true
     },
     {
       "provider_slug": "ibm-granite",
@@ -6778,7 +6782,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.00000035",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.35
       },
       "architecture": {
@@ -6834,7 +6838,7 @@
       "pricing": {
         "prompt_per_token": "0.000000021",
         "completion_per_token": "0.000000063",
-        "prompt_per_1m": 0.021,
+        "prompt_per_1m": 0.020999999999999998,
         "completion_per_1m": 0.063
       },
       "architecture": {
@@ -6950,7 +6954,7 @@
         "prompt_per_token": "0.000000075",
         "completion_per_token": "0.000000225",
         "prompt_per_1m": 0.075,
-        "completion_per_1m": 0.225
+        "completion_per_1m": 0.22499999999999998
       },
       "architecture": {
         "modality": "text->text",
@@ -7007,8 +7011,8 @@
       "pricing": {
         "prompt_per_token": "0.00000005",
         "completion_per_token": "0.00000023",
-        "prompt_per_1m": 0.05,
-        "completion_per_1m": 0.23
+        "prompt_per_1m": 0.049999999999999996,
+        "completion_per_1m": 0.22999999999999998
       },
       "architecture": {
         "modality": "text->text",
@@ -7082,6 +7086,59 @@
         "top_k",
         "top_p"
       ]
+    },
+    {
+      "id": "liquid/lfm-2.5-2.6b",
+      "created": 1786470519,
+      "canonical_slug": "liquid/lfm-2.5-2.6b-20260811",
+      "top_provider": {
+        "context_length": 128000,
+        "max_completion_tokens": 8192,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "LiquidAI: LFM2.5-2.6B",
+      "description": "LFM2.5-2.6B is a compact reasoning model from Liquid AI. It is suited for agent workflows, data extraction, RAG, and long-context processing. Liquid advises against using it for agentic coding or...",
+      "context_length": 128000,
+      "pricing": {
+        "prompt_per_token": "0.00000035",
+        "completion_per_token": "0.0000005",
+        "prompt_per_1m": 0.35,
+        "completion_per_1m": 0.5
+      },
+      "architecture": {
+        "modality": "text->text",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logprobs",
+        "max_completion_tokens",
+        "max_tokens",
+        "min_p",
+        "presence_penalty",
+        "reasoning",
+        "repetition_penalty",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": true
+      }
     },
     {
       "provider_slug": "liquid",
@@ -7159,7 +7216,7 @@
       "pricing": {
         "prompt_per_token": "0.00000005",
         "completion_per_token": "0.0000007",
-        "prompt_per_1m": 0.05,
+        "prompt_per_1m": 0.049999999999999996,
         "completion_per_1m": 0.7
       },
       "architecture": {
@@ -7266,7 +7323,7 @@
       "pricing": {
         "prompt_per_token": "0.0000004",
         "completion_per_token": "0.00000075",
-        "prompt_per_1m": 0.4,
+        "prompt_per_1m": 0.39999999999999997,
         "completion_per_1m": 0.75
       },
       "architecture": {
@@ -7364,15 +7421,15 @@
         "max_completion_tokens": 16384,
         "is_moderated": false
       },
-      "expiration_date": null,
+      "expiration_date": "2026-11-03",
       "name": "Meta: Llama 3.1 70B Instruct",
       "description": "Meta's latest class of model (Llama 3.1) launched with a variety of sizes & flavors. This 70B instruct-tuned version is optimized for high quality dialogue usecases. It has demonstrated strong...",
       "context_length": 131072,
       "pricing": {
         "prompt_per_token": "0.0000004",
         "completion_per_token": "0.0000004",
-        "prompt_per_1m": 0.4,
-        "completion_per_1m": 0.4
+        "prompt_per_1m": 0.39999999999999997,
+        "completion_per_1m": 0.39999999999999997
       },
       "architecture": {
         "modality": "text->text",
@@ -7421,7 +7478,7 @@
       "pricing": {
         "prompt_per_token": "0.00000005",
         "completion_per_token": "0.00000008",
-        "prompt_per_1m": 0.05,
+        "prompt_per_1m": 0.049999999999999996,
         "completion_per_1m": 0.08
       },
       "architecture": {
@@ -7508,8 +7565,8 @@
       "created": 1727222400,
       "canonical_slug": "meta-llama/llama-3.2-3b-instruct",
       "top_provider": {
-        "context_length": 80000,
-        "max_completion_tokens": 72000,
+        "context_length": 131072,
+        "max_completion_tokens": 117964,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -7517,10 +7574,10 @@
       "description": "Llama 3.2 3B is a 3-billion-parameter multilingual large language model, optimized for advanced natural language processing tasks like dialogue generation, reasoning, and summarization. Designed with the latest transformer architecture, it...",
       "context_length": 131072,
       "pricing": {
-        "prompt_per_token": "0.0000000509",
-        "completion_per_token": "0.000000335",
-        "prompt_per_1m": 0.0509,
-        "completion_per_1m": 0.335
+        "prompt_per_token": "0.00000005",
+        "completion_per_token": "0.00000033",
+        "prompt_per_1m": 0.049999999999999996,
+        "completion_per_1m": 0.33
       },
       "architecture": {
         "modality": "text->text",
@@ -7568,7 +7625,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.00000032",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.32
       },
       "architecture": {
@@ -7672,7 +7729,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000003",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.3
       },
       "architecture": {
@@ -7956,8 +8013,8 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000002",
-        "prompt_per_1m": 0.1,
-        "completion_per_1m": 0.2
+        "prompt_per_1m": 0.09999999999999999,
+        "completion_per_1m": 0.19999999999999998
       },
       "architecture": {
         "modality": "text+image+file+video->text",
@@ -8079,8 +8136,8 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000002",
-        "prompt_per_1m": 0.1,
-        "completion_per_1m": 0.2
+        "prompt_per_1m": 0.09999999999999999,
+        "completion_per_1m": 0.19999999999999998
       },
       "architecture": {
         "modality": "text+image+file+video->text",
@@ -8500,8 +8557,8 @@
       "created": 1770908502,
       "canonical_slug": "minimax/minimax-m2.5-20260211",
       "top_provider": {
-        "context_length": 198000,
-        "max_completion_tokens": 32768,
+        "context_length": 204800,
+        "max_completion_tokens": 131072,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -8509,10 +8566,10 @@
       "description": "MiniMax-M2.5 is a SOTA large language model designed for real-world productivity. Trained in a diverse range of complex real-world digital working environments, M2.5 builds upon the coding expertise of M2.1...",
       "context_length": 204800,
       "pricing": {
-        "prompt_per_token": "0.00000027",
-        "completion_per_token": "0.00000095",
-        "prompt_per_1m": 0.27,
-        "completion_per_1m": 0.95
+        "prompt_per_token": "0.0000003",
+        "completion_per_token": "0.0000012",
+        "prompt_per_1m": 0.3,
+        "completion_per_1m": 1.2
       },
       "architecture": {
         "modality": "text->text",
@@ -8666,14 +8723,14 @@
       "created": 1792379569,
       "canonical_slug": "minimax/minimax-m3.1-flash-20261019",
       "top_provider": {
-        "context_length": 1000000,
+        "context_length": 1048576,
         "max_completion_tokens": 524288,
         "is_moderated": false
       },
       "expiration_date": null,
       "name": "MiniMax: MiniMax M3.1 Flash",
       "description": "MiniMax-M3.1-Flash is a multimodal model from MiniMax. Compared with M3, it delivers significant improvements across multiple benchmarks, particularly in complex agentic tasks, coding, and cybersecurity. It is built for complex,...",
-      "context_length": 1000000,
+      "context_length": 1048576,
       "pricing": {
         "prompt_per_token": "0.00000015",
         "completion_per_token": "0.0000006",
@@ -8692,14 +8749,25 @@
         ]
       },
       "supported_parameters": [
+        "frequency_penalty",
         "include_reasoning",
+        "logit_bias",
+        "logprobs",
         "max_tokens",
+        "min_p",
+        "presence_penalty",
         "reasoning",
         "reasoning_effort",
+        "repetition_penalty",
         "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
         "temperature",
         "tool_choice",
         "tools",
+        "top_k",
+        "top_logprobs",
         "top_p"
       ],
       "reasoning": {
@@ -8734,7 +8802,7 @@
       "pricing": {
         "prompt_per_token": "0.0000002",
         "completion_per_token": "0.0000011",
-        "prompt_per_1m": 0.2,
+        "prompt_per_1m": 0.19999999999999998,
         "completion_per_1m": 1.1
       },
       "architecture": {
@@ -8868,7 +8936,7 @@
         "prompt_per_token": "0.0000003",
         "completion_per_token": "0.0000009",
         "prompt_per_1m": 0.3,
-        "completion_per_1m": 0.9
+        "completion_per_1m": 0.8999999999999999
       },
       "architecture": {
         "modality": "text+file->text",
@@ -8941,7 +9009,8 @@
         "tool_choice",
         "tools",
         "top_p"
-      ]
+      ],
+      "catalog_unavailable": true
     },
     {
       "provider_slug": "mistralai",
@@ -8963,7 +9032,7 @@
       "pricing": {
         "prompt_per_token": "0.0000004",
         "completion_per_token": "0.000002",
-        "prompt_per_1m": 0.4,
+        "prompt_per_1m": 0.39999999999999997,
         "completion_per_1m": 2.0
       },
       "architecture": {
@@ -9010,8 +9079,8 @@
       "pricing": {
         "prompt_per_token": "0.0000002",
         "completion_per_token": "0.0000002",
-        "prompt_per_1m": 0.2,
-        "completion_per_1m": 0.2
+        "prompt_per_1m": 0.19999999999999998,
+        "completion_per_1m": 0.19999999999999998
       },
       "architecture": {
         "modality": "text+image->text",
@@ -9057,8 +9126,8 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000001",
-        "prompt_per_1m": 0.1,
-        "completion_per_1m": 0.1
+        "prompt_per_1m": 0.09999999999999999,
+        "completion_per_1m": 0.09999999999999999
       },
       "architecture": {
         "modality": "text+image->text",
@@ -9176,7 +9245,8 @@
         "tool_choice",
         "tools",
         "top_p"
-      ]
+      ],
+      "catalog_unavailable": true
     },
     {
       "provider_slug": "mistralai",
@@ -9272,7 +9342,8 @@
         "tool_choice",
         "tools",
         "top_p"
-      ]
+      ],
+      "catalog_unavailable": true
     },
     {
       "provider_slug": "mistralai",
@@ -9294,7 +9365,7 @@
       "pricing": {
         "prompt_per_token": "0.00000136",
         "completion_per_token": "0.00000418",
-        "prompt_per_1m": 1.36,
+        "prompt_per_1m": 1.3599999999999999,
         "completion_per_1m": 4.18
       },
       "architecture": {
@@ -9355,7 +9426,7 @@
       "pricing": {
         "prompt_per_token": "0.0000004",
         "completion_per_token": "0.000002",
-        "prompt_per_1m": 0.4,
+        "prompt_per_1m": 0.39999999999999997,
         "completion_per_1m": 2.0
       },
       "architecture": {
@@ -9403,7 +9474,7 @@
       "pricing": {
         "prompt_per_token": "0.0000004",
         "completion_per_token": "0.000002",
-        "prompt_per_1m": 0.4,
+        "prompt_per_1m": 0.39999999999999997,
         "completion_per_1m": 2.0
       },
       "architecture": {
@@ -9477,7 +9548,8 @@
         "tool_choice",
         "tools",
         "top_p"
-      ]
+      ],
+      "catalog_unavailable": true
     },
     {
       "provider_slug": "mistralai",
@@ -9669,7 +9741,7 @@
       "pricing": {
         "prompt_per_token": "0.00000005",
         "completion_per_token": "0.00000008",
-        "prompt_per_1m": 0.05,
+        "prompt_per_1m": 0.049999999999999996,
         "completion_per_1m": 0.08
       },
       "architecture": {
@@ -9718,7 +9790,7 @@
         "prompt_per_token": "0.000000351",
         "completion_per_token": "0.000000555",
         "prompt_per_1m": 0.351,
-        "completion_per_1m": 0.555
+        "completion_per_1m": 0.5549999999999999
       },
       "architecture": {
         "modality": "text+image->text",
@@ -9758,7 +9830,7 @@
       "created": 1750443016,
       "canonical_slug": "mistralai/mistral-small-3.2-24b-instruct-2506",
       "top_provider": {
-        "context_length": 256000,
+        "context_length": 128000,
         "max_completion_tokens": 16384,
         "is_moderated": false
       },
@@ -9767,10 +9839,10 @@
       "description": "Mistral-Small-3.2-24B-Instruct-2506 is an updated 24B parameter model from Mistral optimized for instruction following, repetition reduction, and improved function calling. Compared to the 3.1 release, version 3.2 significantly improves accuracy on...",
       "context_length": 256000,
       "pricing": {
-        "prompt_per_token": "0.00000009375",
-        "completion_per_token": "0.00000025",
-        "prompt_per_1m": 0.0938,
-        "completion_per_1m": 0.25
+        "prompt_per_token": "0.000000075",
+        "completion_per_token": "0.0000002",
+        "prompt_per_1m": 0.075,
+        "completion_per_1m": 0.19999999999999998
       },
       "architecture": {
         "modality": "text+image->text",
@@ -9918,7 +9990,8 @@
           "none"
         ],
         "default_effort": "high"
-      }
+      },
+      "catalog_unavailable": true
     },
     {
       "provider_slug": "mistralai",
@@ -9987,7 +10060,7 @@
       "pricing": {
         "prompt_per_token": "0.0000002",
         "completion_per_token": "0.0000006",
-        "prompt_per_1m": 0.2,
+        "prompt_per_1m": 0.19999999999999998,
         "completion_per_1m": 0.6
       },
       "architecture": {
@@ -10034,7 +10107,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000003",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.3
       },
       "architecture": {
@@ -10174,7 +10247,7 @@
       "pricing": {
         "prompt_per_token": "0.00000057",
         "completion_per_token": "0.0000023",
-        "prompt_per_1m": 0.57,
+        "prompt_per_1m": 0.5700000000000001,
         "completion_per_1m": 2.3
       },
       "architecture": {
@@ -10441,10 +10514,10 @@
       "description": "MoonshotAI: Kimi K2.7 Code is a coding-focused model in Moonshot AI's Kimi K2 family, built to complete end-to-end programming tasks reliably over long contexts. It uses a native multimodal mixture-of-experts...",
       "context_length": 262144,
       "pricing": {
-        "prompt_per_token": "0.0000006712",
-        "completion_per_token": "0.00000335",
-        "prompt_per_1m": 0.6712,
-        "completion_per_1m": 3.35
+        "prompt_per_token": "0.0000006725",
+        "completion_per_token": "0.0000031",
+        "prompt_per_1m": 0.6725,
+        "completion_per_1m": 3.1
       },
       "architecture": {
         "modality": "text+image->text",
@@ -10501,10 +10574,10 @@
       "description": "Kimi K3 is a 2.8T parameter open-weight multimodal reasoning model from Moonshot AI. It is suited for complex coding, knowledge work, and long-horizon agentic workflows, and is particularly strong at...",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.000000239",
-        "completion_per_token": "0.0000108",
-        "prompt_per_1m": 0.239,
-        "completion_per_1m": 10.8
+        "prompt_per_token": "0.000000159",
+        "completion_per_token": "0.00002",
+        "prompt_per_1m": 0.159,
+        "completion_per_1m": 20.0
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -10573,8 +10646,8 @@
       "pricing": {
         "prompt_per_token": "0.00000228",
         "completion_per_token": "0.0000114",
-        "prompt_per_1m": 2.28,
-        "completion_per_1m": 11.4
+        "prompt_per_1m": 2.2800000000000002,
+        "completion_per_1m": 11.399999999999999
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -10620,6 +10693,7 @@
       }
     },
     {
+      "description_ar": "نموذج Kimi K3.1 Pro المتقدم للاستدلال والمهام المعقدة، بسياق يصل إلى مليون توكن.",
       "id": "moonshotai/kimi-k3.1-pro",
       "created": 1792778188,
       "canonical_slug": "moonshotai/kimi-k3.1-pro-20261023",
@@ -10632,31 +10706,6 @@
       "name": "MoonshotAI: Kimi K3.1 Pro",
       "description": "Kimi K3.1 Pro is Moonshot AI's flagship open-weight multimodal reasoning model and a post-trained successor to Kimi K3, with a 1M-token context window. It is built for long-horizon coding, 3D...",
       "context_length": 1048576,
-      "supported_parameters": [
-        "frequency_penalty",
-        "include_reasoning",
-        "max_tokens",
-        "presence_penalty",
-        "reasoning",
-        "reasoning_effort",
-        "response_format",
-        "stop",
-        "structured_outputs",
-        "tool_choice",
-        "tools"
-      ],
-      "reasoning": {
-        "mandatory": false,
-        "default_enabled": true,
-        "supported_efforts": [
-          "max",
-          "high",
-          "low",
-          "none"
-        ],
-        "default_effort": "max"
-      },
-      "description_ar": "نموذج Kimi K3.1 Pro المتقدم للاستدلال والمهام المعقدة، بسياق يصل إلى مليون توكن.",
       "pricing": {
         "prompt_per_token": "0.000002",
         "completion_per_token": "0.00001",
@@ -10673,6 +10722,32 @@
         "output_modalities": [
           "text"
         ]
+      },
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logprobs",
+        "max_tokens",
+        "presence_penalty",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "stop",
+        "structured_outputs",
+        "tool_choice",
+        "tools",
+        "top_logprobs"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true,
+        "supported_efforts": [
+          "max",
+          "high",
+          "low",
+          "none"
+        ],
+        "default_effort": "max"
       }
     },
     {
@@ -10693,10 +10768,10 @@
       "description": "This model always redirects to the latest model in the Kimi family.",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.000000238",
-        "completion_per_token": "0.000024",
-        "prompt_per_1m": 0.238,
-        "completion_per_1m": 24.0
+        "prompt_per_token": "0.000000159",
+        "completion_per_token": "0.00002",
+        "prompt_per_1m": 0.159,
+        "completion_per_1m": 20.0
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -10714,8 +10789,10 @@
         "include_reasoning",
         "logit_bias",
         "logprobs",
+        "max_completion_tokens",
         "max_tokens",
         "min_p",
+        "parallel_tool_calls",
         "presence_penalty",
         "reasoning",
         "reasoning_effort",
@@ -10763,7 +10840,7 @@
       "pricing": {
         "prompt_per_token": "0.0000008",
         "completion_per_token": "0.0000012",
-        "prompt_per_1m": 0.8,
+        "prompt_per_1m": 0.7999999999999999,
         "completion_per_1m": 1.2
       },
       "architecture": {
@@ -10805,7 +10882,7 @@
       "pricing": {
         "prompt_per_token": "0.0000009",
         "completion_per_token": "0.0000019",
-        "prompt_per_1m": 0.9,
+        "prompt_per_1m": 0.8999999999999999,
         "completion_per_1m": 1.9
       },
       "architecture": {
@@ -10898,8 +10975,8 @@
       "pricing": {
         "prompt_per_token": "0.000000025",
         "completion_per_token": "0.0000001",
-        "prompt_per_1m": 0.025,
-        "completion_per_1m": 0.1
+        "prompt_per_1m": 0.024999999999999998,
+        "completion_per_1m": 0.09999999999999999
       },
       "architecture": {
         "modality": "text+image->text",
@@ -11364,7 +11441,8 @@
           "none"
         ],
         "default_effort": "medium"
-      }
+      },
+      "catalog_unavailable": true
     },
     {
       "provider_slug": "nvidia",
@@ -11505,8 +11583,8 @@
       "pricing": {
         "prompt_per_token": "0.0000002",
         "completion_per_token": "0.0000002",
-        "prompt_per_1m": 0.2,
-        "completion_per_1m": 0.2
+        "prompt_per_1m": 0.19999999999999998,
+        "completion_per_1m": 0.19999999999999998
       },
       "architecture": {
         "modality": "text+image->text",
@@ -11605,7 +11683,7 @@
         "prompt_per_token": "0.00000007",
         "completion_per_token": "0.0000002",
         "prompt_per_1m": 0.07,
-        "completion_per_1m": 0.2
+        "completion_per_1m": 0.19999999999999998
       },
       "architecture": {
         "modality": "text->text",
@@ -12021,7 +12099,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000005",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.5
       },
       "architecture": {
@@ -12193,17 +12271,17 @@
       "top_provider": {
         "context_length": 1050000,
         "max_completion_tokens": 128000,
-        "is_moderated": false
+        "is_moderated": true
       },
       "expiration_date": null,
       "name": "OpenAI: GPT Terra Latest",
       "description": "This model always redirects to the latest model in the GPT Terra family.",
       "context_length": 1050000,
       "pricing": {
-        "prompt_per_token": "0.000002",
-        "completion_per_token": "0.000012",
-        "prompt_per_1m": 2.0,
-        "completion_per_1m": 12.0
+        "prompt_per_token": "0.000001",
+        "completion_per_token": "0.000005",
+        "prompt_per_1m": 1.0,
+        "completion_per_1m": 5.0
       },
       "architecture": {
         "modality": "text+image+file->text",
@@ -12218,7 +12296,6 @@
       },
       "supported_parameters": [
         "include_reasoning",
-        "max_completion_tokens",
         "max_tokens",
         "reasoning",
         "reasoning_effort",
@@ -12290,7 +12367,8 @@
         "tools",
         "top_logprobs",
         "top_p"
-      ]
+      ],
+      "catalog_unavailable": true
     },
     {
       "provider_slug": "openai",
@@ -12339,7 +12417,8 @@
         "tools",
         "top_logprobs",
         "top_p"
-      ]
+      ],
+      "catalog_unavailable": true
     },
     {
       "provider_slug": "openai",
@@ -12485,7 +12564,8 @@
         "temperature",
         "top_logprobs",
         "top_p"
-      ]
+      ],
+      "catalog_unavailable": true
     },
     {
       "provider_slug": "openai",
@@ -12748,8 +12828,8 @@
       "pricing": {
         "prompt_per_token": "0.0000004",
         "completion_per_token": "0.0000016",
-        "prompt_per_1m": 0.4,
-        "completion_per_1m": 1.6
+        "prompt_per_1m": 0.39999999999999997,
+        "completion_per_1m": 1.5999999999999999
       },
       "architecture": {
         "modality": "text+image+file->text",
@@ -12794,8 +12874,8 @@
       "pricing": {
         "prompt_per_token": "0.0000002",
         "completion_per_token": "0.0000008",
-        "prompt_per_1m": 0.2,
-        "completion_per_1m": 0.8
+        "prompt_per_1m": 0.19999999999999998,
+        "completion_per_1m": 0.7999999999999999
       },
       "architecture": {
         "modality": "text+image+file->text",
@@ -12829,8 +12909,8 @@
       "canonical_slug": "openai/gpt-4.1-nano-2025-04-14",
       "top_provider": {
         "context_length": 1047576,
-        "max_completion_tokens": 32768,
-        "is_moderated": true
+        "max_completion_tokens": 942818,
+        "is_moderated": false
       },
       "expiration_date": null,
       "name": "OpenAI: GPT-4.1 Nano",
@@ -12839,8 +12919,8 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000004",
-        "prompt_per_1m": 0.1,
-        "completion_per_1m": 0.4
+        "prompt_per_1m": 0.09999999999999999,
+        "completion_per_1m": 0.39999999999999997
       },
       "architecture": {
         "modality": "text+image+file->text",
@@ -12885,8 +12965,8 @@
       "pricing": {
         "prompt_per_token": "0.00000005",
         "completion_per_token": "0.0000002",
-        "prompt_per_1m": 0.05,
-        "completion_per_1m": 0.2
+        "prompt_per_1m": 0.049999999999999996,
+        "completion_per_1m": 0.19999999999999998
       },
       "architecture": {
         "modality": "text+image+file->text",
@@ -13588,8 +13668,8 @@
       "pricing": {
         "prompt_per_token": "0.00000005",
         "completion_per_token": "0.0000004",
-        "prompt_per_1m": 0.05,
-        "completion_per_1m": 0.4
+        "prompt_per_1m": 0.049999999999999996,
+        "completion_per_1m": 0.39999999999999997
       },
       "architecture": {
         "modality": "text+image+file->text",
@@ -13646,8 +13726,8 @@
       "pricing": {
         "prompt_per_token": "0.000000025",
         "completion_per_token": "0.0000002",
-        "prompt_per_1m": 0.025,
-        "completion_per_1m": 0.2
+        "prompt_per_1m": 0.024999999999999998,
+        "completion_per_1m": 0.19999999999999998
       },
       "architecture": {
         "modality": "text+image+file->text",
@@ -14720,7 +14800,7 @@
       "pricing": {
         "prompt_per_token": "0.0000002",
         "completion_per_token": "0.00000125",
-        "prompt_per_1m": 0.2,
+        "prompt_per_1m": 0.19999999999999998,
         "completion_per_1m": 1.25
       },
       "architecture": {
@@ -14780,7 +14860,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.000000625",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.625
       },
       "architecture": {
@@ -15183,7 +15263,7 @@
       "pricing": {
         "prompt_per_token": "0.0000002",
         "completion_per_token": "0.0000012",
-        "prompt_per_1m": 0.2,
+        "prompt_per_1m": 0.19999999999999998,
         "completion_per_1m": 1.2
       },
       "architecture": {
@@ -15244,7 +15324,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000006",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.6
       },
       "architecture": {
@@ -15304,7 +15384,7 @@
       "pricing": {
         "prompt_per_token": "0.0000002",
         "completion_per_token": "0.0000012",
-        "prompt_per_1m": 0.2,
+        "prompt_per_1m": 0.19999999999999998,
         "completion_per_1m": 1.2
       },
       "architecture": {
@@ -15365,7 +15445,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000006",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.6
       },
       "architecture": {
@@ -15779,7 +15859,7 @@
       "top_provider": {
         "context_length": 1050000,
         "max_completion_tokens": 128000,
-        "is_moderated": true
+        "is_moderated": false
       },
       "expiration_date": null,
       "name": "OpenAI: GPT-5.6 Terra Pro",
@@ -16147,7 +16227,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000005",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.5
       },
       "architecture": {
@@ -16208,7 +16288,7 @@
       "pricing": {
         "prompt_per_token": "0.00000005",
         "completion_per_token": "0.00000025",
-        "prompt_per_1m": 0.05,
+        "prompt_per_1m": 0.049999999999999996,
         "completion_per_1m": 0.25
       },
       "architecture": {
@@ -16268,7 +16348,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000005",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.5
       },
       "architecture": {
@@ -16329,7 +16409,7 @@
       "pricing": {
         "prompt_per_token": "0.00000005",
         "completion_per_token": "0.00000025",
-        "prompt_per_1m": 0.05,
+        "prompt_per_1m": 0.049999999999999996,
         "completion_per_1m": 0.25
       },
       "architecture": {
@@ -16812,6 +16892,228 @@
         "completion_per_token": "0.000005",
         "prompt_per_1m": 1.0,
         "completion_per_1m": 5.0
+      },
+      "architecture": {
+        "modality": "text+image+file->text",
+        "input_modalities": [
+          "file",
+          "image",
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "seed",
+        "structured_outputs",
+        "tool_choice",
+        "tools",
+        "verbosity"
+      ],
+      "reasoning": {
+        "mandatory": true,
+        "default_enabled": true,
+        "supported_efforts": [
+          "max",
+          "xhigh",
+          "high",
+          "medium",
+          "low"
+        ],
+        "default_effort": "medium"
+      }
+    },
+    {
+      "id": "openai/gpt-6.1-terra",
+      "created": 1793038409,
+      "canonical_slug": "openai/gpt-6.1-terra-20261026",
+      "top_provider": {
+        "context_length": 1050000,
+        "max_completion_tokens": 128000,
+        "is_moderated": true
+      },
+      "expiration_date": null,
+      "name": "OpenAI: GPT-6.1 Terra",
+      "description": "GPT-6.1 Terra is the mid-tier model in OpenAI's GPT-6.1 series, priced below GPT-6.1 Sol. It is suited for everyday agentic, coding, and writing work, is particularly strong at understanding screenshots...",
+      "context_length": 1050000,
+      "pricing": {
+        "prompt_per_token": "0.000001",
+        "completion_per_token": "0.000005",
+        "prompt_per_1m": 1.0,
+        "completion_per_1m": 5.0
+      },
+      "architecture": {
+        "modality": "text+image+file->text",
+        "input_modalities": [
+          "file",
+          "image",
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "seed",
+        "structured_outputs",
+        "tool_choice",
+        "tools",
+        "verbosity"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true,
+        "supported_efforts": [
+          "max",
+          "xhigh",
+          "high",
+          "medium",
+          "low",
+          "none"
+        ],
+        "default_effort": "medium"
+      }
+    },
+    {
+      "id": "openai/gpt-6.1-terra:batch",
+      "created": 1793038409,
+      "canonical_slug": "openai/gpt-6.1-terra-20261026",
+      "top_provider": {
+        "context_length": 1050000,
+        "max_completion_tokens": 128000,
+        "is_moderated": true
+      },
+      "expiration_date": null,
+      "name": "OpenAI: GPT-6.1 Terra (batch)",
+      "description": "GPT-6.1 Terra is the mid-tier model in OpenAI's GPT-6.1 series, priced below GPT-6.1 Sol. It is suited for everyday agentic, coding, and writing work, is particularly strong at understanding screenshots...",
+      "context_length": 1050000,
+      "pricing": {
+        "prompt_per_token": "0.0000005",
+        "completion_per_token": "0.0000025",
+        "prompt_per_1m": 0.5,
+        "completion_per_1m": 2.5
+      },
+      "architecture": {
+        "modality": "text+image+file->text",
+        "input_modalities": [
+          "file",
+          "image",
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "seed",
+        "structured_outputs",
+        "tool_choice",
+        "tools",
+        "verbosity"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true,
+        "supported_efforts": [
+          "max",
+          "xhigh",
+          "high",
+          "medium",
+          "low",
+          "none"
+        ],
+        "default_effort": "medium"
+      }
+    },
+    {
+      "id": "openai/gpt-6.1-terra-pro",
+      "created": 1793038556,
+      "canonical_slug": "openai/gpt-6.1-terra-pro-20261026",
+      "top_provider": {
+        "context_length": 1050000,
+        "max_completion_tokens": 128000,
+        "is_moderated": true
+      },
+      "expiration_date": null,
+      "name": "OpenAI: GPT-6.1 Terra Pro",
+      "description": "GPT-6.1 Terra Pro is the same underlying model as [GPT-6.1 Terra](https://openrouter.ai/openai/gpt-6.1-terra), served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks. **Cost note:** pro mode spends far more...",
+      "context_length": 1050000,
+      "pricing": {
+        "prompt_per_token": "0.000001",
+        "completion_per_token": "0.000005",
+        "prompt_per_1m": 1.0,
+        "completion_per_1m": 5.0
+      },
+      "architecture": {
+        "modality": "text+image+file->text",
+        "input_modalities": [
+          "file",
+          "image",
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "seed",
+        "structured_outputs",
+        "tool_choice",
+        "tools",
+        "verbosity"
+      ],
+      "reasoning": {
+        "mandatory": true,
+        "default_enabled": true,
+        "supported_efforts": [
+          "max",
+          "xhigh",
+          "high",
+          "medium",
+          "low"
+        ],
+        "default_effort": "medium"
+      }
+    },
+    {
+      "id": "openai/gpt-6.1-terra-pro:batch",
+      "created": 1793038556,
+      "canonical_slug": "openai/gpt-6.1-terra-pro-20261026",
+      "top_provider": {
+        "context_length": 1050000,
+        "max_completion_tokens": 128000,
+        "is_moderated": true
+      },
+      "expiration_date": null,
+      "name": "OpenAI: GPT-6.1 Terra Pro (batch)",
+      "description": "GPT-6.1 Terra Pro is the same underlying model as [GPT-6.1 Terra](https://openrouter.ai/openai/gpt-6.1-terra), served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks. **Cost note:** pro mode spends far more...",
+      "context_length": 1050000,
+      "pricing": {
+        "prompt_per_token": "0.0000005",
+        "completion_per_token": "0.0000025",
+        "prompt_per_1m": 0.5,
+        "completion_per_1m": 2.5
       },
       "architecture": {
         "modality": "text+image+file->text",
@@ -17655,8 +17957,8 @@
       "pricing": {
         "prompt_per_token": "0.0000008",
         "completion_per_token": "0.0000032",
-        "prompt_per_1m": 0.8,
-        "completion_per_1m": 3.2
+        "prompt_per_1m": 0.7999999999999999,
+        "completion_per_1m": 3.1999999999999997
       },
       "architecture": {
         "modality": "text+image->text",
@@ -17738,8 +18040,8 @@
       "pricing": {
         "prompt_per_token": "0.0000008",
         "completion_per_token": "0.0000032",
-        "prompt_per_1m": 0.8,
-        "completion_per_1m": 3.2
+        "prompt_per_1m": 0.7999999999999999,
+        "completion_per_1m": 3.1999999999999997
       },
       "architecture": {
         "modality": "text+image->text",
@@ -18364,7 +18666,7 @@
         "prompt_per_token": "0.00000036",
         "completion_per_token": "0.0000004",
         "prompt_per_1m": 0.36,
-        "completion_per_1m": 0.4
+        "completion_per_1m": 0.39999999999999997
       },
       "architecture": {
         "modality": "text->text",
@@ -18509,8 +18811,8 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000002",
-        "prompt_per_1m": 0.1,
-        "completion_per_1m": 0.2
+        "prompt_per_1m": 0.09999999999999999,
+        "completion_per_1m": 0.19999999999999998
       },
       "architecture": {
         "modality": "text->text",
@@ -18558,7 +18860,7 @@
       "pricing": {
         "prompt_per_token": "0.0000008",
         "completion_per_token": "0.000001",
-        "prompt_per_1m": 0.8,
+        "prompt_per_1m": 0.7999999999999999,
         "completion_per_1m": 1.0
       },
       "architecture": {
@@ -18717,7 +19019,7 @@
       "pricing": {
         "prompt_per_token": "0.00000045",
         "completion_per_token": "0.0000035",
-        "prompt_per_1m": 0.45,
+        "prompt_per_1m": 0.44999999999999996,
         "completion_per_1m": 3.5
       },
       "architecture": {
@@ -18820,9 +19122,9 @@
       "description": "Qwen3-30B-A3B-Instruct-2507 is a 30.5B-parameter mixture-of-experts language model from Qwen, with 3.3B active parameters per inference. It operates in non-thinking mode and is designed for high-quality instruction following, multilingual understanding, and...",
       "context_length": 262144,
       "pricing": {
-        "prompt_per_token": "0.00000009",
+        "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000003",
-        "prompt_per_1m": 0.09,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.3
       },
       "architecture": {
@@ -19077,7 +19379,7 @@
         "prompt_per_token": "0.00000012",
         "completion_per_token": "0.0000008",
         "prompt_per_1m": 0.12,
-        "completion_per_1m": 0.8
+        "completion_per_1m": 0.7999999999999999
       },
       "architecture": {
         "modality": "text->text",
@@ -19443,7 +19745,7 @@
         "prompt_per_token": "0.0000005",
         "completion_per_token": "0.0000036",
         "prompt_per_1m": 0.5,
-        "completion_per_1m": 3.6
+        "completion_per_1m": 3.5999999999999996
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -19558,7 +19860,7 @@
         "prompt_per_token": "0.0000003",
         "completion_per_token": "0.0000018",
         "prompt_per_1m": 0.3,
-        "completion_per_1m": 1.8
+        "completion_per_1m": 1.7999999999999998
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -19662,7 +19964,7 @@
       "canonical_slug": "qwen/qwen3.5-27b-20260224",
       "top_provider": {
         "context_length": 262144,
-        "max_completion_tokens": 65536,
+        "max_completion_tokens": 81920,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -19670,10 +19972,10 @@
       "description": "The Qwen3.5 27B native vision-language Dense model incorporates a linear attention mechanism, delivering fast response times while balancing inference speed and performance. Its overall capabilities are comparable to those of...",
       "context_length": 262144,
       "pricing": {
-        "prompt_per_token": "0.00000027",
-        "completion_per_token": "0.00000216",
-        "prompt_per_1m": 0.27,
-        "completion_per_1m": 2.16
+        "prompt_per_token": "0.00000026",
+        "completion_per_token": "0.0000026",
+        "prompt_per_1m": 0.26,
+        "completion_per_1m": 2.6
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -19780,7 +20082,7 @@
       "canonical_slug": "qwen/qwen3.5-9b-20260310",
       "top_provider": {
         "context_length": 262144,
-        "max_completion_tokens": 65536,
+        "max_completion_tokens": 235929,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -19788,10 +20090,10 @@
       "description": "Qwen3.5-9B is a multimodal foundation model from the Qwen3.5 family, designed to deliver strong reasoning, coding, and visual understanding in an efficient 9B-parameter architecture. It uses a unified vision-language design...",
       "context_length": 262144,
       "pricing": {
-        "prompt_per_token": "0.00000008",
-        "completion_per_token": "0.00000013",
-        "prompt_per_1m": 0.08,
-        "completion_per_1m": 0.13
+        "prompt_per_token": "0.00000017",
+        "completion_per_token": "0.00000025",
+        "prompt_per_1m": 0.16999999999999998,
+        "completion_per_1m": 0.25
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -19809,6 +20111,7 @@
         "include_reasoning",
         "logit_bias",
         "logprobs",
+        "max_completion_tokens",
         "max_tokens",
         "min_p",
         "presence_penalty",
@@ -19893,7 +20196,7 @@
       "canonical_slug": "qwen/qwen3.6-27b-20260422",
       "top_provider": {
         "context_length": 262144,
-        "max_completion_tokens": 65536,
+        "max_completion_tokens": 81920,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -19901,10 +20204,10 @@
       "description": "Qwen3.6 27B is a dense 27-billion-parameter language model from the Qwen Team at Alibaba, released in April 2026. It features hybrid multimodal capabilities — accepting text, image, and video inputs...",
       "context_length": 262144,
       "pricing": {
-        "prompt_per_token": "0.00000025",
-        "completion_per_token": "0.000002",
-        "prompt_per_1m": 0.25,
-        "completion_per_1m": 2.0
+        "prompt_per_token": "0.00000032",
+        "completion_per_token": "0.0000032",
+        "prompt_per_1m": 0.32,
+        "completion_per_1m": 3.1999999999999997
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -19963,7 +20266,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.00000095",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.95
       },
       "architecture": {
@@ -20300,8 +20603,8 @@
       "pricing": {
         "prompt_per_token": "0.00000023",
         "completion_per_token": "0.00000092",
-        "prompt_per_1m": 0.23,
-        "completion_per_1m": 0.92
+        "prompt_per_1m": 0.22999999999999998,
+        "completion_per_1m": 0.9199999999999999
       },
       "architecture": {
         "modality": "text+image->text",
@@ -20411,7 +20714,7 @@
       "canonical_slug": "qwen/qwen3.8-27b-20260814",
       "top_provider": {
         "context_length": 262144,
-        "max_completion_tokens": 65536,
+        "max_completion_tokens": 235929,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -20419,10 +20722,10 @@
       "description": "Qwen3.8 27B is an open-weight dense vision-language model from Qwen. It is suited for coding, professional workflows, research, multimodal interaction, and long-running agent tasks, with flexible thinking that can be...",
       "context_length": 1000000,
       "pricing": {
-        "prompt_per_token": "0.00000004",
-        "completion_per_token": "0.00000135",
-        "prompt_per_1m": 0.04,
-        "completion_per_1m": 1.35
+        "prompt_per_token": "0.0000002",
+        "completion_per_token": "0.0000025",
+        "prompt_per_1m": 0.19999999999999998,
+        "completion_per_1m": 2.5
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -20850,8 +21153,8 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000001",
-        "prompt_per_1m": 0.1,
-        "completion_per_1m": 0.1
+        "prompt_per_1m": 0.09999999999999999,
+        "completion_per_1m": 0.09999999999999999
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -20903,8 +21206,8 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000002",
-        "prompt_per_1m": 0.1,
-        "completion_per_1m": 0.2
+        "prompt_per_1m": 0.09999999999999999,
+        "completion_per_1m": 0.19999999999999998
       },
       "architecture": {
         "modality": "text->text",
@@ -21301,7 +21604,7 @@
         "prompt_per_token": "0.00000004",
         "completion_per_token": "0.00000005",
         "prompt_per_1m": 0.04,
-        "completion_per_1m": 0.05
+        "completion_per_1m": 0.049999999999999996
       },
       "architecture": {
         "modality": "text->text",
@@ -21943,7 +22246,7 @@
       "pricing": {
         "prompt_per_token": "0.0000001",
         "completion_per_token": "0.0000003",
-        "prompt_per_1m": 0.1,
+        "prompt_per_1m": 0.09999999999999999,
         "completion_per_1m": 0.3
       },
       "architecture": {
@@ -21990,7 +22293,7 @@
       "pricing": {
         "prompt_per_token": "0.0000002",
         "completion_per_token": "0.00000115",
-        "prompt_per_1m": 0.2,
+        "prompt_per_1m": 0.19999999999999998,
         "completion_per_1m": 1.15
       },
       "architecture": {
@@ -22121,7 +22424,7 @@
         "prompt_per_token": "0.00000014",
         "completion_per_token": "0.00000057",
         "prompt_per_1m": 0.14,
-        "completion_per_1m": 0.57
+        "completion_per_1m": 0.5700000000000001
       },
       "architecture": {
         "modality": "text->text",
@@ -22168,7 +22471,7 @@
         "prompt_per_token": "0.000000044",
         "completion_per_token": "0.000000177",
         "prompt_per_1m": 0.044,
-        "completion_per_1m": 0.177
+        "completion_per_1m": 0.17700000000000002
       },
       "architecture": {
         "modality": "text->text",
@@ -22286,10 +22589,10 @@
       "description": "Hy3 is a 295B-parameter Mixture-of-Experts model from Tencent (21B active, 192 experts with top-8 routing) built for reasoning, agentic workflows, and real-world production use. It supports a configurable reasoning effort:...",
       "context_length": 262144,
       "pricing": {
-        "prompt_per_token": "0.0000000825",
-        "completion_per_token": "0.00000033",
-        "prompt_per_1m": 0.0825,
-        "completion_per_1m": 0.33
+        "prompt_per_token": "0.000000132",
+        "completion_per_token": "0.000000528",
+        "prompt_per_1m": 0.13199999999999998,
+        "completion_per_1m": 0.5279999999999999
       },
       "architecture": {
         "modality": "text->text",
@@ -22404,10 +22707,10 @@
       "description": "Tencent: Hy4 preview is a mixture-of-experts model from Tencent, with 49B active parameters out of 770B total. It is designed for coding agents, complex tool-use workflows, and productivity tasks that...",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.0000007506",
-        "completion_per_token": "0.0000022509",
-        "prompt_per_1m": 0.7506,
-        "completion_per_1m": 2.2509
+        "prompt_per_token": "0.000000834",
+        "completion_per_token": "0.000002501",
+        "prompt_per_1m": 0.834,
+        "completion_per_1m": 2.501
       },
       "architecture": {
         "modality": "text->text",
@@ -22523,7 +22826,7 @@
         "prompt_per_token": "0.00000055",
         "completion_per_token": "0.0000008",
         "prompt_per_1m": 0.55,
-        "completion_per_1m": 0.8
+        "completion_per_1m": 0.7999999999999999
       },
       "architecture": {
         "modality": "text->text",
@@ -22571,8 +22874,8 @@
       "pricing": {
         "prompt_per_token": "0.0000004",
         "completion_per_token": "0.0000004",
-        "prompt_per_1m": 0.4,
-        "completion_per_1m": 0.4
+        "prompt_per_1m": 0.39999999999999997,
+        "completion_per_1m": 0.39999999999999997
       },
       "architecture": {
         "modality": "text->text",
@@ -22745,7 +23048,7 @@
       "pricing": {
         "prompt_per_token": "0.00000045",
         "completion_per_token": "0.0000012",
-        "prompt_per_1m": 0.45,
+        "prompt_per_1m": 0.44999999999999996,
         "completion_per_1m": 1.2
       },
       "architecture": {
@@ -22872,8 +23175,8 @@
       "pricing": {
         "prompt_per_token": "0.00000005",
         "completion_per_token": "0.0000002",
-        "prompt_per_1m": 0.05,
-        "completion_per_1m": 0.2
+        "prompt_per_1m": 0.049999999999999996,
+        "completion_per_1m": 0.19999999999999998
       },
       "architecture": {
         "modality": "text->text",
@@ -22927,7 +23230,7 @@
         "max_completion_tokens": 117964,
         "is_moderated": false
       },
-      "expiration_date": null,
+      "expiration_date": "2026-10-30",
       "name": "Upstage: Solar Pro 3",
       "description": "Solar Pro 3 is Upstage's powerful Mixture-of-Experts (MoE) language model. With 102B total parameters and 12B active parameters per forward pass, it delivers exceptional performance while maintaining computational efficiency. Optimized...",
       "context_length": 131072,
@@ -23056,8 +23359,8 @@
       "pricing": {
         "prompt_per_token": "0.0000002",
         "completion_per_token": "0.0000009",
-        "prompt_per_1m": 0.2,
-        "completion_per_1m": 0.9
+        "prompt_per_1m": 0.19999999999999998,
+        "completion_per_1m": 0.8999999999999999
       },
       "architecture": {
         "modality": "text->text",
@@ -23189,8 +23492,8 @@
       "created": 1776874269,
       "canonical_slug": "xiaomi/mimo-v2.5-20260422",
       "top_provider": {
-        "context_length": 1050000,
-        "max_completion_tokens": 945000,
+        "context_length": 1000000,
+        "max_completion_tokens": 65536,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -23198,10 +23501,10 @@
       "description": "MiMo-V2.5 is a native omnimodal model by Xiaomi. It delivers Pro-level agentic performance at roughly half the inference cost, while surpassing MiMo-V2-Omni in multimodal perception across image and video understanding...",
       "context_length": 1050000,
       "pricing": {
-        "prompt_per_token": "0.000000119",
-        "completion_per_token": "0.000000238",
-        "prompt_per_1m": 0.119,
-        "completion_per_1m": 0.238
+        "prompt_per_token": "0.0000004",
+        "completion_per_token": "0.000002",
+        "prompt_per_1m": 0.39999999999999997,
+        "completion_per_1m": 2.0
       },
       "architecture": {
         "modality": "text+image+audio+video->text",
@@ -23221,7 +23524,6 @@
         "max_tokens",
         "presence_penalty",
         "reasoning",
-        "repetition_penalty",
         "response_format",
         "seed",
         "stop",
@@ -23245,8 +23547,8 @@
       "created": 1776874273,
       "canonical_slug": "xiaomi/mimo-v2.5-pro-20260422",
       "top_provider": {
-        "context_length": 1050000,
-        "max_completion_tokens": 945000,
+        "context_length": 262144,
+        "max_completion_tokens": 235929,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -23254,10 +23556,10 @@
       "description": "MiMo-V2.5-Pro is Xiaomi’s flagship model, delivering strong performance in general agentic capabilities, complex software engineering, and long-horizon tasks, with top rankings on benchmarks such as ClawEval, GDPVal, and SWE-bench Pro....",
       "context_length": 1050000,
       "pricing": {
-        "prompt_per_token": "0.0000003045",
-        "completion_per_token": "0.000000609",
-        "prompt_per_1m": 0.3045,
-        "completion_per_1m": 0.609
+        "prompt_per_token": "0.00000048",
+        "completion_per_token": "0.0000018",
+        "prompt_per_1m": 0.48,
+        "completion_per_1m": 1.7999999999999998
       },
       "architecture": {
         "modality": "text->text",
@@ -23269,21 +23571,16 @@
         ]
       },
       "supported_parameters": [
-        "frequency_penalty",
         "include_reasoning",
         "logprobs",
         "max_tokens",
-        "presence_penalty",
         "reasoning",
-        "repetition_penalty",
         "response_format",
         "seed",
-        "stop",
         "structured_outputs",
         "temperature",
         "tool_choice",
         "tools",
-        "top_k",
         "top_logprobs",
         "top_p"
       ],
@@ -23629,7 +23926,7 @@
         "max_completion_tokens": 16384,
         "is_moderated": false
       },
-      "expiration_date": null,
+      "expiration_date": "2026-12-31",
       "name": "Z.ai: GLM 4.5V",
       "description": "GLM-4.5V is a vision-language foundation model for multimodal agent applications. Built on a Mixture-of-Experts (MoE) architecture with 106B parameters and 12B activated parameters, it achieves state-of-the-art results in video understanding,...",
       "context_length": 65536,
@@ -23637,7 +23934,7 @@
         "prompt_per_token": "0.0000006",
         "completion_per_token": "0.0000018",
         "prompt_per_1m": 0.6,
-        "completion_per_1m": 1.8
+        "completion_per_1m": 1.7999999999999998
       },
       "architecture": {
         "modality": "text+image->text",
@@ -23745,7 +24042,7 @@
         "prompt_per_token": "0.0000003",
         "completion_per_token": "0.0000009",
         "prompt_per_1m": 0.3,
-        "completion_per_1m": 0.9
+        "completion_per_1m": 0.8999999999999999
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -23799,7 +24096,7 @@
         "prompt_per_token": "0.00000054",
         "completion_per_token": "0.00000198",
         "prompt_per_1m": 0.54,
-        "completion_per_1m": 1.98
+        "completion_per_1m": 1.9800000000000002
       },
       "architecture": {
         "modality": "text->text",
@@ -23855,8 +24152,8 @@
       "pricing": {
         "prompt_per_token": "0.0000000605",
         "completion_per_token": "0.0000004",
-        "prompt_per_1m": 0.0605,
-        "completion_per_1m": 0.4
+        "prompt_per_1m": 0.060500000000000005,
+        "completion_per_1m": 0.39999999999999997
       },
       "architecture": {
         "modality": "text->text",
@@ -23914,7 +24211,7 @@
         "prompt_per_token": "0.000001",
         "completion_per_token": "0.0000032",
         "prompt_per_1m": 1.0,
-        "completion_per_1m": 3.2
+        "completion_per_1m": 3.1999999999999997
       },
       "architecture": {
         "modality": "text->text",
@@ -24006,8 +24303,8 @@
       "created": 1775578025,
       "canonical_slug": "z-ai/glm-5.1-20260406",
       "top_provider": {
-        "context_length": 202752,
-        "max_completion_tokens": 131072,
+        "context_length": 200000,
+        "max_completion_tokens": 128000,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -24015,10 +24312,10 @@
       "description": "GLM-5.1 delivers a major leap in coding capability, with particularly significant gains in handling long-horizon tasks. Unlike previous models built around minute-level interactions, GLM-5.1 can work independently and continuously on...",
       "context_length": 204800,
       "pricing": {
-        "prompt_per_token": "0.0000014",
-        "completion_per_token": "0.0000044",
-        "prompt_per_1m": 1.4,
-        "completion_per_1m": 4.4
+        "prompt_per_token": "0.000000966",
+        "completion_per_token": "0.000003036",
+        "prompt_per_1m": 0.966,
+        "completion_per_1m": 3.036
       },
       "architecture": {
         "modality": "text->text",
@@ -24131,7 +24428,7 @@
       "canonical_slug": "z-ai/glm-5.3-20260816",
       "top_provider": {
         "context_length": 1048576,
-        "max_completion_tokens": 262144,
+        "max_completion_tokens": 943718,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -24139,10 +24436,10 @@
       "description": "GLM-5.3 is a large-scale reasoning model from Z.ai, built for complex software engineering and long-horizon agent tasks. It supports text input and output with a 1M-token context window, and improves...",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.0000007",
-        "completion_per_token": "0.0000022",
-        "prompt_per_1m": 0.7,
-        "completion_per_1m": 2.2
+        "prompt_per_token": "0.0000000699",
+        "completion_per_token": "0.0000014",
+        "prompt_per_1m": 0.0699,
+        "completion_per_1m": 1.4
       },
       "architecture": {
         "modality": "text->text",
@@ -24207,7 +24504,7 @@
       "pricing": {
         "prompt_per_token": "0.00000045",
         "completion_per_token": "0.000002",
-        "prompt_per_1m": 0.45,
+        "prompt_per_1m": 0.44999999999999996,
         "completion_per_1m": 2.0
       },
       "architecture": {
@@ -24259,8 +24556,8 @@
       "created": 1787752741,
       "canonical_slug": "z-ai/glm-5.3-flash-20260826",
       "top_provider": {
-        "context_length": 1048576,
-        "max_completion_tokens": 943718,
+        "context_length": 1048575,
+        "max_completion_tokens": 943717,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -24268,10 +24565,10 @@
       "description": "GLM-5.3-Flash is a native multimodal model from Z.ai. It is suited for efficient coding and long-horizon agent tasks. Its hybrid sparse and linear attention architecture maintains accurate long-context behavior while...",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.0000000052",
-        "completion_per_token": "0.0000001985",
-        "prompt_per_1m": 0.0052,
-        "completion_per_1m": 0.1985
+        "prompt_per_token": "0.00000015",
+        "completion_per_token": "0.0000005",
+        "prompt_per_1m": 0.15,
+        "completion_per_1m": 0.5
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -24338,7 +24635,7 @@
       "pricing": {
         "prompt_per_token": "0.00000005",
         "completion_per_token": "0.00000018",
-        "prompt_per_1m": 0.05,
+        "prompt_per_1m": 0.049999999999999996,
         "completion_per_1m": 0.18
       },
       "architecture": {
@@ -24563,7 +24860,7 @@
       "canonical_slug": "~z-ai/glm-flash-latest",
       "top_provider": {
         "context_length": 1048576,
-        "max_completion_tokens": 943718,
+        "max_completion_tokens": 131072,
         "is_moderated": false
       },
       "expiration_date": null,
@@ -24571,10 +24868,10 @@
       "description": "This model always redirects to the latest model in the GLM Flash family.",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.0000000052",
-        "completion_per_token": "0.0000001985",
-        "prompt_per_1m": 0.0052,
-        "completion_per_1m": 0.1985
+        "prompt_per_token": "0.0000000345",
+        "completion_per_token": "0.0000000846",
+        "prompt_per_1m": 0.034499999999999996,
+        "completion_per_1m": 0.08460000000000001
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -24639,9 +24936,9 @@
       "description": "This model always redirects to the latest GLM model from Z.ai.",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.000000079",
+        "prompt_per_token": "0.0000000699",
         "completion_per_token": "0.0000014",
-        "prompt_per_1m": 0.079,
+        "prompt_per_1m": 0.0699,
         "completion_per_1m": 1.4
       },
       "architecture": {

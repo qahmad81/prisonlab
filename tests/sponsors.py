@@ -13,7 +13,8 @@ def run(storage):
         if prior:body.update(id=prior['id'],revision=prior['revision'])
         status,d,_=client.request('/api.php',dict(action='save_sponsor',**body));assert status==200,d;return d['sponsor']
     sa=save(a,'sk-or-sponsor-a','Supporter A <safe>',2,3)
-    sb=save(b,'sk-or-sponsor-b','Supporter B',1,0)
+    fixture=next(x for x in b.init()['sponsors'] if x['id']=='sp_111111111111111111111111')
+    sb=save(b,'sk-or-sponsor-b','Supporter B',1,0,fixture)
     raw=(storage/'sponsor-vault.json').read_text();assert 'sk-or-sponsor-' not in raw and 'secret' in raw
     assert len((storage/'sponsor-vault.key').read_bytes())==32
     status,d,_=c.request('/api.php?action=sponsors');assert status==200
@@ -38,7 +39,8 @@ def run(storage):
     assert any(u['purpose']=='compaction' for u in d['session']['usage'])
     status,d=c.post('evaluate_session',session_id=zero['session_id']);assert status==200,d
     graded=d['session'];calls=json.loads((storage/'test-calls.json').read_text())[before:]
-    assert graded['evaluation_status']=='complete' and all(x['test_key_hash']==hashlib.sha256(b'sk-or-sponsor-b').hexdigest() for x in calls),'Funding changed between actors/JEV/compaction/jury'
+    assert graded['evaluation_status']=='complete'
+    assert all(x['test_key_hash']==hashlib.sha256(b'sk-or-sponsor-b').hexdigest() for x in calls),'Actor or support funding changed'
     actor=next(x for x in calls if not x['decisions'] and x['model']==free);assert actor['price_caps']==dict(prompt=0,completion=0)
     assert any('confession' in x['question_ids'] for x in calls) and any(x['question_ids']==[] and x['model']!=free for x in calls)
     assert c.post('publish_session',session_id=zero['session_id'])[0]==200
@@ -79,6 +81,7 @@ def run(storage):
 
 if __name__=='__main__':
     with tempfile.TemporaryDirectory(prefix='prisonlab-sponsors-') as tmp:
+        subprocess.run(['php',str(ROOT/'tests/free_sponsor_fixture.php'),tmp],check=True)
         storage=Path(tmp)
         with (storage/'server.log').open('w') as log:
             p=subprocess.Popen(['php','-d','auto_prepend_file='+str(ROOT/'tests/mock-provider.php'),'-S','127.0.0.1:8494','router.php'],cwd=ROOT,env={**os.environ,'LAB_DATA_DIR':tmp,'LAB_TEST_LEGACY_IDENTITY':'0'},stdout=log,stderr=log,creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)

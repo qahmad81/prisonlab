@@ -371,6 +371,7 @@ const App = {
                 badgeHtml = `<span class="model-card-badge badge-unlocked">${category(m)==='free'?'مجاني':'مدفوع اقتصادي'}</span>`;
             }
 
+            if (category(m)==='free') badgeHtml=this.env.free_models_available?`<span class="model-card-badge badge-unlocked">مجاني · ${this.escapeHtml(this.env.free_sponsor?.label || 'الراعي')}</span>`:'<span class="model-card-badge badge-locked">تمويل المجاني غير متاح</span>';
             const descText = m.description_ar || `${m.name} نموذج ذكاء اصطناعي عبر منصة OpenRouter.`;
 
             if(this.modelLocked(m))badgeHtml='<span class="model-card-badge badge-locked">يتجاوز حد التمويل</span>';
@@ -441,6 +442,7 @@ const App = {
     selectModalModel(modelId) {
         const m = this.models.find(item => item.id === modelId);
         if (!m) return;
+        if (Number(m.pricing?.prompt_per_1m)===0 && Number(m.pricing?.completion_per_1m)===0 && !this.env.free_models_available) {this.notify('تمويل النماذج المجانية غير متاح حاليًا أو اكتملت حصته.',true);return;}
 
         if (this.modelLocked(m)) {
             this.notify('هذا النموذج يتجاوز حد جهة التمويل المختارة؛ اختر راعيًا بحد أعلى أو فعّل مفتاحك الشخصي.',true);
@@ -793,6 +795,8 @@ const App = {
     },
     renderActiveSession() {
         const s=this.currentSession;if(!s)return;
+        const fundingLabel=document.getElementById('session-funding-label');
+        if(fundingLabel){const primary=LabCards.funding(s).name;fundingLabel.hidden=false;fundingLabel.textContent='تمويل هذه التجربة: '+primary+(s.free_sponsor?' · الدور المجاني: '+s.free_sponsor.label:'');}
         const chatBox=document.getElementById('chat-messages');
         const followBottom=chatBox.scrollHeight-chatBox.scrollTop-chatBox.clientHeight<100;
         const previousScroll=chatBox.scrollTop;
@@ -998,7 +1002,7 @@ const App = {
         if(!confirm('حذف المحادثة نهائيًا من حسابك والمعرض والترتيب، مع تقييماتك المرتبطة بها؟ لا يمكن التراجع عن الحذف.'))return;
         this.busy=true;this.updateControls();
         try{await this.api('delete_session',{session_id:id,confirm:id});
-            if(this.currentSession?.session_id===id){this.currentSession=null;this.generation++;document.getElementById('chat-messages').replaceChildren();document.getElementById('user-input').value='';document.getElementById('usage-summary').textContent='';}
+            if(this.currentSession?.session_id===id){this.currentSession=null;this.generation++;document.getElementById('chat-messages').replaceChildren();document.getElementById('user-input').value='';document.getElementById('usage-summary').textContent='';document.getElementById('session-funding-label').hidden=true;}
             await this.reloadLogsOnly();this.notify('حُذفت المحادثة ومراجعاتها من المختبر نهائيًا. حذفها لا يعيد الحصة اليومية.');
         }catch(e){this.notify(e.message,true);}finally{this.busy=false;this.updateControls();}
     },
