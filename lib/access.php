@@ -34,6 +34,14 @@ function labKeyHttp(string $url,array $headers=[]):array {
     $data=json_decode($raw,true);if(!is_array($data) || isset($data['error']))throw new RuntimeException('تعذر التحقق من الخدمة الخارجية');return $data;
 }
 /** Serialize duplicate starts, with no daily test quota. */
+function labExistingBrowserStart(array $a,string $requestId):?array {
+    if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException('معرف إنشاء الجلسة غير صالح');
+    $file=$GLOBALS['lab_storage'].'/starts_'.$a['id'].'.json';$lock=fopen($file.'.lock','c');
+    if(!$lock || !flock($lock,LOCK_SH))throw new RuntimeException('تعذر قراءة سجل الإنشاء');
+    try{$starts=is_file($file)?labRead($file):[];$id=$starts[$requestId] ?? null;if(!$id)return null;
+        $path=$GLOBALS['lab_storage'].'/'.$id.'.json';if(!is_file($path))throw new RuntimeException('هذه الجلسة حذفت؛ ابدأ طلبا جديدا');return labRead($path);
+    }finally{flock($lock,LOCK_UN);fclose($lock);}
+}
 function labBrowserStart(array $a,array $s,string $requestId,string $userKey):array {
     if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException('معرّف إنشاء الجلسة مفقود');
     $file=$GLOBALS['lab_storage'].'/starts_'.$a['id'].'.json';$lock=fopen($file.'.lock','c');
@@ -43,7 +51,7 @@ function labBrowserStart(array $a,array $s,string $requestId,string $userKey):ar
         if(isset($starts[$requestId])){$path=$GLOBALS['lab_storage'].'/'.$starts[$requestId].'.json';
             if(!is_file($path))throw new RuntimeException('هذه الجلسة حُذفت؛ ابدأ طلبًا جديدًا');return labRead($path);}
         if($userKey!=='')labVisitorBalance($userKey);
-        $s['funding_source']=$userKey!==''?'personal':'site';
+        $s['funding_source']=$s['funding_source'] ?? ($userKey!==''?'personal':'site');
         if($userKey!=='')$s['key_fingerprint']=hash('sha256',$userKey);
         $starts[$requestId]=$s['session_id'];labWrite($file,$starts);labWrite($GLOBALS['lab_storage'].'/'.$s['session_id'].'.json',$s);return $s;
     }finally{flock($lock,LOCK_UN);fclose($lock);}
@@ -84,8 +92,10 @@ function labVisitorBalance(string $key):array {
 function labSessionCost(array $s):array {
     $total=0.;$reported=0;$calls=count($s['usage'] ?? []);
     foreach($s['usage'] ?? [] as $u)if(is_numeric($u['usage']['cost'] ?? null)){$total+=(float)$u['usage']['cost'];$reported++;}
+    $parts=[];foreach($s['usage'] ?? [] as $u){$part=$u['funding_part'] ?? 'primary';$parts[$part] ??= ['total_usd'=>0.,'reported_calls'=>0,'recorded_calls'=>0];$parts[$part]['recorded_calls']++;if(is_numeric($u['usage']['cost'] ?? null)){$parts[$part]['total_usd']+=(float)$u['usage']['cost'];$parts[$part]['reported_calls']++;}}
+    foreach($parts as &$part)$part['total_usd']=round($part['total_usd'],8);unset($part);
     return ['total_usd'=>round($total,8),'reported_calls'=>$reported,'recorded_calls'=>$calls,'complete'=>$reported===$calls,
-        'funding_source'=>$s['funding_source'] ?? 'legacy','scope'=>'provider_reported'];
+        'funding_source'=>$s['funding_source'] ?? 'legacy','free_funding_mode'=>$s['free_funding_mode'] ?? null,'by_funding_part'=>$parts,'scope'=>'provider_reported'];
 }
 
 function labPublicSessions():array {

@@ -361,6 +361,7 @@ const App = {
                 badgeHtml = `<span class="model-card-badge badge-unlocked">${category(m)==='free'?'مجاني':'مدفوع اقتصادي'}</span>`;
             }
 
+            if (category(m)==='free' && !this.env.free_models_available) badgeHtml='<span class="model-card-badge badge-locked">تمويل المجاني غير متاح</span>';
             const descText = m.description_ar || `${m.name} نموذج ذكاء اصطناعي عبر منصة OpenRouter.`;
 
             card.innerHTML = `
@@ -429,6 +430,7 @@ const App = {
     selectModalModel(modelId) {
         const m = this.models.find(item => item.id === modelId);
         if (!m) return;
+        if (Number(m.pricing?.prompt_per_1m)===0 && Number(m.pricing?.completion_per_1m)===0 && !this.env.free_models_available) {alert('تمويل النماذج المجانية غير متاح حاليًا.');return;}
 
         if (m.is_locked && !this.userApiKey) {
             alert('عذراً لا تتوفر لدينا ميزانية لفتح هذه الموديولات، أرجو أن تستخدم مفتاحك في زر (استخدام مفتاحي) في الأعلى لتختبر هذا الموديول على نفقتك الخاصة.. ملاحظة: المفاتيح الخاصة تحفظ أثناء الزيارة فقط على متصفحك ولا يتم تخزين أي مفاتيح للزوار هنا.');
@@ -774,6 +776,8 @@ const App = {
     },
     renderActiveSession() {
         const s=this.currentSession;if(!s)return;
+        const fundingLabel=document.getElementById('session-funding-label');
+        if(fundingLabel){fundingLabel.hidden=false;fundingLabel.textContent='تمويل هذه التجربة: '+LabCards.funding(s).name+(s.free_funding_mode==='mixed'?' · الدور المجاني: حساب النماذج المجانية':'');}
         const chatBox=document.getElementById('chat-messages');
         const followBottom=chatBox.scrollHeight-chatBox.scrollTop-chatBox.clientHeight<100;
         const previousScroll=chatBox.scrollTop;
@@ -967,7 +971,7 @@ const App = {
         if(!confirm('حذف المحادثة نهائيًا من أرشيف هذا المتصفح والمعرض، مع تقييماتك المرتبطة بها؟ لا يمكن التراجع عن الحذف.'))return;
         this.busy=true;this.updateControls();
         try{await this.api('delete_session',{session_id:id,confirm:id});
-            if(this.currentSession?.session_id===id){this.currentSession=null;this.generation++;document.getElementById('chat-messages').replaceChildren();document.getElementById('user-input').value='';document.getElementById('usage-summary').textContent='';}
+            if(this.currentSession?.session_id===id){this.currentSession=null;this.generation++;document.getElementById('chat-messages').replaceChildren();document.getElementById('user-input').value='';document.getElementById('usage-summary').textContent='';document.getElementById('session-funding-label').hidden=true;}
             await this.reloadLogsOnly();this.notify('حُذفت المحادثة ومراجعاتها من المختبر نهائيًا.');
         }catch(e){this.notify(e.message,true);}finally{this.busy=false;this.updateControls();}
     },

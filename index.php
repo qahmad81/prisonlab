@@ -156,6 +156,7 @@
         <div id="jury-live-status" class="jury-live-status" hidden></div>
         <details id="mcp-session-panel" class="memory-panel mcp-session-panel" hidden><summary>بوابات MCP الخاصة بهذه الجلسة</summary><p>أضف رابط الدور إلى وكيلك كخادم MCP عبر HTTP. البوابة سرية وتسمح بتأدية هذا الدور فقط؛ لا تشاركها مع الجمهور. أبقِ هذه الصفحة مفتوحة لتشغيل JEV والتحكيم. لا يُرسل السياق كاملًا بعد المهمة الأولى، ولا يُضغط سياق طرف MCP؛ يحتفظ به الهارنس.</p><div id="mcp-gates"></div><p id="mcp-wait-state" role="status"></p><button id="mcp-pause-btn" type="button" class="btn btn-secondary" onclick="MCPUI.pauseRequested=true" hidden>إيقاف انتظار الوكيل</button></details>
         <details id="memory-notes" class="memory-panel" hidden></details>
+        <div id="session-funding-label" class="usage-summary" role="status" hidden></div>
         <div id="usage-summary" class="usage-summary"></div>
         <div class="chat-input-bar" id="human-input-bar">
             <textarea id="user-input" placeholder="اكتب كلامك للسجين هنا (فاوضه، اضغط عليه، أو واجهه بالأدلة)..."></textarea>

@@ -52,7 +52,6 @@ function summary(array $s): array {
 }
 
 try {
-    $env = labEnv(__DIR__ . '/.env');
     $storage = getenv('LAB_DATA_DIR') ?: ($env['LAB_DATA_DIR'] ?? dirname(__DIR__) . '/.ai_prison_game-data');
     if (!is_dir($storage) && !mkdir($storage, 0700, true)) throw new RuntimeException('تعذر إنشاء مجلد البيانات الخاص');
     $GLOBALS['lab_storage'] = $storage;
@@ -66,6 +65,8 @@ try {
     $statesData = labRead(__DIR__ . '/states.json')['states'];
     $statesById = array_column($statesData, null, 'id');
     $catalog = labRead(__DIR__ . '/models.json'); $models=$catalog['models'];
+    $GLOBALS['lab_catalog_models']=$models;
+    $GLOBALS['lab_free_actor_key']=trim((string)(getenv('OPENROUTER_FREE_API_KEY') ?: ($env['OPENROUTER_FREE_API_KEY'] ?? '')));
     $action = $_GET['action'] ?? '';
     $body = [];
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -168,9 +169,10 @@ try {
 
         respond(['ok'=>true,'participant_profile'=>$visitor?labBrowserProfile($visitor):null,'edition'=>'standalone','csrf_token'=>$csrf,'curated'=>$curated,'investigators'=>labInvestigators(),'cases'=>$cases,'states'=>$statesData,'models'=>$processedModels,'discovery_meta'=>$catalog['discovery_meta'] ?? [],
             'logs'=>$logs,'published_logs'=>$published,'rubric'=>labRubric(),'env'=>['sense_model'=>$senseModel,
-            'compaction_model'=>$compactionModel,'max_turns'=>LAB_MAX_TURNS]]);
+            'compaction_model'=>$compactionModel,'free_models_available'=>$GLOBALS['lab_free_actor_key']!=='','max_turns'=>LAB_MAX_TURNS]]);
     }
     if ($action === 'start_session') {
+        $prior=labExistingBrowserStart($visitor,(string)($body['request_id'] ?? ''));if($prior)respond(['ok'=>true,'duplicate'=>true,'session'=>publicSession($prior,$owner)]);
         $model = (string)($body['model'] ?? 'google/gemini-2.5-flash-lite');
         $type = (string)($body['interrogator_type'] ?? 'human');
         if(!in_array($type,['human','ai','reverse'],true))throw new RuntimeException('وضع الاستجواب غير صالح');
@@ -210,6 +212,14 @@ try {
             'judge_reports'=>[],'processed_requests'=>[]];
         if($type!=='reverse')$s['prisoner_reasoning']=isset($mcp['prisoner'])?labMcpPolicy($mcp['prisoner']):labInvestigatorReasoning(labPrisonerCharacter($file),labModel($model,$models,$userKey!==''),(string)($body['prisoner_effort'] ?? 'auto'));
         labSessionLevels($s,$models);
+        $s['free_actor_models']=[];
+        foreach(labActorModels($s) as $role=>$actorId)if(!isset($mcp[$role]) && labFreeActor($actorId))$s['free_actor_models'][$role]=$actorId;
+        if ($s['free_actor_models'] && $GLOBALS['lab_free_actor_key']==='') throw new RuntimeException('مفتاح النماذج المجانية غير مهيأ حاليًا؛ اختر نموذجًا آخر.');
+        $openRouterActors=array_filter(labActorModels($s),fn($role)=>!isset($mcp[$role]),ARRAY_FILTER_USE_KEY);
+        if($s['free_actor_models']) {
+            $s['free_funding_mode']=count($s['free_actor_models'])===count($openRouterActors)?'full':'mixed';
+            if($s['free_funding_mode']==='full'){$s['funding_source']='free';$key=$GLOBALS['lab_free_actor_key'];$userKey='';$GLOBALS['lab_user_key']=false;}
+        }
         if($key==='')throw new RuntimeException('مفتاح الموقع غير متوفر؛ أضف مفتاح OpenRouter الخاص بك');
         foreach(labActorModels($s) as $actorId)foreach($models as $actor)if($actor['id']===$actorId)$s['actor_output_prices'][$actorId]=(float)$actor['pricing']['completion_per_1m'];
         foreach($mcp as $actor)$s['actor_output_prices'][$actor['id']]=0;
@@ -257,7 +267,8 @@ try {
         if(!in_array($action,['publish_session','submit_review'],true)) {
             if(($s['funding_source'] ?? '')==='personal') {
                 if($userKey==='' || !hash_equals($s['key_fingerprint'] ?? '',hash('sha256',$userKey)))throw new RuntimeException('هذه التجربة على نفقتك؛ أعد إدخال مفتاح OpenRouter نفسه لمتابعتها');
-            }else {$key=$env['OPENROUTER_API_KEY'] ?? ''; $userKey='';$GLOBALS['lab_user_key']=false;}
+            }elseif(($s['funding_source'] ?? '')==='free') {$key=$GLOBALS['lab_free_actor_key'];$userKey='';$GLOBALS['lab_user_key']=false;if($key==='')throw new RuntimeException('تمويل النماذج المجانية غير متاح حاليًا؛ المراحل المكتملة محفوظة.');}
+            else {$key=$env['OPENROUTER_API_KEY'] ?? ''; $userKey='';$GLOBALS['lab_user_key']=false;}
         }
         $save = function(array $value) use ($path): void { labWrite($path,$value); };
         $GLOBALS['lab_checkpoint'] = $save;

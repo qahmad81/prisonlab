@@ -39,6 +39,33 @@ class Client:
 def run(storage):
     a,b=Client(),Client();data=a.init();b.init()
     assert len(data['cases'])==16 and len(data['states'])==20
+
+    # Verify real request routing with separate mock keys, across both actor roles.
+    import hashlib
+    free=next(m['id'] for m in data['models'] if not m.get('catalog_unavailable') and float(m['pricing']['prompt_per_token'])==0 and float(m['pricing']['completion_per_token'])==0)
+    paid='google/gemini-2.5-flash-lite'
+    for prisoner,investigator in [(free,paid),(paid,free),(free,free)]:
+        status,d=a.post('start_session',model=prisoner,interrogator_type='ai',interrogator_model=investigator,case_file='char_1_victor_vance.md');assert status==200,d
+        trial=d['session'];before=len(json.loads((storage/'test-calls.json').read_text())) if (storage/'test-calls.json').exists() else 0
+        status,d=a.step(trial,0);assert status==200,d
+        calls=json.loads((storage/'test-calls.json').read_text())[before:]
+        for call in calls:
+            is_free_actor=not call['decisions'] and call['model']==free
+            assert call['test_key_hash']==hashlib.sha256(('free-test-key' if is_free_actor or prisoner==investigator==free else 'sk-or-test').encode()).hexdigest(),call
+            if is_free_actor:assert call['price_caps']=={'prompt':0,'completion':0}
+        assert a.post('delete_session',session_id=trial['session_id'],confirm=trial['session_id'])[0]==200
+    for mode in ['human','reverse']:
+        args=dict(model=free,interrogator_type=mode,interrogator_model=free,case_file='char_1_victor_vance.md')
+        status,d=a.post('start_session',**args);assert status==200,d;trial=d['session']
+        before=len(json.loads((storage/'test-calls.json').read_text()))
+        if mode=='reverse':status,d=a.post('reverse_question',session_id=trial['session_id'],request_id=uuid.uuid4().hex,expected_turns=0)
+        else:status,d=a.step(trial,0)
+        assert status==200,d
+        calls=json.loads((storage/'test-calls.json').read_text())[before:]
+        assert any(x['model']==free and x['test_key_hash']==hashlib.sha256(b'free-test-key').hexdigest() and x['price_caps']=={'prompt':0,'completion':0} for x in calls)
+        assert all(x['test_key_hash']==hashlib.sha256(b'free-test-key').hexdigest() for x in calls if x['decisions'])
+        assert a.post('delete_session',session_id=trial['session_id'],confirm=trial['session_id'])[0]==200
+
     assert len(data['investigators'])==10 and [p['level'] for p in data['investigators']]==list(range(1,11))
     for tier,members in data['curated'].items():
         assert len(members)<=10 and len({m['publisher'] for m in members})==len(members)

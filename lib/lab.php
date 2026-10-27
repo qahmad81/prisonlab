@@ -62,6 +62,7 @@ function labScale(string $instructions): array {
 function labUsage(array &$s, string $purpose, array $response, string $requested): void {
     $s['usage'][] = ['purpose' => $purpose, 'model' => $response['model'] ?? $requested,
         'finish_reason'=>$response['choices'][0]['finish_reason'] ?? null,'call_id'=>$GLOBALS['lab_last_call_id'] ?? null,
+        'funding_part'=>isset($s['free_actor_models'][$purpose]) && ($s['free_funding_mode'] ?? '')==='mixed' ? 'free_actor' : 'primary',
         'requested_model' => $requested, 'provider'=>$response['provider'] ?? null,'usage' => $response['usage'] ?? [], 'timestamp' => gmdate('c')];
 }
 
@@ -99,6 +100,17 @@ function labRequestOnce(array $payload, string $key, bool $decisions = false, in
     return $res;
 }
 
+/** Route only catalog-confirmed zero-price OpenRouter actor calls to the free account. */
+function labFreeActor(string $model): bool {
+    foreach ($GLOBALS['lab_catalog_models'] ?? [] as $m) if (($m['id'] ?? '') === $model) {
+        $p = $m['pricing'] ?? [];
+        foreach (['prompt_per_token','completion_per_token'] as $field)
+            if (!isset($p[$field]) || !is_numeric($p[$field]) || (float)$p[$field] != 0.0) return false;
+        return true;
+    }
+    return false;
+}
+
 function labChat(array &$s, string $purpose, string $model, array $messages, string $key, int $max = 1500, bool $json = false): string {
     $payload = ['model' => $model, 'messages' => $messages, 'temperature' => $json ? 0.2 : 0.65, 'max_tokens' => $max];
     if ($json) $payload['response_format'] = ['type' => 'json_object'];
@@ -119,6 +131,11 @@ function labChat(array &$s, string $purpose, string $model, array $messages, str
         if($events)$payload['messages'][]=['role'=>'system','content'=>'المحاولة السابقة تجاوزت ميزانية الإخراج. لا تعِد النص السابق؛ أجب بأقل من نصف الحد وأغلق JSON، واختصر الملاحظة الاختيارية أو احذفها.'.labOutputInstruction($purpose)];
     }
     if(isset($s['mcp_actors'][$purpose]))return labMcpChat($s,$purpose,$payload['messages']);
+    if (in_array($purpose,['interrogator','prisoner'],true) && (($s['free_actor_models'][$purpose] ?? null) === $model)) {
+        $key = $GLOBALS['lab_free_actor_key'] ?? '';
+        if ($key === '') throw new RuntimeException('مفتاح النماذج المجانية غير مهيأ حاليًا؛ اختر نموذجًا آخر.');
+        $payload['provider']['max_price'] = ['prompt'=>0,'completion'=>0];
+    }
     $r = labRequest($payload, $key, false, in_array($purpose,['interrogator','prisoner'],true) ? 300 : ($purpose === 'judge' ? 180 : 65));
     labUsage($s, $purpose, $r, $model);
     if (($r['choices'][0]['finish_reason'] ?? '') === 'length') {
