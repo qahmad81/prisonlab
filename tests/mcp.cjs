@@ -20,6 +20,7 @@ try{
  await page.locator('#swap-roles-btn').click();
  await page.locator('#start-session-btn').click();await page.waitForFunction(()=>MCPUI.waiting && Object.keys(MCPUI.urls).length===2);
  assert.equal(await page.locator('#compact-btn').isDisabled(),true);assert.equal(await page.locator('#mcp-gates input[type=password]').count(),2);
+ const prompts=await page.locator('#mcp-gates textarea').evaluateAll(xs=>xs.map(x=>x.value));assert.equal(prompts.length,2);assert(prompts.every(p=>p.includes('prisonlab_wait') && p.includes('prisonlab_reply') && p.includes('15')));assert(prompts[0].includes('.prisoner.') && !prompts[0].includes('.interrogator.'));assert(prompts[1].includes('.interrogator.') && !prompts[1].includes('.prisoner.'));
  await page.screenshot({path:'test-results/mcp-session-local.png',fullPage:true});
  const gates=await page.evaluate(()=>Object.fromEntries(Object.entries(MCPUI.urls).map(([k,v])=>[k.endsWith('prisoner')?'prisoner':'interrogator',new URL(v).searchParams.get('gate')])));
  async function rpc(role,name,args){const response=await page.request.post(base+'/mcp.php?gate='+gates[role],{data:{jsonrpc:'2.0',id:1,method:'tools/call',params:{name,arguments:args}}});const r=await response.json();assert(!r.result.isError,JSON.stringify(r));return JSON.parse(r.result.content[0].text);}

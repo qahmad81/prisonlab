@@ -149,6 +149,7 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
 </div>
 
 <script src="assets/session-view.js?v=<?= (int)filemtime(__DIR__ . "/assets/session-view.js") ?>"></script>
+<script src="assets/lab-cards.js?v=<?= (int)filemtime(__DIR__.'/assets/lab-cards.js') ?>"></script>
 <script src="assets/community.js?v=<?= (int)filemtime(__DIR__ . '/assets/community.js') ?>"></script>
 <script>
 let publishedSessions = [];
@@ -198,53 +199,7 @@ function renderPublicGrid(q) {
         return;
     }
 
-    filtered.forEach(s => {
-        const card = document.createElement('div');
-        card.className = 'archive-card';
-
-        const imgSlug = s.character_slug || s.gender || 'char_1';
-        const st = s.current_state || 'calm';
-        const imgPath = `assets/images/${imgSlug}/${st}.jpg`;
-
-        const isAI = (s.interrogator_type !== 'human');
-        const interrogatorLabel = isAI
-            ? `🤖 ${escapeHtml(s.interrogator_character?.name || 'المحقق الذكي')}: <strong>${escapeHtml(LabView.actorName(s,'interrogator') || 'AI')}</strong>`
-            : `🕵️‍♂️ المحقق: <strong>مستخدم بشري</strong>`;
-
-        const evalScore = s.evaluation ? s.evaluation.overall_score : s.breaking_point;
-        const evalBadge = s.evaluation
-            ? `<span class="state-badge-pill" style="background:#059669;">السجين: ${s.evaluation.prisoner_score ?? s.evaluation.overall_score}% · المحقق: ${s.evaluation.investigator_score ?? '—'}% (${escapeHtml(s.evaluation.grade_ar || '')})</span>`
-            : `<span class="state-badge-pill" style="background:#2563eb;">نقطة الانكسار: ${s.breaking_point || 0}%</span>`;
-
-        card.innerHTML = `
-            <div class="archive-card-top">
-                <img src="${imgPath}" class="archive-card-avatar" alt="${escapeHtml(s.case_title)}" onerror="this.src='assets/images/char_1/calm.jpg'">
-                <div class="archive-card-header-info">
-                    <div class="archive-card-name">${escapeHtml(s.case_title)}</div>
-                    <div class="archive-card-roles">${interrogatorLabel}</div>
-                    ${LabView.participants(s)}<div class="archive-card-roles">🔒 المتهم: <strong>${s.interrogator_type==='reverse'?'مستخدم بشري':escapeHtml(LabView.actorName(s,'prisoner'))}</strong></div>
-                </div>
-            </div>
-            <div class="archive-card-body">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    ${evalBadge}
-                    <span style="font-size:0.75rem; color:#94a3b8;">${s.turns_count} ردود</span>
-                </div>
-                <div class="meter-bar" style="height:6px; margin-bottom:8px;">
-                    <div class="meter-fill" style="width:${evalScore}%; background:#38bdf8;"></div>
-                </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; color:#64748b;">
-                    <span>نُشرت: ${s.published_at || s.updated_at}</span>
-                    <button type="button" class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;">تصفح الحوار 🔍</button>
-                </div>
-            </div>
-        `;
-
-        card.appendChild(LabCommunity.operator(s));const cost=document.createElement('p');cost.className='archive-cost';cost.textContent=LabCommunity.cost(s);card.appendChild(cost);
-        for(const [role,review] of Object.entries(s.user_reviews || {})){const p=document.createElement('p');p.className='archive-cost';p.textContent=`مراجعته للموديل ${role==='prisoner'?'المتهم':'المحقق'} · ${review.rating}/5: ${review.text}`;card.appendChild(p);}
-        card.addEventListener('click',e=>{if(!e.target.closest('a'))openSessionReader(s.session_id);});
-        container.appendChild(card);
-    });
+    filtered.forEach(s=>container.appendChild(LabCards.card(s,{open:openSessionReader})));
 }
 
 async function openSessionReader(sessionId) {

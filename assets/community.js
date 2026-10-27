@@ -7,11 +7,11 @@ const LabCommunity = {
         }catch(e){if(e.name==='AbortError')throw new Error('انتهت مهلة الاتصال. أعد المحاولة؛ سجلاتك محفوظة.');throw e;}
         finally{clearTimeout(timer);}
     },
-    money(value) {return Number.isFinite(Number(value))?'$'+Number(value).toFixed(5):'غير متاح';},
+    money(value) {return Number.isFinite(Number(value))?'$'+Number(value).toFixed(3):'غير متاح';},
     cost(s) {
         const c=s.cost;if(!c)return 'التكلفة غير متاحة';
         const source=({site:'على نفقة الموقع',personal:'بالمفتاح الشخصي',legacy:'تجربة سابقة'})[c.funding_source] || '';
-        return `التكلفة المبلغ عنها ${this.money(c.total_usd)} · ${source}${c.complete?'':' · المبلغ المتاح فقط؛ بعض الاستدعاءات بلا تكلفة مبلغ عنها'}${Object.keys(s.mcp_actors || {}).length?' · تكلفة وكيل MCP خارج المختبر غير مقاسة':''}`;
+        return `التكلفة ${this.money(c.total_usd)} · ${source}${c.complete?'':' *'}${Object.keys(s.mcp_actors || {}).length?' · MCP: تكلفة خارجية غير مقاسة':''}`;
     },
     operator() {const label=document.createElement('span');label.className='operator-line';label.textContent='تجربة في النسخة المستقلة';return label;},
     result(s) {

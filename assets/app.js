@@ -64,8 +64,8 @@ const App = {
         this.publishedLogs = data.published_logs || [];
         this.discoveryMeta = data.discovery_meta || {};
 
-        document.getElementById('sense-model-pill').textContent = this.env.sense_model || 'typesafe/jev-1.14';
-        document.getElementById('compact-model-pill').textContent = this.env.compaction_model || '';
+        document.getElementById('sense-model-pill').textContent = 'Jev';
+        document.getElementById('compact-model-pill').textContent = LabCards.shortName(this.env.compaction_model || '');
         document.getElementById('models-count-pill').textContent = this.models.length;
 
         // Default Case
@@ -167,31 +167,7 @@ const App = {
         this.renderStatesGallery(st);
     },
 
-    renderSelectedCaseSummary() {
-        const c = this.getSelectedCase();
-        const container = document.getElementById('selected-case-summary');
-        if (!c) {
-            container.innerHTML = '<span style="color:var(--text-muted);font-size:0.8rem;">لم يتم اختيار قضية بعد.</span>';
-            return;
-        }
-
-        const stateId = c.initial_state || 'calm';
-        const stateAr = c.initial_state_ar || 'هادئ';
-        const imgPath = `assets/images/${c.character_slug || c.gender}/${stateId}.jpg`;
-
-        container.innerHTML = `
-            <img src="${imgPath}" class="selected-case-avatar" alt="${this.escapeHtml(c.character_name)}" onerror="this.src='assets/images/char_1/calm.jpg'">
-            <span class="selected-case-info">
-                <span class="selected-case-name">${this.escapeHtml(c.character_name)}</span>
-                <span class="selected-case-title">${this.escapeHtml(c.title)}</span>
-                <span class="case-summary-tags">
-                    <span class="case-card-state">الحالة الابتدائية: ${this.escapeHtml(stateAr)}</span>
-                    ${c.difficulty?`<span class="case-card-state">المستوى ${c.difficulty.level}/10 · ${this.escapeHtml(c.difficulty.level_ar)}</span>`:''}
-                    <span style="font-size:0.7rem; color:#38bdf8;">🔄 تغيير القضية</span>
-                </span>
-            </span>
-        `;
-    },
+    renderSelectedCaseSummary() {LabCards.setupCase();},
 
     // ==========================================
     // Case Selector Modal
@@ -293,52 +269,7 @@ const App = {
         return this.models.find(m => m.id === this.selectedModelId) || this.models[0];
     },
 
-    renderSelectedModelSummary() {
-        if(typeof MCPUI!=='undefined' && MCPUI.renderSelection('prisoner'))return;
-        const m = this.getSelectedModel();
-        const container = document.getElementById('selected-model-card');
-        const tip = document.getElementById('model-status-tip');
-        if (!m) return;
-
-        container.classList.toggle('connection-weak',!!m.health?.weak);
-        const pIn = m.pricing?.prompt_per_1m ?? 0;
-        const pOut = m.pricing?.completion_per_1m ?? 0;
-        const isLocked = !!m.is_locked;
-
-        let statusBadge = '';
-        if (isLocked) {
-            if (this.userApiKey) {
-                statusBadge = '<span class="model-card-badge badge-userkey">✓ مفعل بمفتاحك</span>';
-                tip.innerHTML = '<span style="color:#10b981;">✓ موديول متقدم (مفعّل باستخدام مفتاحك الخاص).</span>';
-            } else {
-                statusBadge = '<span class="model-card-badge badge-locked">🔒 متقدم (أكثر من $1.00)</span>';
-                tip.innerHTML = '<span style="color:#f87171;">🔒 موديول متقدم مقفل (يتطلب مفتاحك الخاص لتجربته على نفقتك).</span>';
-            }
-        } else {
-            statusBadge = '<span class="model-card-badge badge-unlocked">⚡ خفيف / اقتصادي</span>';
-            tip.innerHTML = this.userApiKey ? '<span style="color:#10b981;">✓ سيُستخدم مفتاحك الشخصي لهذا النموذج؛ لا يوجد حد يومي للتجارب.</span>' : '<span style="color:#94a3b8;">✓ موديول خفيف متاح على نفقة المشغّل.</span>';
-        }
-
-        this.renderReasoningControl('prisoner',m);
-        container.innerHTML = `
-            <span class="selected-model-icon">
-                ${m.icon_svg || '🤖'}
-            </span>
-            <span class="selected-model-info">
-                <span class="model-summary-heading">
-                    <span class="selected-model-name">${this.escapeHtml(m.name)}</span>
-                    ${statusBadge}
-                </span>
-                <span class="selected-model-meta">
-                    <span>${this.escapeHtml(m.context_formatted || '128K')} سياق</span>
-                    <span>•</span>
-                    <span>إدخال: $${pIn} / إخراج: $${pOut} / مليون</span>
-                    <span>•</span>
-                    <span style="color:#38bdf8; font-weight:700;">تغيير 🔄</span>
-                </span>
-            </span>
-        `;
-    },
+    renderSelectedModelSummary() {this.renderReasoningControl('prisoner',this.getSelectedModel());LabCards.setupModel('prisoner');},
 
     // ==========================================
     // Model Selector Modal
@@ -722,7 +653,6 @@ const App = {
         const humanPrisoner=mode==='reverse',humanInvestigator=mode==='human';
         document.getElementById('interrogator-model-group').hidden=humanInvestigator;
         document.getElementById('interrogator-persona-group').hidden=humanInvestigator;
-        document.getElementById('interrogator-level-hint').hidden=humanInvestigator;
         document.getElementById('human-investigator-character').hidden=!humanInvestigator;
         document.getElementById('prisoner-model-group').hidden=humanPrisoner;
         document.getElementById('prisoner-human-card').hidden=!humanPrisoner;
@@ -750,13 +680,8 @@ const App = {
     },
     renderInterrogatorSummary() {
         const m=this.models.find(m=>m.id===this.selectedInterrogatorId);
-        const card=document.getElementById('selected-interrogator-card');
-        card.classList.toggle('connection-weak',!!m?.health?.weak);
-        card.innerHTML=m ? `<span class="selected-model-icon">${m.icon_svg || '🤖'}</span><span class="selected-model-info"><span class="model-summary-heading"><strong class="selected-model-name">${this.escapeHtml(m.name)}</strong><span class="model-change-label">تغيير ↗</span></span><span class="selected-model-meta"><span>${this.escapeHtml(m.context_formatted || '')} سياق</span><span>إدخال $${m.pricing.prompt_per_1m} · إخراج $${m.pricing.completion_per_1m} / مليون</span></span><span class="model-card-badge ${m.is_locked && !this.userApiKey?'badge-locked':this.userApiKey?'badge-userkey':'badge-unlocked'}">${m.is_locked?'نموذج احترافي':'خفيف / اقتصادي'}</span></span>` : 'اختر نموذج المحقق';
-        this.renderReasoningControl('interrogator',m);
-        if(typeof MCPUI!=='undefined')MCPUI.renderSelection('interrogator');
-        const p=this.investigators.find(p=>p.id===this.selectedInvestigatorPersona);
-        document.getElementById('selected-investigator-persona').innerHTML=p?`${LabView.investigatorAvatar(p)}<span><strong dir="ltr">${this.escapeHtml(p.name)}</strong><small>المستوى ${p.level}/10 · ${this.escapeHtml(p.level_ar)}</small><small>${this.escapeHtml(p.specialty)}</small></span><span>تغيير ←</span>`:'اختر شخصية المحقق';
+        this.renderReasoningControl('interrogator',m);LabCards.setupModel('interrogator');
+        LabCards.setupInvestigator(this.investigators.find(p=>p.id===this.selectedInvestigatorPersona));
     },
     openInvestigatorModal() {
         document.getElementById('connection-toast').hidden=true;
@@ -1018,13 +943,8 @@ const App = {
         const logs=(this.archiveMode==='public'?this.publishedLogs:this.logs).filter(s=>[s.case_title,s.model,s.interrogator_model].join(' ').toLowerCase().includes(q));
         if(!logs.length){box.textContent='لا توجد جلسات مطابقة.';return;}
         for(const s of logs){
-            const card=document.createElement('div');card.className='archive-card';card.tabIndex=0;card.setAttribute('role','button');
-            card.innerHTML=`<div class="archive-card-top"><img class="archive-card-avatar" src="${LabView.face(s.character_slug,s.current_state)}" alt=""><div class="archive-card-header-info"><div class="archive-card-name">${this.escapeHtml(s.case_title)}</div><div class="archive-card-roles">المحقق: ${this.escapeHtml(s.interrogator_type!=='human'?(s.interrogator_character?.name || '')+' · '+LabView.actorName(s,'interrogator'):'بشري')}</div><div class="archive-card-roles">السجين: ${this.escapeHtml(s.interrogator_type==='reverse'?'أنت · متهم بشري':LabView.actorName(s,'prisoner'))}</div></div></div><div class="archive-card-body"><span>${s.turns_count} / 30 جولة · ${s.is_ended?'منتهية':'قيد التحقيق'}</span><progress max="30" value="${s.turns_count}"></progress>${s.evaluation?`<strong>السجين ${s.evaluation.prisoner_score ?? s.evaluation.overall_score} · المحقق ${s.evaluation.investigator_score ?? '—'}</strong>`:''}</div>`;
-            card.insertAdjacentHTML('beforeend',LabView.participants(s));
-            const cost=document.createElement('p');cost.className='archive-cost';cost.textContent=LabCommunity.cost(s);card.appendChild(cost);
-            const open=()=>this.loadSession(s.session_id);card.addEventListener('click',open);card.addEventListener('keydown',e=>{if(e.target===card && (e.key==='Enter' || e.key===' ')){e.preventDefault();open();}});
-            if(this.archiveMode!=='public') {const remove=document.createElement('button');remove.className='btn danger-outline archive-delete';remove.textContent='حذف نهائي';remove.addEventListener('click',e=>{e.stopPropagation();this.deleteSession(s.session_id);});card.appendChild(remove);}
-            box.appendChild(card);
+            const compact=LabCards.card(s,{open:id=>this.loadSession(id)});box.appendChild(compact);
+
         }
     },
     renderAccount() {
