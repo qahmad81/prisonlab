@@ -9,11 +9,11 @@ try{$publicEnv=labAccountBootstrap();$metaBase=labBaseUrl($publicEnv);$metaUrl=$
         $metaPath=$GLOBALS['lab_storage'].'/'.$metaSid.'.json';$metaSession=is_file($metaPath)?labRead($metaPath):[];
         if(empty($metaSession['is_published']) || empty($metaSession['evaluation']) || ($metaSession['evaluation_status'] ?? '')!=='complete')throw new RuntimeException('private');
         $metaTitle='PrisonLab | '.mb_substr($metaSession['case_title'],0,120);
-        $metaDescription='تجربة منشورة · '.($metaSession['operator_profile']['display_name'] ?? 'المجتمع').' · السجين '.($metaSession['evaluation']['prisoner_score'] ?? '—').'/100 · المحقق '.($metaSession['evaluation']['investigator_score'] ?? '—').'/100 · التكلفة المبلغ عنها $'.labSessionCost($metaSession)['total_usd'];
+        $metaDescription='تجربة منشورة · '.($metaSession['operator_profile']['display_name'] ?? 'المجتمع').' · السجين '.($metaSession['evaluation']['prisoner_score'] ?? '—').'/100 · المحقق '.($metaSession['evaluation']['investigator_score'] ?? '—').'/100 · التكلفة $'.labSessionCost($metaSession)['total_usd'];
         $metaUrl=$metaBase.'/public.php?session_id='.rawurlencode($metaSid);
     }else {
         $params=[];
-        foreach(['view','model','role','case_file','investigator','profile','tab','level','opponent_level','rubric'] as $k)if(is_string($_GET[$k] ?? null) && strlen($_GET[$k])<240)$params[$k]=$_GET[$k];
+        foreach(['view','model','role','case_file','investigator','profile','sponsor','funder','funding','tab','level','opponent_level','rubric'] as $k)if(is_string($_GET[$k] ?? null) && strlen($_GET[$k])<240)$params[$k]=$_GET[$k];
         $metaUrl=$metaBase.'/public.php'.($params?'?'.http_build_query($params):'');
         if(!empty($params['case_file'])){
             $file=$params['case_file'];if(basename($file)!==$file || !preg_match('/^[a-zA-Z0-9_-]+\.md$/D',$file) || !is_file(__DIR__.'/cases/'.$file))throw new RuntimeException('missing');
@@ -121,7 +121,7 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
     <section class="public-hero">
         <div>
             <h2>🌐 الأرشيف العلني لجلسات الاستجواب والاختبار تحت الضغط</h2>
-            <p>تصفح جلسات التحقيق الحقيقية التي أجراها المستخدمون أو الوكلاء الأذكياء (AI vs AI) ضد نماذج الذكاء الاصطناعي، مع قياسات المشاعر الحية وتقييمات SENSE_MODEL (jev) النهائية.</p>
+            <p>تصفح جلسات التحقيق الحقيقية التي أجراها المستخدمون أو الوكلاء الأذكياء (AI vs AI) ضد نماذج الذكاء الاصطناعي، مع قياسات المشاعر الحية وتقييمات Jev النهائية.</p>
         </div>
         <div class="public-stats">
             <div class="public-stat-box">
@@ -147,7 +147,7 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
             <label>مستوى الشخصية<select id="board-level"><option value="">كل المستويات</option><?php for($i=1;$i<=10;$i++): ?><option value="<?= $i ?>"><?= $i ?>/10</option><?php endfor; ?></select></label>
             <label>مستوى الطرف المقابل<select id="board-opponent-level"><option value="">كل المستويات</option><option value="human">محقق بشري</option><?php for($i=1;$i<=10;$i++): ?><option value="<?= $i ?>"><?= $i ?>/10</option><?php endfor; ?></select></label>
             <label>معيار التحكيم<select id="board-rubric"><option value="">كل الإصدارات</option></select></label>
-        </div><p id="board-status" class="community-notice" role="status"></p><div class="leaderboard-scroll"><table class="leaderboard-table"><thead><tr><th>المرتبة</th><th>الموديل / الدرجة</th><th>المشارك</th><th>التجربة والسياق</th><th>التكلفة</th></tr></thead><tbody id="board-rows"></tbody></table></div>
+        </div><p id="board-status" class="community-notice" role="status"></p><div id="board-rows" class="archive-cards-grid"></div>
     </section>
 
     <div class="case-filter-bar" style="margin-bottom:18px;">
@@ -181,6 +181,7 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
 <script src="assets/session-view.js?v=<?= (int)filemtime(__DIR__ . "/assets/session-view.js") ?>"></script>
 <script src="assets/sharing.js?v=<?= (int)filemtime(__DIR__.'/assets/sharing.js') ?>"></script>
 <script src="assets/community.js?v=<?= (int)filemtime(__DIR__ . '/assets/community.js') ?>"></script>
+<script src="assets/lab-cards.js?v=<?= (int)filemtime(__DIR__.'/assets/lab-cards.js') ?>"></script>
 <script src="assets/public-community.js?v=<?= (int)filemtime(__DIR__ . '/assets/public-community.js') ?>"></script>
 <script>
 let publishedSessions = [];
@@ -237,56 +238,8 @@ function renderPublicGrid(q) {
         return;
     }
 
-    filtered.forEach(s => {
-        const card = document.createElement('div');
-        card.className = 'archive-card';
-
-        const imgSlug = s.character_slug || s.gender || 'char_1';
-        const st = s.current_state || 'calm';
-        const imgPath = `assets/images/${imgSlug}/${st}.jpg`;
-
-        const isAI = (s.interrogator_type !== 'human');
-        const interrogatorLabel = isAI
-            ? `🤖 ${escapeHtml(s.interrogator_character?.name || 'المحقق الذكي')}: <strong>${escapeHtml(LabView.actorName(s,'interrogator') || 'AI')}</strong>`
-            : `🕵️‍♂️ المحقق: <strong>مستخدم بشري</strong>`;
-
-        const evalScore = s.evaluation ? s.evaluation.overall_score : s.breaking_point;
-        const evalBadge = s.evaluation
-            ? `<span class="state-badge-pill" style="background:#059669;">السجين: ${s.evaluation.prisoner_score ?? s.evaluation.overall_score}% · المحقق: ${s.evaluation.investigator_score ?? '—'}% (${escapeHtml(s.evaluation.grade_ar || '')})</span>`
-            : `<span class="state-badge-pill" style="background:#2563eb;">نقطة الانكسار: ${s.breaking_point || 0}%</span>`;
-
-        card.innerHTML = `
-            <div class="archive-card-top">
-                <img src="${imgPath}" class="archive-card-avatar" alt="${escapeHtml(s.case_title)}" onerror="this.src='assets/images/char_1/calm.jpg'">
-                <div class="archive-card-header-info">
-                    <div class="archive-card-name">${escapeHtml(s.case_title)}</div>
-                    <div class="archive-card-roles">${interrogatorLabel}</div>
-                    ${LabView.participants(s)}<div class="archive-card-roles">🔒 المتهم: <strong>${s.interrogator_type==='reverse'?'مستخدم بشري':escapeHtml(LabView.actorName(s,'prisoner'))}</strong></div>
-                </div>
-            </div>
-            <div class="archive-card-body">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    ${evalBadge}
-                    <span style="font-size:0.75rem; color:#94a3b8;">${s.turns_count} ردود</span>
-                </div>
-                <div class="meter-bar" style="height:6px; margin-bottom:8px;">
-                    <div class="meter-fill" style="width:${evalScore}%; background:#38bdf8;"></div>
-                </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; color:#64748b;">
-                    <span>نُشرت: ${s.published_at || s.updated_at}</span>
-                    <button type="button" class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;">تصفح الحوار 🔍</button>
-                </div>
-            </div>
-        `;
-
-        card.appendChild(LabCommunity.operator(s));const cost=document.createElement('p');cost.className='archive-cost';cost.textContent=LabCommunity.cost(s);card.appendChild(cost);
-        for(const [role,review] of Object.entries(s.user_reviews || {})){const p=document.createElement('p');p.className='archive-cost';p.textContent=`مراجعته للموديل ${role==='prisoner'?'المتهم':'المحقق'} · ${review.rating}/5: ${review.text}`;card.appendChild(p);}
-        card.addEventListener('click',e=>{if(!e.target.closest('a'))openSessionReader(s.session_id);});
-        card.appendChild(LabSharing.link('القضية والشخصية ↗',LabSharing.case(s.case_file)));
-        if(s.interrogator_type!=='reverse')card.appendChild(LabSharing.link('نتائج نموذج المتهم ↗',LabSharing.model(s.model,'prisoner')));
-        if(s.interrogator_type!=='human')card.appendChild(LabSharing.link('نتائج نموذج المحقق ↗',LabSharing.model(s.interrogator_model,'interrogator')));
-        container.appendChild(card);
-    });
+    const scope=Object.fromEntries(new URLSearchParams(location.search));
+    filtered.forEach(s=>container.appendChild(LabCards.card(s,{open:openSessionReader,scope})));
 }
 
 async function openSessionReader(sessionId) {

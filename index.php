@@ -23,12 +23,7 @@
     </div>
     <div class="header-actions">
         <div id="account-controls" class="account-controls"><a href="auth.php?action=login" class="btn linkedin-share">الدخول عبر LinkedIn</a></div>
-        <a href="index.php?sponsors=1" class="text-button" id="open-sponsors-btn" onclick="event.preventDefault();SponsorUI.open()">الرعاة وتمويل التجارب</a><nav class="brand-links" aria-label="معلومات الموقع"><a href="public.php?view=leaderboard">الترتيب والتجارب</a><a href="privacy.php">الخصوصية</a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer">تواصل معنا ↗</a></nav>
-        <div class="env-pills">
-            <div class="env-pill">محرك المشاعر (SENSE): <strong id="sense-model-pill">typesafe/jev-1.14</strong></div>
-            <div class="env-pill">موديل الضغط: <strong id="compact-model-pill">...</strong></div>
-            <div class="env-pill">النماذج: <strong id="models-count-pill">0</strong></div>
-        </div>
+        <button type="button" class="sponsor-header-button" id="open-sponsors-btn" title="انقر لعرض أو تغيير الرعاية لتجربتك أو تقديم رعاية" onclick="SponsorUI.open()"><strong>الرعاية والتمويل</strong><small id="active-sponsor-label">أنت برعاية الموقع</small></button><nav class="brand-links" aria-label="معلومات الموقع"><a href="public.php?view=leaderboard">الترتيب والتجارب</a><a href="privacy.php">الخصوصية</a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer">تواصل معنا ↗</a></nav>
         <button type="button" id="open-key-modal-btn" class="user-key-btn" onclick="App.openKeyModal()">
             🔑 استخدام مفتاحي
         </button>
@@ -61,13 +56,13 @@
                 <div class="role-character-section">
                     <div class="role-section-label"><span>الشخصية والقضية</span><button type="button" id="open-case-modal-btn" class="role-change" onclick="App.openCaseModal()">استعراض القضايا ↗</button></div>
                     <button type="button" id="selected-case-summary" class="selected-case-card" onclick="App.openCaseModal()" title="تغيير شخصية المتهم والقضية"></button>
-                    <a id="case-share-link" class="text-button public-context-link" target="_blank" rel="noopener"></a>
+                    <div id="case-setup-tags" class="setup-character-tags"><a id="case-share-link" class="text-button public-context-link" target="_blank" rel="noopener"></a></div>
                 </div>
                 <div class="role-representation">
                     <div class="role-section-label"><span>من يؤدي الدور؟</span><span id="prisoner-performer-type">نموذج ذكاء اصطناعي</span></div>
                     <div id="prisoner-model-group">
-                        <button type="button" id="selected-model-card" class="selected-model-card" onclick="App.openModelModal('prisoner')" title="تغيير نموذج المتهم"></button>
-                    <a id="prisoner-share-link" class="text-button public-context-link" target="_blank" rel="noopener"></a>
+                        <div class="setup-model-heading"><button type="button" id="selected-model-card" class="selected-model-card" onclick="App.openModelModal('prisoner')" title="تغيير نموذج المتهم"></button>
+                    <a id="prisoner-share-link" class="text-button public-context-link" target="_blank" rel="noopener"></a></div><div class="setup-model-meta" id="prisoner-setup-meta"></div>
                         <button type="button" id="prisoner-reasoning-btn" class="reasoning-control" onclick="App.openReasoningModal('prisoner')" aria-haspopup="dialog"></button>
                         <div id="model-status-tip" class="role-model-tip"></div>
                     </div>
@@ -86,24 +81,20 @@
                 <div class="role-character-section" id="interrogator-persona-group" hidden>
                     <div class="role-section-label"><span>شخصية المحقق ومستواه</span><span>ملف المحقق</span></div>
                     <button type="button" id="selected-investigator-persona" class="investigator-selected" onclick="App.openInvestigatorModal()"></button>
-                    <a id="investigator-share-link" class="text-button public-context-link" target="_blank" rel="noopener"></a>
+                    <div id="investigator-setup-tags" class="setup-character-tags"><a id="investigator-share-link" class="text-button public-context-link" target="_blank" rel="noopener"></a></div>
                 </div>
                 <div id="human-investigator-character" class="human-character-note">أسلوبك، أسئلتك، وطريقتك في كشف الحقيقة.</div>
                 <div class="role-representation">
                     <div class="role-section-label"><span>من يؤدي الدور؟</span><span id="interrogator-performer-type">المشارك البشري</span></div>
                     <div id="interrogator-model-group" hidden>
-                        <button type="button" id="selected-interrogator-card" class="selected-model-card" onclick="App.openModelModal('interrogator')" title="تغيير نموذج المحقق"></button>
-                    <a id="interrogator-share-link" class="text-button public-context-link" target="_blank" rel="noopener"></a>
+                        <div class="setup-model-heading"><button type="button" id="selected-interrogator-card" class="selected-model-card" onclick="App.openModelModal('interrogator')" title="تغيير نموذج المحقق"></button>
+                    <a id="interrogator-share-link" class="text-button public-context-link" target="_blank" rel="noopener"></a></div><div class="setup-model-meta" id="interrogator-setup-meta"></div>
                         <button type="button" id="interrogator-reasoning-btn" class="reasoning-control" onclick="App.openReasoningModal('interrogator')" aria-haspopup="dialog"></button>
                     </div>
                     <div id="interrogator-human-card" class="human-performer"></div>
                 </div>
-                <p class="investigator-hint" id="interrogator-level-hint" hidden>الشخصية تحدد الأسلوب والخبرة؛ النموذج يحدد القدرة الفعلية. التفكير وفق دعم النموذج.</p>
             </article>
             <div id="reverse-role-brief" class="reverse-role-brief" hidden>أنت تؤدي دور المتهم من القضية المختارة. اقرأ خلفيته وأسراره في ملف القضية، ثم أجب بكلماتك. المحقق يبدأ، وله 30 جولة كحد أقصى. توجيهات JEV مقترحات لتمثيل الدور وليست قياسًا لمشاعرك.</div>
-
-            <p id="funding-selection" class="investigator-hint"></p>
-            <p id="closure-policy-hint" class="investigator-hint">يمكن للطرفين طلب إنهاء التحقيق بكلام صريح يراجعه JEV. الهدف الطبيعي 5–15 جولة؛ توقيت الإنهاء ومبرره يؤثران في التقييم.</p>
             <button type="button" id="start-session-btn" class="btn btn-primary" style="margin-top:6px;">🚨 بدء جلسة استجواب جديدة</button>
 
             <hr style="border-color: var(--border); margin: 16px 0;">
@@ -218,7 +209,7 @@
                 </div>
 
                 <div id="sense-directive-text" style="font-size:0.75rem; color:#94a3b8; margin-top:8px; line-height:1.45;">
-                    سيقوم SENSE_MODEL بتحليل نبرة الاستجواب مع كل رسالة وتغذية النموذج بالشعور الداخلي.
+                    يحلل Jev نبرة الاستجواب مع كل رسالة ويوجّه تمثيل مشاعر الشخصية.
                 </div>
             </div>
 
@@ -226,6 +217,12 @@
         </div>
     </section>
 </main>
+<footer class="lab-footer">        <div class="env-pills">
+            <div class="env-pill">محرك المشاعر: <strong id="sense-model-pill">Jev</strong></div>
+            <div class="env-pill">موديل الضغط: <strong id="compact-model-pill">...</strong></div>
+            <div class="env-pill">النماذج: <strong id="models-count-pill">0</strong></div>
+        </div>
+<a href="https://odehit.com/" target="_blank" rel="noopener">تم تطوير المختبر بواسطة <b dir="ltr">OdehIt</b></a></footer>
 
 <!-- Modal: Case Selector -->
 <div id="case-modal" class="modal-overlay">
@@ -389,6 +386,7 @@
 <script src="assets/sponsors.js?v=<?= (int)filemtime(__DIR__.'/assets/sponsors.js') ?>"></script>
 <script src="assets/session-view.js?v=<?= (int)filemtime(__DIR__ . "/assets/session-view.js") ?>"></script>
 <script src="assets/community.js?v=<?= (int)filemtime(__DIR__ . '/assets/community.js') ?>"></script>
+<script src="assets/lab-cards.js?v=<?= (int)filemtime(__DIR__.'/assets/lab-cards.js') ?>"></script>
 <script src="assets/app.js?v=<?= (int)filemtime(__DIR__ . "/assets/app.js") ?>"></script>
 <script src="assets/mcp.js?v=<?= (int)filemtime(__DIR__.'/assets/mcp.js') ?>"></script>
 </body>

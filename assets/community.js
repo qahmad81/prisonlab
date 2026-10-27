@@ -7,11 +7,11 @@ const LabCommunity = {
         }catch(e){if(e.name==='AbortError')throw new Error('انتهت مهلة الاتصال. أعد المحاولة؛ سجلاتك محفوظة.');throw e;}
         finally{clearTimeout(timer);}
     },
-    money(value) {return Number.isFinite(Number(value))?'$'+Number(value).toFixed(5):'غير متاح';},
+    money(value) {return Number.isFinite(Number(value))?'$'+Number(value).toFixed(3):'غير متاح';},
     cost(s) {
         const c=s.cost;if(!c)return 'التكلفة غير متاحة';
         const source=c.funding_source==='sponsor'?'على نفقة الراعي '+(c.sponsor_label || c.sponsor_profile?.display_name || ''):({site:'على نفقة الموقع',personal:'بالمفتاح الشخصي',legacy:'تجربة سابقة'})[c.funding_source] || '';
-        return `التكلفة المبلغ عنها ${this.money(c.total_usd)} · ${source}${c.complete?'':' · المبلغ المتاح فقط؛ بعض الاستدعاءات بلا تكلفة مبلغ عنها'}${Object.keys(s.mcp_actors || {}).length?' · تكلفة وكيل MCP خارج المختبر غير مقاسة':''}`;
+        return `التكلفة ${this.money(c.total_usd)} · ${source}${c.complete?'':' *'}${Object.keys(s.mcp_actors || {}).length?' · تكلفة MCP غير مقاسة':''}`;
     },
     publicUrl(s) {return new URL('public.php?session_id='+encodeURIComponent(s.session_id),location.href).href;},
     operator(s) {
@@ -20,7 +20,7 @@ const LabCommunity = {
         const a=document.createElement('a');a.href='public.php?profile='+encodeURIComponent(p.public_id);
         a.dir='auto';
         if(p.avatar_url && /^https:\/\//.test(p.avatar_url)){const img=document.createElement('img');img.src=p.avatar_url;img.alt='';img.loading='lazy';img.referrerPolicy='no-referrer';img.addEventListener('error',()=>img.remove());a.appendChild(img);}
-        a.appendChild(document.createTextNode(p.display_name || 'مشارك'));box.append('المشارك / مشغل المحاكاة: ',a);return box;
+        a.appendChild(document.createTextNode(p.display_name || 'مشارك'));box.append('المشغّل: ',a);return box;
     },
     share(s) {
         const box=document.createElement('section');box.className='share-session';

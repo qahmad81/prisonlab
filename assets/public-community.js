@@ -32,13 +32,14 @@ const PublicCommunity={
     },
     filterSessions(items){
         const p=new URL(location.href).searchParams, mode={investigator:'human',accused:'reverse',simulations:'ai'}[this.profileTab];
-        return items.filter(s=>(!p.get('profile') || !mode || s.interrogator_type===mode) && (!p.get('case_file') || s.case_file===p.get('case_file')) && (!p.get('investigator') || s.interrogator_character?.id===p.get('investigator')) && (!p.get('model') || (p.get('role')==='interrogator'?s.interrogator_model===p.get('model'):p.get('role')==='prisoner'?s.model===p.get('model'):[s.model,s.interrogator_model].includes(p.get('model')))));
+        return items.filter(s=>(!p.get('sponsor') || s.sponsor_id===p.get('sponsor')) && (!p.get('funding') || s.cost?.funding_source===p.get('funding')) && (!p.get('funder') || (s.cost?.funding_source==='personal'?s.operator_profile?.public_id:s.sponsor_profile?.public_id)===p.get('funder')) && (!p.get('profile') || !mode || s.interrogator_type===mode) && (!p.get('case_file') || s.case_file===p.get('case_file')) && (!p.get('investigator') || s.interrogator_character?.id===p.get('investigator')) && (!p.get('model') || (p.get('role')==='interrogator'?s.interrogator_model===p.get('model'):p.get('role')==='prisoner'?s.model===p.get('model'):[s.model,s.interrogator_model].includes(p.get('model')))));
     },
     updateUrl(){const u=new URL(location.href);u.searchParams.set('view','leaderboard');for(const [id,param] of [['model','model'],['role','role'],['case','case_file'],['level','level'],['opponent-level','opponent_level'],['rubric','rubric']]){const value=document.getElementById('board-'+id).value;if(value)u.searchParams.set(param,value);else u.searchParams.delete(param);}history.replaceState(null,'',u);this.shareControl();},
     shareControl(){const box=document.getElementById('public-share-control');if(box)box.replaceChildren(LabSharing.copy(location.href,'نسخ رابط هذه الصفحة والمرشحات'));},
     context(){
         const box=document.getElementById('public-context-heading'),p=new URL(location.href).searchParams,data=this.catalog || {};box.replaceChildren();
         const file=data.cases?.find(c=>c.filename===p.get('case_file')),persona=data.investigators?.find(c=>c.id===p.get('investigator')),model=data.models?.find(m=>m.id===p.get('model'));
+        if(p.get('sponsor') || p.get('funder') || p.get('funding')){box.hidden=false;const h=document.createElement('h2');const funded=publishedSessions.find(s=>s.sponsor_id===p.get('sponsor') || (s.cost?.funding_source==='personal'?s.operator_profile?.public_id:s.sponsor_profile?.public_id)===p.get('funder'));h.textContent='التجارب الممولة · '+(funded?LabCards.funding(funded).name:'حسب جهة التمويل المختارة');box.appendChild(h);}
         if(file || persona || model){box.hidden=false;const h=document.createElement('h2');h.textContent=file?.title || persona?.name || model?.name;box.appendChild(h);
             const text=document.createElement('p');text.textContent=file?'القضية وشخصية المتهم · المستوى '+file.difficulty.level+'/10':persona?persona.bio+' · المستوى '+persona.level+'/10':'نتائج النموذج المنشورة حسب الدور والمرشحات؛ لا تظهر المحادثات الخاصة.';box.appendChild(text);
             if(file){const details=document.createElement('details');details.innerHTML='<summary>ملف القضية والشخصية</summary>';const pre=document.createElement('pre');pre.className='public-case-content';pre.textContent=file.content;details.appendChild(pre);box.appendChild(details);const start=document.createElement('a');start.href='index.php?case_file='+encodeURIComponent(file.filename);start.textContent='اختبر هذه القضية في المختبر ↗';start.className='text-button';box.appendChild(start);}
@@ -51,17 +52,12 @@ const PublicCommunity={
     async load(){const serial=this.serial=(this.serial || 0)+1;const params=new URLSearchParams({action:'leaderboard'});
         for(const [id,param] of [['model','model'],['role','role'],['case','case_file'],['level','level'],['opponent-level','opponent_level'],['rubric','rubric']])params.set(param,document.getElementById('board-'+id).value);
         const scope=new URL(location.href).searchParams;params.set('profile_id',scope.get('profile') || '');params.set('investigator',scope.get('investigator') || '');
+        for(const k of ['sponsor','funder','funding'])if(scope.get(k))params.set(k,scope.get(k));
         const status=document.getElementById('board-status');status.textContent='جارٍ تحميل النتائج…';
         try{const data=await LabCommunity.fetchJson('api.php?'+params);if(this.serial!==serial)return;
             const body=document.getElementById('board-rows');body.replaceChildren();let previous=null,rank=0;
-            data.rows.forEach((r,i)=>{if(r.score!==previous)rank=i+1;previous=r.score;const tr=document.createElement('tr');
-                for(let n=0;n<5;n++)tr.appendChild(document.createElement('td'));
-                tr.children[0].textContent=rank;tr.children[1].appendChild(LabSharing.link(LabView.actorName(r,r.role),LabSharing.model(r.model_id,r.role)));tr.children[1].append(' · '+r.score+'/100');
-                tr.children[2].appendChild(LabCommunity.operator(r));
-                const a=document.createElement('a');a.href='public.php?session_id='+encodeURIComponent(r.session_id);a.textContent=r.case_title;tr.children[3].appendChild(a);
-                const p=document.createElement('p');p.textContent=`${r.role==='prisoner'?'المتهم':'المحقق'} · مستوى ${r.level ?? '—'}/10 · الطرف المقابل ${r.opponent_level==null?'محقق بشري':r.opponent_level+'/10'} · معيار ${r.rubric}`;tr.children[3].appendChild(p);
-                tr.children[3].insertAdjacentHTML('beforeend',LabView.participants(r));
-                tr.children[4].textContent=LabCommunity.cost(r);body.appendChild(tr);
+            const context=Object.fromEntries(new URLSearchParams(location.search));
+            data.rows.forEach((r,i)=>{if(r.score!==previous)rank=i+1;previous=r.score;body.appendChild(LabCards.card(r,{open:openSessionReader,scope:context,rank}));
             });status.textContent=data.total?`${data.total} نتائج منشورة · راعِ اختلاف مستويات التفكير المعروضة${data.total>data.limit?'؛ تُعرض أعلى '+data.limit+' نتيجة. استخدم المرشحات.':''}`:'لا توجد نتائج منشورة ضمن هذه المرشحات.';
         }catch(e){if(this.serial===serial)status.textContent='تعذر تحميل الترتيب: '+e.message;}
     }

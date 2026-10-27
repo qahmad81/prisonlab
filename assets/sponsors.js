@@ -7,9 +7,9 @@ const SponsorUI={
         document.getElementById('sponsors-modal').classList.remove('active');App.notify('تغير تمويل التجربة التالية فقط؛ المحادثات السابقة تحتفظ بجهة تمويلها.');
     },
     selection(){
-        const box=document.getElementById('funding-selection');if(!box)return;
-        const r=App.sponsors.find(r=>r.id===App.selectedSponsorId);
-        box.textContent=r?`الراعي: ${r.label} · متبقٍ ${r.remaining}/${r.daily_limit} اليوم · حد النموذج $${r.price_cap}/مليون`:App.personalFunding()?'تمويل التجربة التالية: مفتاحك الشخصي':'تمويل التجربة التالية: الموقع';
+        const label=document.getElementById('active-sponsor-label');if(!label)return;
+        const r=App.sponsors.find(r=>r.id===App.selectedSponsorId) || App.sponsors.find(r=>r.is_site);
+        label.textContent=App.personalFunding()?'أنت برعاية '+(App.participantProfile?.display_name || 'نفسك')+' · مفتاحك':'أنت برعاية '+(r?.label || 'الموقع');
     },
     render(){
         this.selection();const grid=document.getElementById('sponsor-list');if(!grid)return;grid.replaceChildren();

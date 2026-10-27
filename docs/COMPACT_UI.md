@@ -1,0 +1,11 @@
+# Compact test cards and role setup
+
+Public galleries, role leaderboards and the private archive share `assets/lab-cards.js`. A card gives the full case title its own heading, with a close, smaller character caption. The portrait and two role blocks follow. Each role lists the character, provider-free model display name, thinking declaration, and adjacent statistics anchors. On a scoped case/persona page the matching role does not repeat its character name in the role block. The score strip contains both independent scores and completed rounds. Operator and funding attribution have separate profile/statistics links. Costs are display-rounded to three decimal places; stored provider charges keep their original precision. Asterisks flag incomplete provider reporting. External MCP spend remains unavailable, not fabricated.
+
+Statistics anchors navigate in the current page and retain native browser context menus. They are siblings of setup picker buttons rather than nested controls. Role setup uses the same portrait/name/detail layout for both actors, a single row of state/level/statistics, and a separate full-width context/price row. Identity, prompts, levels, grades and canonical message roles are unchanged.
+
+Community funding routes `sponsor`, `funder`, and `funding` filter only published tests. A sponsor ID is a public record identifier, never a key or fingerprint. Sponsor/funder drill-down does not grant access to funded private transcripts. Daily reservations and payer binding are unchanged. The orange header control reflects the next test's selected sponsor or personal payer; exhaustion invites another sponsor without automatically switching funding.
+
+MCP connection panels offer a role-specific Arabic handoff prompt containing that gate's URL and tool workflow. It stays in page memory, is hidden in a collapsed private section, and is copied only by the user. It contains no opponent gate, funding key or account credential. Gate expiry, revocation, ownership and transport permissions are unchanged.
+
+Runtime model pills move from the header to the footer, alongside the OdehIt credit. Arabic UI calls the emotion engine Jev. Provider prefixes are removed for display only; exact model IDs remain in requests, tooltips and statistical URLs. No approved catalog or judge selection changes are part of this presentation update.

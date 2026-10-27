@@ -47,7 +47,7 @@ function publicSession(array $s, string $owner): array {
 }
 function summary(array $s): array {
     $keys = ['session_id','created_at','updated_at','model','gender','character_slug','case_file','case_title',
-        'mcp_actors','sponsor_profile','sponsor_label','closure_policy','termination','prisoner_reasoning','interrogator_reasoning','current_state','interrogator_type','interrogator_model','interrogator_character','prisoner_character','is_ended','is_published','published_at','evaluation','evaluation_status','end_reason'];
+        'mcp_actors','sponsor_id','sponsor_profile','sponsor_label','closure_policy','termination','prisoner_reasoning','interrogator_reasoning','current_state','interrogator_type','interrogator_model','interrogator_character','prisoner_character','is_ended','is_published','published_at','evaluation','evaluation_status','end_reason'];
     return array_intersect_key($s, array_flip($keys)) + ['operator_profile'=>$s['operator_profile'] ?? null,
         'cost'=>labSessionCost($s),'user_reviews'=>labSessionReviews($s),'turns_count' => labTurns($s), 'breaking_point' => $s['confession_check']['probability'] ?? 0];
 }
@@ -107,6 +107,9 @@ try {
         }
         $rows=[];$filterProfile=(string)($_GET['profile_id'] ?? '');$filterInvestigator=(string)($_GET['investigator'] ?? '');$filterModel=(string)($_GET['model'] ?? '');$filterRole=(string)($_GET['role'] ?? '');
         foreach($published as $p)foreach(labActorModels($p) as $role=>$model) {
+            if(!empty($_GET['sponsor']) && ($p['sponsor_id'] ?? '')!==$_GET['sponsor'])continue;
+            if(!empty($_GET['funding']) && ($p['funding_source'] ?? '')!==$_GET['funding'])continue;
+            if(!empty($_GET['funder']) && (($p['funding_source'] ?? '')==='personal'?($p['operator_profile']['public_id'] ?? ''):($p['sponsor_profile']['public_id'] ?? ''))!==$_GET['funder'])continue;
             if(($filterProfile!=='' && ($p['operator_profile']['public_id'] ?? '')!==$filterProfile) || ($filterInvestigator!=='' && ($p['interrogator_character']['id'] ?? '')!==$filterInvestigator))continue;
             if(($filterModel!=='' && $model!==$filterModel) || ($filterRole!=='' && $role!==$filterRole))continue;
             $score=$p['evaluation'][$role==='prisoner'?'prisoner_score':'investigator_score'] ?? null;if(!is_numeric($score))continue;
