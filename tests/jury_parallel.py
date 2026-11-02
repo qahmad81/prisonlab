@@ -2,7 +2,7 @@
 from collections import Counter
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-import json, socket, subprocess, tempfile, threading, time
+import json, os, socket, subprocess, tempfile, threading, time
 
 ROOT=Path(__file__).resolve().parents[1]
 AXES=['prisoner_arguments','prisoner_consistency','prisoner_emotion','prisoner_resistance',
@@ -37,9 +37,12 @@ def scenario(name,seconds=50):
     try:
         with tempfile.TemporaryDirectory(prefix='prison-jury-sockets-') as storage:
             result=subprocess.run(['php',str(ROOT/'tests/jury_driver.php'),f'http://127.0.0.1:{server.server_port}',storage,str(seconds)],
-                                  capture_output=True,text=True,encoding='utf-8',check=True,timeout=15)
+                                  capture_output=True,text=True,encoding='utf-8',check=True,timeout=15,env={**os.environ,'TEST_STOP_JURY_FUNDING':'1' if name=='budget' else '0'})
             s=json.loads(result.stdout)
-            if name in ('all','recover'):
+            if name=='budget':
+                assert len(s['judge_reports'])==1 and calls['judge1']==1 and calls['judge2']==0 and calls['judge3']==0,(name,s)
+                assert s['judge_failures']['judge2']['type']=='funding' and s['judge_failures']['judge3']['type']=='funding'
+            elif name in ('all','recover'):
                 assert len(s['judge_reports'])==3,(name,s)
                 assert s['jury_wait']['elapsed_seconds']<seconds
             elif name=='two':
@@ -55,5 +58,5 @@ def scenario(name,seconds=50):
             print('PASS parallel jury:',name)
     finally:server.shutdown();server.server_close()
 
-for name in ['all','two','recover','one','zero']:scenario(name)
+for name in ['all','two','recover','one','zero','budget']:scenario(name)
 for seconds in [80,180]:scenario('one',seconds)

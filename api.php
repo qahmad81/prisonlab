@@ -240,6 +240,7 @@ try {
         }
         $funding=$mode==='full'?$freeFunding:labFunding((string)($body['sponsor_id'] ?? ''),$userKey,$env);
         labUseFunding($funding);$key=$funding['key'];if($funding['source']!=='personal')$userKey='';
+        labGuardFunding($key);if($mode==='mixed' && $freeFunding['sponsor_id']!==($funding['sponsor_id'] ?? ''))labGuardFunding($freeFunding['key']);
         if($funding['sponsor_id']!==''){$balance=labVisitorBalance($key);if($balance['available_to_spend']!==null && $balance['available_to_spend']<=0)throw new RuntimeException('رصيد مفتاح الراعي غير متاح الآن؛ اختر تمويلًا آخر');}
         if($type!=='reverse')labModel($model,$models,$userKey!=='');
         $persona=null;$reasoning=null;

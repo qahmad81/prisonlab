@@ -68,7 +68,7 @@ function labUsage(array &$s, string $purpose, array $response, string $requested
 
 /** Transport can be replaced in deterministic tests; never controlled by HTTP input. */
 function labRequest(array $payload, string $key, bool $decisions = false, int $timeout = 65): array {
-    if(function_exists('labGuardFunding'))labGuardFunding();
+    if(function_exists('labGuardFunding'))labGuardFunding($key);
     $start = microtime(true); $GLOBALS['lab_first_byte_ms'] = null;
     try {
         $res = labRequestOnce($payload,$key,$decisions,$timeout);

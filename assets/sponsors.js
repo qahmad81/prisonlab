@@ -24,12 +24,11 @@ const SponsorUI={
         }
         if(!App.sponsors.length)grid.textContent='لم تُضف مفاتيح راعية بعد. يبقى مفتاح الموقع أو مفتاحك الشخصي متاحًا.';
         document.getElementById('sponsor-auth-notice').hidden=!!App.participantProfile;document.getElementById('sponsor-form').hidden=!App.participantProfile;
-        document.getElementById('sponsor-personal').textContent=App.userApiKey?'استخدام مفتاحي الشخصي':'إضافة مفتاحي الشخصي';
     },
-    edit(r){const f=document.getElementById('sponsor-form');f.reset();f.elements.id.value=r.id;f.elements.revision.value=r.revision;f.elements.label.value=r.label;f.elements.daily_limit.value=r.daily_limit;f.elements.price_cap.value=r.price_cap;f.elements.active.checked=r.active;f.elements.key.required=false;f.querySelector('h3').textContent='تعديل الرعاية · اترك المفتاح فارغًا للاحتفاظ به';f.scrollIntoView({block:'nearest'});},
+    edit(r){const f=document.getElementById('sponsor-form');f.reset();f.elements.id.value=r.id;f.elements.revision.value=r.revision;f.elements.label.value=r.label;f.elements.daily_limit.value=r.daily_limit;f.elements.price_cap.value=r.price_cap;f.elements.budget_daily_usd.value=r.budget_daily_usd ?? '';f.elements.budget_total_usd.value=r.budget_total_usd ?? '';f.elements.active.checked=r.active;f.elements.key.required=false;f.querySelector('h3').textContent='تعديل الرعاية · اترك المفتاح فارغًا للاحتفاظ به';f.scrollIntoView({block:'nearest'});},
     reset(){const f=document.getElementById('sponsor-form');f.reset();f.elements.id.value='';f.elements.revision.value='';f.elements.key.required=true;f.querySelector('h3').textContent='أضف مفتاحًا راعيًا';},
     async save(e){e.preventDefault();const f=e.target,b=f.querySelector('[type=submit]');b.disabled=true;
-        try{const d=await App.api('save_sponsor',{id:f.elements.id.value,revision:Number(f.elements.revision.value),label:f.elements.label.value,key:f.elements.key.value,daily_limit:Number(f.elements.daily_limit.value),price_cap:Number(f.elements.price_cap.value),active:f.elements.active.checked});
+        try{const d=await App.api('save_sponsor',{id:f.elements.id.value,revision:Number(f.elements.revision.value),label:f.elements.label.value,key:f.elements.key.value,daily_limit:Number(f.elements.daily_limit.value),price_cap:Number(f.elements.price_cap.value),budget_daily_usd:f.elements.budget_daily_usd.value===''?null:Number(f.elements.budget_daily_usd.value),budget_total_usd:f.elements.budget_total_usd.value===''?null:Number(f.elements.budget_total_usd.value),active:f.elements.active.checked});
             f.elements.key.value='';App.sponsors=d.sponsors;this.reset();App.renderAccount();App.renderSelectedModelSummary();App.renderInterrogatorSummary();this.render();document.getElementById('sponsor-save-status').textContent='حُفظ المفتاح مشفرًا في المساحة الخاصة؛ لا يُعرض للزوار.';
         }catch(err){document.getElementById('sponsor-save-status').textContent=err.message;}finally{b.disabled=false;}
     }

@@ -32,7 +32,10 @@ try{
     await page.locator('#open-sponsors-btn').click();
     await page.locator('#sponsor-form [name=label]').fill('UI Support <safe>');await page.locator('#sponsor-form [name=key]').fill('sk-or-ui-sponsor');
     await page.locator('#sponsor-form [name=daily_limit]').fill('2');await page.locator('#sponsor-form [name=price_cap]').fill('0');
+    assert.equal(await page.locator('#sponsor-personal').count(),0);
+    await page.locator('#sponsor-form [name=budget_daily_usd]').fill('10');await page.locator('#sponsor-form [name=budget_total_usd]').fill('20');
     await page.locator('#sponsor-form [type=submit]').click();await page.waitForFunction(()=>App.sponsors.some(r=>r.label==='UI Support <safe>'));
+    assert(await page.evaluate(()=>App.sponsors.some(r=>r.label==='UI Support <safe>' && r.budget_daily_usd===10 && r.budget_total_usd===20)));
     assert.equal(await page.locator('#sponsor-form [name=key]').inputValue(),'');assert.equal(await page.locator('#sponsor-list safe').count(),0);
     await page.screenshot({path:'test-results/sponsors-management.png',fullPage:true});
     await page.locator('.sponsor-card').filter({hasText:'UI Support <safe>'}).getByRole('button',{name:'استخدام تمويل هذا الراعي',exact:true}).click();

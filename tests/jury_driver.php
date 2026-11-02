@@ -2,6 +2,7 @@
 // CLI-only driver for real parallel cURL tests against a local threaded provider.
 if(PHP_SAPI!=='cli')exit;
 require_once dirname(__DIR__).'/lib/lab.php';
+function labGuardFunding(?string $key=null):void {static $calls=0;if(getenv('TEST_STOP_JURY_FUNDING')==='1' && ++$calls>1)throw new RuntimeException('حد الراعي الاختباري');}
 $GLOBALS['lab_storage']=$argv[2];
 $GLOBALS['lab_jury_url']=$argv[1];
 $GLOBALS['lab_jury_clock']=fn()=>microtime(true)*100;

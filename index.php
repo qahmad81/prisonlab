@@ -371,13 +371,16 @@
 <div id="sponsors-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="sponsors-title">
 <section class="sponsors-dialog"><header class="modal-header"><h2 id="sponsors-title">الرعاة · تجارب بتمويل المجتمع</h2><button type="button" class="text-button" onclick="document.getElementById('sponsors-modal').classList.remove('active')" aria-label="إغلاق الرعاة">×</button></header>
 <div class="sponsors-body"><p>اختر جهة تمويل للتجربة التالية. لكل حساب LinkedIn حصة يومية مستقلة لدى كل راعٍ، تتجدد منتصف الليل بتوقيت القدس. يشمل التمويل طرفَي الحوار وJEV وضغط السياق ولجنة التحكيم.</p>
-<div class="sponsor-funding-actions"><button type="button" class="btn btn-secondary" onclick="SponsorUI.choose('')">العودة لتمويل الموقع / مفتاحي</button><button type="button" class="btn btn-secondary" id="sponsor-personal" onclick="if(App.userApiKey)SponsorUI.choose('');else{document.getElementById('sponsors-modal').classList.remove('active');App.openKeyModal();}">استخدام مفتاحي الشخصي</button></div><div id="sponsor-list" class="sponsor-grid"></div>
+<div class="sponsor-funding-actions"><button type="button" class="btn btn-secondary" onclick="SponsorUI.choose('')">العودة للتمويل الافتراضي</button></div><div id="sponsor-list" class="sponsor-grid"></div>
 <p id="sponsor-auth-notice"><a href="auth.php?action=login">سجّل الدخول عبر LinkedIn لإضافة رعاية أو بدء تجربة.</a></p>
 <form id="sponsor-form" class="sponsor-form"><h3>أضف مفتاحًا راعيًا</h3><input type="hidden" name="id"><input type="hidden" name="revision">
 <label>اسم الراعي أو المؤسسة<input name="label" required minlength="2" maxlength="100" autocomplete="organization"></label>
 <label>مفتاح OpenRouter<input name="key" type="password" required maxlength="512" autocomplete="off" placeholder="sk-or-…" dir="ltr"></label>
 <label>عدد التجارب اليومية لكل حساب LinkedIn<input name="daily_limit" type="number" min="1" max="1000" value="3" required></label>
 <label>أقصى سعر إخراج لكل مليون توكن بالدولار<input name="price_cap" type="number" min="0" max="1000" step="0.01" value="1" required></label>
+<label>حد الإنفاق اليومي للمفتاح بالدولار (اختياري)<input name="budget_daily_usd" type="number" min="0" max="1000000" step="0.01" placeholder="دون حد رقابي"></label>
+<label>حد الإنفاق الإجمالي للمفتاح بالدولار (اختياري)<input name="budget_total_usd" type="number" min="0" max="1000000" step="0.01" placeholder="دون حد رقابي"></label>
+<p>يفحص المختبر استهلاك المفتاح المبلّغ عنه من OpenRouter قبل كل طلب؛ يُعاد اليومي عند منتصف الليل UTC. هذا حد رقابي وقد تتجاوزه الطلبات الجارية أو المتزامنة؛ اضبط حدًا صارمًا داخل OpenRouter. الحدان يشملان استخدام المفتاح خارج المختبر وقبل إضافته؛ وقد يبدأ الإجمالي من جديد عند تبديل المفتاح. ترك الحقل فارغًا يعطّل الحد الرقابي.</p>
 <p>سعر الإدخال لا يتجاوز الحد نفسه. صفر يسمح بنماذج حوار مجانية فقط، وتبقى تكلفة JEV والضغط والتحكيم على المفتاح الراعي. هذه قيود داخل المختبر؛ اضبط ميزانية المفتاح الكلية في OpenRouter أيضًا.</p>
 <label class="sponsor-active"><input name="active" type="checkbox" checked> الرعاية مفعلة للزوار</label>
 <p>يرتبط المفتاح بحساب LinkedIn المسجل، ويُعرض اسم الراعي وصاحب الحساب ونسبة التمويل علنًا. لا يستطيع الراعي الاطلاع على المحادثات الخاصة التي موّلها. يُحفظ المفتاح مشفرًا على الخادم؛ يمكنك تبديله أو تغيير القيود أو حذفه. لا تُلغى الطلبات التي بدأت لدى المزود بالفعل، ولا تُصفّر حصص اليوم عند تعديل المفتاح.</p>

@@ -14,8 +14,9 @@ $GLOBALS['lab_identity_http']=function(string $url,array $headers,?array $form):
     }
     $key=str_replace('Authorization: Bearer ','',$headers[0] ?? '');
     if($key==='invalid-key' || $key==='')throw new RuntimeException('Mock invalid key');
+    if(str_contains($key,'missing-daily') && str_ends_with($url,'/key'))return ['data'=>['usage'=>2.5]];
     if(str_ends_with($url,'/credits')){if($key==='sk-or-uncapped')throw new RuntimeException('Credits unavailable');return ['data'=>['total_credits'=>10,'total_usage'=>2.5]];}
-    return ['data'=>['usage'=>2.5,'limit'=>str_contains($key,'uncapped')?null:5,'limit_remaining'=>str_contains($key,'uncapped')?null:2.5]];
+    return ['data'=>['usage_daily'=>0.5,'usage'=>2.5,'limit'=>str_contains($key,'uncapped')?null:5,'limit_remaining'=>str_contains($key,'uncapped')?null:2.5]];
 };
 if(getenv('LAB_TEST_LEGACY_IDENTITY')==='1')$GLOBALS['lab_test_account_bootstrap']=function():void {
     if(empty($_SESSION['account_id'])){$a=labAccountUpsert(['sub'=>bin2hex(random_bytes(12)),'name'=>'Test Operator'],'test-client');$_SESSION['account_id']=$a['id'];}
