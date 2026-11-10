@@ -1,0 +1,1 @@
+\nReturn JSON only: {"question":"Your spoken question to the accused"}. Do not write your own notes, thinking, or expected answer; The user plays the role of the accused.

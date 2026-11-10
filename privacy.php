@@ -1,21 +1,23 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__ . '/lib/i18n.php';
+labBeginPage('privacy');
 header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: strict-origin-when-cross-origin');
 ?>
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html <?= labLocaleAttributes() ?>>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="index,follow">
-    <title>سياسة الخصوصية | PrisonLab</title>
-    <link rel="icon" href="favicon.ico?v=2" sizes="any">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/branding/prisonlab-32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/branding/prisonlab-180.png">
-    <link rel="stylesheet" href="assets/style.css?v=<?= (int)filemtime(__DIR__ . '/assets/style.css') ?>">
+    <title><?= labE('privacy.html.1') ?></title>
+    <link rel="icon" href="/favicon.ico?v=2" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/branding/prisonlab-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/branding/prisonlab-180.png">
+    <link rel="stylesheet" href="/assets/style.css?v=<?= (int)filemtime(__DIR__ . '/assets/style.css') ?>">
     <style>
         body{display:block;min-height:100vh;height:auto;overflow:auto;background:#0b1120;color:#e2e8f0}
         .privacy-wrap{max-width:820px;margin:auto;padding:36px 24px 72px;font-family:Tahoma,Arial,sans-serif;line-height:1.95}
@@ -23,59 +25,60 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
         .privacy-nav a,.privacy-wrap a{color:#7dd3fc}.privacy-brand{font-weight:800;font-size:24px;color:#f8fafc;direction:ltr}
         .privacy-wrap h1{font-size:32px;color:#f8fafc;line-height:1.4;margin:0 0 12px}.privacy-wrap h2{font-size:20px;margin:32px 0 10px;color:#f8fafc}
         .privacy-wrap p{margin:10px 0}.privacy-meta{color:#94a3b8;font-size:14px}.privacy-note{border-right:3px solid #fbbf24;padding:12px 18px;background:#172032;margin:24px 0}
-        .privacy-wrap li{margin-bottom:8px}.privacy-wrap ul{padding-right:24px}
+        .privacy-wrap li{margin-bottom:8px}.privacy-wrap ul{padding-inline-start:24px}
         @media(max-width:560px){.privacy-wrap{padding:24px 18px 50px}.privacy-wrap h1{font-size:27px}.privacy-nav{flex-wrap:wrap}}
     </style>
 </head>
 <body>
 <main class="privacy-wrap">
-    <nav class="privacy-nav" aria-label="روابط الموقع"><span class="privacy-brand"><img src="assets/branding/prisonlab-128.png" width="44" height="44" alt="" style="vertical-align:middle;border-radius:10px;margin-inline-end:8px">PrisonLab</span><div><a href="index.php">المختبر</a> · <a href="public.php">المحادثات المنشورة</a></div></nav>
-    <h1>سياسة الخصوصية</h1>
-    <p class="privacy-meta">آخر تحديث: 23 أكتوبر 2026</p>
-    <p>PrisonLab مختبر مجتمعي لمقارنة أداء نماذج الذكاء الاصطناعي من خلال قضايا وشخصيات خيالية. تشرح هذه الصفحة البيانات المستخدمة في التجارب، وما يظهر للزوار، ودور الخدمات الخارجية.</p>
-    <div class="privacy-note"><strong>أنت تختار ما يظهر:</strong> تسجيل الدخول مطلوب لبدء التجارب. محادثاتك خاصة افتراضيًا، والنشر والمشاركة على LinkedIn خطوتان اختياريتان مستقلتان.</div>
+    <nav class="privacy-nav" aria-label="<?= labE('privacy.html.2') ?>"><span class="privacy-brand"><img src="/assets/branding/prisonlab-128.png" width="44" height="44" alt="" style="vertical-align:middle;border-radius:10px;margin-inline-end:8px">PrisonLab</span><div><a href="<?= labPageHref('home') ?>"><?= labE('privacy.html.3') ?></a> · <a href="<?= labPageHref('public') ?>"><?= labE('privacy.html.4') ?></a></div></nav>
+    <?php labLanguageMenu(); ?>
+    <h1><?= labE('privacy.html.5') ?></h1>
+    <p class="privacy-meta"><?= labE('privacy.html.6') ?></p>
+    <p><?= labE('privacy.html.7') ?></p>
+    <div class="privacy-note"><strong><?= labE('privacy.html.8') ?></strong> <?= labE('privacy.html.9') ?></div>
 
-    <h2>بيانات التجربة</h2>
-    <p>يحفظ المختبر نص المحادثة، واختيارات النماذج والشخصيات، والانفعالات المحاكية، وتقارير التحكيم، والمراجعات التي تكتبها، ومعلومات الاستخدام والتكلفة التي يعيدها المزود. تستخدم هذه البيانات لاستكمال الجلسة وتقييم أداء النماذج. الانفعالات تخص الشخصية الخيالية ولا تمثل تشخيصًا نفسيًا للمستخدم.</p>
-    <p>ترتبط السجلات الخاصة بمعرّف حسابك لدى تطبيق LinkedIn، ويمكنك الوصول إليها عند تسجيل الدخول بالحساب نفسه من متصفح آخر. السجلات القديمة التي أُنشئت قبل ربط الحسابات لا تُنسب تلقائيًا إلى أي حساب جديد.</p>
+    <h2><?= labE('privacy.html.10') ?></h2>
+    <p><?= labE('privacy.html.11') ?></p>
+    <p><?= labE('privacy.html.12') ?></p>
 
-    <h2>المحادثات الخاصة والمنشورة</h2>
-    <p>لا تظهر المحادثة في المعرض العام إلا عندما تختار نشرها بعد اكتمال تقييمها. عند النشر يصبح نصها ونتائجها والانفعالات ومراجعاتها وبيانات الاستخدام المتاحة قابلة للعرض عبر رابط عام. راجع المحتوى قبل النشر، وتجنب إدخال معلومات شخصية أو أسرار أو بيانات تخص أشخاصًا آخرين في التجارب.</p>
-    <p>يعرض الملف العام المحادثات المنشورة فقط، مع اسم صاحب الحساب وصورته بصفته مشاركًا أو مشغلًا للمحاكاة، ومراجعاته المرتبطة بها إن وُجدت. لا تعرض لوائح الترتيب المحادثات الخاصة. الترتيب التقديري قبل النشر يظهر لصاحب المحادثة، ويتغير عند إضافة نتائج أخرى.</p>
+    <h2><?= labE('privacy.html.13') ?></h2>
+    <p><?= labE('privacy.html.14') ?></p>
+    <p><?= labE('privacy.html.15') ?></p>
 
-    <h2>تسجيل الدخول عبر LinkedIn</h2>
-    <p>نطلب صلاحيات تسجيل الدخول والملف الأساسي فقط (<span dir="ltr">openid profile</span>): معرّف الحساب لدى التطبيق، والاسم، والصورة عند توفرها. لا نطلب كلمة مرور LinkedIn، أو البريد الإلكتروني، أو قائمة العلاقات. تُستخدم استجابة LinkedIn على الخادم لتسجيل الدخول ثم تُستبعد رموز الوصول؛ لا نخزنها في حسابك أو المحادثات. تسجيل الدخول بحساب LinkedIn لا يعني التحقق من الهوية الحقيقية للشخص.</p>
-    <p>نحفظ معرّفًا داخليًا مشتقًا للحساب، ومعرّفًا عامًا عشوائيًا، والاسم ورابط الصورة، وتواريخ إنشاء الحساب وتحديثه. الغرض هو ربط السجلات بالحساب، وتطبيق الحد اليومي، وإظهار صاحب المحادثات التي ينشرها. يمكن طلب حذف بيانات الحساب عبر رابط التواصل أدناه.</p>
+    <h2><?= labE('privacy.html.16') ?></h2>
+    <p><?= labE('privacy.html.17') ?><span dir="ltr">openid profile</span><?= labE('privacy.html.18') ?></p>
+    <p><?= labE('privacy.html.19') ?></p>
 
-    <h2>المشاركة على LinkedIn</h2>
-    <p>زر المشاركة متاح للمحادثات المنشورة فقط، ويفتح محرر LinkedIn برابطها العام لتراجع المنشور وتختار نشره والجمهور بنفسك. لا يرسل المختبر منشورًا تلقائيًا، ولا يطلب صلاحية النشر ضمن تسجيل الدخول. تفعيل منتج Share on LinkedIn في إعدادات التطبيق لا يمنح الموقع تفويضًا تلقائيًا للنشر باسم المستخدم.</p>
+    <h2><?= labE('privacy.html.20') ?></h2>
+    <p><?= labE('privacy.html.21') ?></p>
 
-    <h2>الحصة اليومية والتكلفة</h2>
-    <p>الحد الافتراضي لكل حساب ثلاث محادثات جديدة يوميًا على نفقة الموقع، ويمكن لمالك الرعاية تعديل حدود مفتاحه، وتتجدد الحصة منتصف الليل بتوقيت القدس. إنشاء المحادثة يستهلك تجربة حتى لو أوقفتها أو حذفتها. إضافة مفتاحك الخاص تتيح تجارب جديدة غير محدودة من الموقع، مع بقاء حدود ورصيد المزود مطبقة. تحتفظ المحادثة بمصدر تمويلها الأصلي؛ المحادثة الشخصية تحتاج مفتاحها نفسه عند المتابعة.</p>
-    <p>يظهر المبلغ الذي أبلغ عنه المزود وتحديد نفقة الموقع أو المفتاح الشخصي داخل المحادثة، ويظهر للزوار عند نشرها. قد تكون التكلفة جزئية إذا لم يبلغ المزود عن بعض الاستدعاءات. رصيد المفتاح ومعلومات حساب OpenRouter متاحة لصاحب المفتاح فقط؛ عدم توفر الرصيد لا يعني أنه صفر أو غير محدود.</p>
+    <h2><?= labE('privacy.html.22') ?></h2>
+    <p><?= labE('privacy.html.23') ?></p>
+    <p><?= labE('privacy.html.24') ?></p>
 
-    <h2>خدمات الذكاء الاصطناعي والمفاتيح</h2>
-    <p>ترسل تعليمات القضية والشخصيات ومحتوى المحادثة اللازم إلى OpenRouter ومزودي النماذج المختارة، بما في ذلك نماذج المشاعر والتحكيم وضغط السياق. تطبق هذه الجهات سياساتها الخاصة لمعالجة البيانات واحتفاظها بها. لا ترسل بيانات تسجيل الدخول إلى نماذج المحادثة.</p>
-    <p>إذا أدخلت مفتاح OpenRouter الخاص بك، يحفظه المتصفح في <span dir="ltr">sessionStorage</span> ويرسله إلى خادم المختبر لتنفيذ الطلبات والتحقق من الرصيد عبر OpenRouter. لا يُحفظ المفتاح نفسه في ملفات المحادثات ولا يُعرض للزوار؛ نحفظ بصمة مشتقة منه لربط متابعة المحادثة بمصدر تمويلها. تُستبعد البصمة من استجابات الواجهة. عند الخروج يُزال المفتاح من تخزين المتصفح. مفتاح الموقع يبقى على الخادم.</p>
-    <p><a href="https://openrouter.ai/privacy" rel="noopener noreferrer">سياسة خصوصية OpenRouter</a> · <a href="https://www.linkedin.com/legal/privacy-policy" rel="noopener noreferrer">سياسة خصوصية LinkedIn</a></p>
+    <h2><?= labE('privacy.html.25') ?></h2>
+    <p><?= labE('privacy.html.26') ?></p>
+    <p><?= labE('privacy.html.27') ?> <span dir="ltr">sessionStorage</span> <?= labE('privacy.html.28') ?></p>
+    <p><a href="https://openrouter.ai/privacy" rel="noopener noreferrer"><?= labE('privacy.html.29') ?></a> · <a href="https://www.linkedin.com/legal/privacy-policy" rel="noopener noreferrer"><?= labE('privacy.html.30') ?></a></p>
 
-    <h2>الرعاة ومفاتيح المجتمع</h2>
-    <p>يمكن لصاحب حساب LinkedIn إضافة مفتاح OpenRouter راعٍ، باسم شخص أو مؤسسة مع إظهار صاحب الحساب المرتبط به. عند حفظ الرعاية يوافق على ظهور اسم الرعاية وصاحبها وحدودها للزوار، وعلى استخدامها لتمويل التجارب ضمن القيود التي يحددها. يحفظ الخادم مفاتيح الرعاية مشفرة في ملف JSON داخل المساحة الخاصة خارج الموقع العام، مع مفتاح تشفير منفصل وصلاحيات مقيدة. لا نعرض المفتاح أو بصمته للزوار، ولا نضعه في ملفات المحادثات أو مستودع الكود أو نسخ نشر الكود الاحتياطية.</p>
-    <p>لكل راعٍ حصة يومية مستقلة لكل حساب LinkedIn، وحد أعلى لسعر نموذج الحوار لكل مليون توكن. حد الصفر يسمح بنماذج حوار مجانية فقط؛ يستمر تمويل JEV وضغط السياق ولجنة التحكيم من الراعي نفسه. هذه حدود داخل المختبر ولا تغير سقف ميزانية المفتاح في OpenRouter. إنشاء تجربة يستهلك حصة؛ حذفها أو تبديل المفتاح أو تعديل القيود لا يعيد الحصة من الصفر.</p>
-    <p>يمكن لصاحب المفتاح تبديله أو تعطيله أو تعديل حدوده أو حذفه. تؤثر التغييرات في الاستدعاءات اللاحقة، ولا يمكن إلغاء طلب وصل بالفعل إلى المزود. المحادثة مرتبطة بالراعي الأصلي، ولا نستخدم مفتاح الموقع أو راعيا آخر تلقائيا عند إيقاف مفتاحه. تبقى نسبة تمويل التجارب السابقة واسم الراعي المحفوظ ظاهرين مع المحادثات المنشورة؛ حذف المفتاح لا يحذف محادثات الآخرين. لا يحصل الراعي على محتوى المحادثات الخاصة أو هوية المستخدمين الذين استهلكوا حصصهم عبر لوحة الرعاية.</p>
-    <p>يمكن مشاركة روابط القضايا وشخصيات التحقيق والنماذج والترتيب والملفات العامة. تبويبات الملف العام تعرض الاختبارات المنشورة التي كان صاحب الحساب فيها محققا أو متهما أو مشغلا لمحاكاة بين النماذج. الرابط لا يمنح صلاحية الوصول إلى محادثة خاصة؛ المحادثة المحذوفة أو غير المنشورة لا تظهر للزوار.</p>
+    <h2><?= labE('privacy.html.31') ?></h2>
+    <p><?= labE('privacy.html.32') ?></p>
+    <p><?= labE('privacy.html.33') ?></p>
+    <p><?= labE('privacy.html.34') ?></p>
+    <p><?= labE('privacy.html.35') ?></p>
 
-    <h2>القياسات وملفات الارتباط</h2>
-    <p>نسجل نجاح استدعاءات النماذج وفشلها ووقت الاستجابة ومعدل التوليد لتوضيح موثوقيتها. لا تعني هذه القياسات ضمان استجابة النموذج مستقبلًا. يستخدم الموقع ملف ارتباط للجلسة وحماية الطلبات، وتستخدم واجهته خطوط Google Fonts التي قد يتصل بها المتصفح. قد تحتفظ استضافة الموقع بسجلات تشغيل وأمان مثل وقت الطلب وعنوان الشبكة.</p>
+    <h2><?= labE('privacy.html.36') ?></h2>
+    <p><?= labE('privacy.html.37') ?></p>
 
-    <h2>الحفظ والحذف</h2>
-    <p>تُحفظ بيانات التطبيق في مساحة خاصة على الخادم، خارج مجلد الموقع العام ومستودع الكود. يمكنك حذف أي محادثة تملكها نهائيًا من سجل حسابك، بما فيها المنشورة؛ يشمل ذلك نصها وتقييماتها ومراجعاتك المرتبطة بها وظهورها في المعرض والملف العام والترتيب. يُحتفظ بعدّاد الحصة اليومية دون محتوى المحادثة لمنع إعادة استخدام الحصة بالحذف، وبقياسات أداء النماذج المجمعة التي لا تتضمن هوية الحساب أو نص المحادثة. تبقى الملفات الشخصية حتى طلب حذفها عبر التواصل.</p>
-    <p>لا تُضمّن بيانات الحسابات والمحادثات في نسخ نشر الكود الاحتياطية. بعد حذف المحادثة يصبح رابطها غير متاح من الخادم؛ قد تبقى نسخ أو معاينات لدى الزوار أو LinkedIn أو مزودي النماذج وفق سياساتهم. حذف المحادثة في المختبر لا يحذف منشورك في LinkedIn؛ يمكنك إدارته هناك.</p>
-    <p>لا تُضمّن المحادثات أو مفاتيح API في مستودع المشروع المفتوح. ترخيص الكود لا يحوّل بيانات المستخدمين إلى بيانات مفتوحة المصدر.</p>
+    <h2><?= labE('privacy.html.38') ?></h2>
+    <p><?= labE('privacy.html.39') ?></p>
+    <p><?= labE('privacy.html.40') ?></p>
+    <p><?= labE('privacy.html.41') ?></p>
 
-    <h2>الأسئلة والتحديثات</h2>
-    <p>للاستفسارات وطلبات الخصوصية، تواصل مع مشغل الموقع عبر <a href="https://odehit.com/#contact" rel="noopener noreferrer">صفحة اتصل بنا لدى Odeh IT</a>. تُعلن التغييرات المؤثرة في جمع البيانات أو نشرها داخل الموقع قبل تفعيلها. لا ترسل كلمات مرور أو مفاتيح API ضمن طلب التواصل.</p>
-    <p class="privacy-meta">PrisonLab مشروع مستقل، ولا يمثل LinkedIn أو شركات النماذج المستخدمة.</p>
+    <h2><?= labE('privacy.html.42') ?></h2>
+    <p><?= labE('privacy.html.43') ?> <a href="https://odehit.com/#contact" rel="noopener noreferrer"><?= labE('privacy.html.44') ?></a><?= labE('privacy.html.45') ?></p>
+    <p class="privacy-meta"><?= labE('privacy.html.46') ?></p>
 </main>
 </body>
 </html>

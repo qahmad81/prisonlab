@@ -17,12 +17,10 @@
 !/favicon.svg
 !/favicon.ico
 !/models.json
-!/states.json
-!/investigators.json
 !/fetch_models.py
 !/start.bat
 !/assets/
-!/cases/
+!/lang/
 !/lib/
 !/tests/
 !/tools/

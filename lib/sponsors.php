@@ -4,7 +4,7 @@ declare(strict_types=1);
 /** Private encrypted vault. Never return vault records or key fingerprints to HTTP clients. */
 function labSponsorPath():string {return $GLOBALS['lab_storage'].'/sponsor-vault.json';}
 function labSponsorLocked(callable $fn,bool $write=false):mixed {
-    $lock=fopen(labSponsorPath().'.lock','c');if(!$lock || !flock($lock,$write?LOCK_EX:LOCK_SH))throw new RuntimeException('تعذر فتح سجل الرعاة');
+    $lock=fopen(labSponsorPath().'.lock','c');if(!$lock || !flock($lock,$write?LOCK_EX:LOCK_SH))throw new RuntimeException(labT('sponsors.SponsorLocked.1'));
     try{$v=is_file(labSponsorPath())?labRead(labSponsorPath()):['version'=>1,'sponsors'=>[]];return $fn($v);}
     finally{flock($lock,LOCK_UN);fclose($lock);}
 }
@@ -13,17 +13,17 @@ function labSponsorWrite(array $v):void {
 }
 function labSponsorCipherKey(bool $create=false):string {
     $p=$GLOBALS['lab_storage'].'/sponsor-vault.key';
-    if(!is_file($p) && $create){$mask=umask(0077);try{$h=fopen($p,'x');if(!$h)throw new RuntimeException('تعذر تجهيز حماية المفاتيح');fwrite($h,random_bytes(32));fclose($h);chmod($p,0600);}finally{umask($mask);}}
-    $key=is_file($p)?file_get_contents($p):'';if(strlen($key)!==32)throw new RuntimeException('تعذر فتح حماية مفاتيح الرعاة');return $key;
+    if(!is_file($p) && $create){$mask=umask(0077);try{$h=fopen($p,'x');if(!$h)throw new RuntimeException(labT('sponsors.SponsorCipherKey.1'));fwrite($h,random_bytes(32));fclose($h);chmod($p,0600);}finally{umask($mask);}}
+    $key=is_file($p)?file_get_contents($p):'';if(strlen($key)!==32)throw new RuntimeException(labT('sponsors.SponsorCipherKey.2'));return $key;
 }
 function labSponsorEncrypt(string $key):array {
     $iv=random_bytes(12);$tag='';$data=openssl_encrypt($key,'aes-256-gcm',labSponsorCipherKey(true),OPENSSL_RAW_DATA,$iv,$tag,'PrisonLab sponsors v1');
-    if($data===false)throw new RuntimeException('تعذر حماية المفتاح');
+    if($data===false)throw new RuntimeException(labT('sponsors.SponsorEncrypt.1'));
     return ['iv'=>base64_encode($iv),'tag'=>base64_encode($tag),'data'=>base64_encode($data)];
 }
 function labSponsorDecrypt(array $r):string {
     $c=$r['secret'];$key=openssl_decrypt(base64_decode($c['data'],true),'aes-256-gcm',labSponsorCipherKey(),OPENSSL_RAW_DATA,base64_decode($c['iv'],true),base64_decode($c['tag'],true),'PrisonLab sponsors v1');
-    if(!is_string($key) || $key==='')throw new RuntimeException('تعذر فتح مفتاح الراعي');return $key;
+    if(!is_string($key) || $key==='')throw new RuntimeException(labT('sponsors.SponsorDecrypt.1'));return $key;
 }
 function labSponsorDay():string {return (new DateTimeImmutable('now',new DateTimeZone('Asia/Jerusalem')))->format('Y-m-d');}
 function labSponsorPublic(array $r,array $v,?array $a):array {
@@ -46,24 +46,24 @@ function labDefaultSponsor():string {return labSponsorLocked(function($v){foreac
 function labSponsorBudgetValue(mixed $value):?float {
     if($value===null || $value==='')return null;
     if(!is_numeric($value) || !is_finite((float)$value) || (float)$value<0 || (float)$value>1000000)
-        throw new RuntimeException('أدخل حد إنفاق صحيحًا بالدولار أو اتركه فارغًا');
+        throw new RuntimeException(labT('sponsors.SponsorBudgetValue.1'));
     return (float)$value;
 }
 function labSaveSponsor(array $a,array $body,bool $site=false):array {
     $id=(string)($body['id'] ?? '');$label=trim((string)($body['label'] ?? $a['display_name']));
     $limit=filter_var($body['daily_limit'] ?? null,FILTER_VALIDATE_INT);$price=$body['price_cap'] ?? null;
-    if(mb_strlen($label)<2 || mb_strlen($label)>100 || $limit===false || $limit<1 || $limit>1000 || !is_numeric($price) || $price<0 || $price>1000 || !is_bool($body['active'] ?? null))throw new RuntimeException('أدخل اسم الراعي وحدًا يوميًا من 1 إلى 1000 وسعرًا من صفر إلى 1000');
+    if(mb_strlen($label)<2 || mb_strlen($label)>100 || $limit===false || $limit<1 || $limit>1000 || !is_numeric($price) || $price<0 || $price>1000 || !is_bool($body['active'] ?? null))throw new RuntimeException(labT('sponsors.SaveSponsor.1'));
     $budgets=[];foreach(['budget_daily_usd','budget_total_usd'] as $field)if(array_key_exists($field,$body))$budgets[$field]=labSponsorBudgetValue($body[$field]);
     $key=trim((string)($body['key'] ?? ''));if($key!=='')labVisitorBalance($key);
     return labSponsorLocked(function($v)use($a,$body,$id,$label,$limit,$price,$key,$site,$budgets){
         $r=$id!==''?($v['sponsors'][$id] ?? null):null;
-        if($id!=='' && (!$r || !hash_equals($r['owner_id'],$a['id'])))throw new RuntimeException('لا تملك هذا المفتاح');
-        if($r && (int)($body['revision'] ?? 0)!==$r['revision'])throw new RuntimeException('تغيرت إعدادات الراعي؛ حدّث القائمة قبل الحفظ');
-        if(!$r && count(array_filter($v['sponsors'],fn($x)=>$x['owner_id']===$a['id']))>=5)throw new RuntimeException('يمكن للحساب إدارة خمسة مفاتيح راعية كحد أقصى');
-        if(!$r && $key==='')throw new RuntimeException('أدخل مفتاح OpenRouter لتسجيل الرعاية');
-        if($key!=='')foreach($v['sponsors'] as $other)if($other['id']!==$id && hash_equals($other['fingerprint'],hash('sha256',$key)))throw new RuntimeException('هذا المفتاح مسجل بالفعل؛ عدّل سجله الحالي');
+        if($id!=='' && (!$r || !hash_equals($r['owner_id'],$a['id'])))throw new RuntimeException(labT('sponsors.SaveSponsor.2'));
+        if($r && (int)($body['revision'] ?? 0)!==$r['revision'])throw new RuntimeException(labT('sponsors.SaveSponsor.3'));
+        if(!$r && count(array_filter($v['sponsors'],fn($x)=>$x['owner_id']===$a['id']))>=5)throw new RuntimeException(labT('sponsors.SaveSponsor.4'));
+        if(!$r && $key==='')throw new RuntimeException(labT('sponsors.SaveSponsor.5'));
+        if($key!=='')foreach($v['sponsors'] as $other)if($other['id']!==$id && hash_equals($other['fingerprint'],hash('sha256',$key)))throw new RuntimeException(labT('sponsors.SaveSponsor.6'));
         if(!$r)$r=['id'=>'sp_'.bin2hex(random_bytes(12)),'owner_id'=>$a['id'],'is_site'=>$site,'created_at'=>gmdate('c'),'revision'=>0];
-        if($site && array_filter($v['sponsors'],fn($x)=>!empty($x['is_site'])))throw new RuntimeException('مفتاح الموقع مسجل بالفعل');
+        if($site && array_filter($v['sponsors'],fn($x)=>!empty($x['is_site'])))throw new RuntimeException(labT('sponsors.SaveSponsor.7'));
         if($key!==''){$r['secret']=labSponsorEncrypt($key);$r['fingerprint']=hash('sha256',$key);}
         foreach($budgets as $field=>$value)$r[$field]=$value;
         $r['profile']=labAccountProfile($a);$r['label']=$label;$r['daily_limit']=$limit;$r['price_cap']=(float)$price;$r['active']=$body['active'];$r['revision']++;$r['updated_at']=gmdate('c');
@@ -71,16 +71,16 @@ function labSaveSponsor(array $a,array $body,bool $site=false):array {
     },true);
 }
 function labDeleteSponsor(array $a,string $id):void {
-    labSponsorLocked(function($v)use($a,$id){$r=$v['sponsors'][$id] ?? null;if(!$r || !hash_equals($r['owner_id'],$a['id']))throw new RuntimeException('لا تملك هذا المفتاح');unset($v['sponsors'][$id]);labSponsorWrite($v);},true);
+    labSponsorLocked(function($v)use($a,$id){$r=$v['sponsors'][$id] ?? null;if(!$r || !hash_equals($r['owner_id'],$a['id']))throw new RuntimeException(labT('sponsors.DeleteSponsor.1'));unset($v['sponsors'][$id]);labSponsorWrite($v);},true);
 }
 
 /** Resolve only the selected or session-bound donor; never fall through to a different key. */
 function labFunding(string $id,string $personal,array $env):array {
     if($id==='' && $personal!=='')return ['key'=>$personal,'source'=>'personal','cap'=>null,'sponsor_id'=>''];
     if($id==='')$id=labDefaultSponsor();
-    if($id==='' && labSponsorLocked(fn($v)=>!empty($v['site_initialized'])))throw new RuntimeException('مفتاح الموقع متوقف أو محذوف؛ اختر راعيا آخر أو أضف مفتاحك الشخصي');
+    if($id==='' && labSponsorLocked(fn($v)=>!empty($v['site_initialized'])))throw new RuntimeException(labT('sponsors.Funding.1'));
     if($id==='')return ['key'=>$env['OPENROUTER_API_KEY'] ?? '','source'=>'site','cap'=>1.,'sponsor_id'=>''];
-    return labSponsorLocked(function($v)use($id){$r=$v['sponsors'][$id] ?? null;if(!$r || !$r['active'])throw new RuntimeException('هذا الراعي غير متاح أو أوقف مفتاحه؛ اختر تمويلًا آخر لتجربة جديدة');
+    return labSponsorLocked(function($v)use($id){$r=$v['sponsors'][$id] ?? null;if(!$r || !$r['active'])throw new RuntimeException(labT('sponsors.Funding.2'));
         return ['key'=>labSponsorDecrypt($r),'source'=>$r['is_site']?'site':'sponsor','cap'=>$r['price_cap'],'sponsor_id'=>$r['id'],'revision'=>$r['revision'],'profile'=>$r['profile'],'label'=>$r['label']];});
 }
 /** An operator explicitly selects one existing, active vault sponsor by ID. */
@@ -101,10 +101,10 @@ function labUseFunding(array $f):void {$GLOBALS['lab_funding_key']=$f['key'];$GL
 function labReserveSponsor(array $a,array &$s,string $requestId,array $funding,array &$quota):void {
     labSponsorLocked(function($v)use($a,&$s,$requestId,$funding,&$quota){
         $r=$v['sponsors'][$funding['sponsor_id']] ?? null;
-        if(!$r || !$r['active'] || $r['revision']!==$funding['revision'])throw new RuntimeException('تغير مفتاح الراعي أو قيوده؛ حدّث القائمة وأعد المحاولة');
+        if(!$r || !$r['active'] || $r['revision']!==$funding['revision'])throw new RuntimeException(labT('sponsors.ReserveSponsor.1'));
         $day=labSponsorDay();$prior=$quota['sponsor_usage'][$day][$r['id']] ?? [];
-        if(isset($prior[$requestId]))throw new RuntimeException('هذا الطلب محجوز بالفعل؛ افتح سجلك أو ابدأ طلبًا جديدًا');
-        if(count($prior)>=$r['daily_limit'])throw new RuntimeException('شكرًا لمساهمتك! اكتملت حصتك لدى هذا الراعي اليوم. يمكنك اختيار راعٍ آخر أو استخدام مفتاحك أو العودة غدًا.');
+        if(isset($prior[$requestId]))throw new RuntimeException(labT('sponsors.ReserveSponsor.2'));
+        if(count($prior)>=$r['daily_limit'])throw new RuntimeException(labT('sponsors.ReserveSponsor.3'));
         $s['funding_source']=$funding['source'];$s['sponsor_id']=$r['id'];$s['sponsor_profile']=$r['profile'];$s['sponsor_label']=$r['label'];$s['sponsor_revision_at_start']=$r['revision'];$s['actor_price_cap_at_start']=$r['price_cap'];
         $quota['sponsor_usage'][$day][$r['id']][$requestId]=$s['session_id'];
     });
@@ -115,14 +115,14 @@ function labGuardFunding(?string $requestKey=null):void {
     if(!$ids)return;
     $matchingId='';
     if($requestKey!==null)foreach(['funding','free'] as $kind){$candidate=$GLOBALS[$kind==='funding'?'lab_funding_key':'lab_free_actor_key'] ?? '';if($candidate!=='' && hash_equals($candidate,$requestKey) && !empty($GLOBALS['lab_'.$kind.'_sponsor_id'])){$matchingId=$GLOBALS['lab_'.$kind.'_sponsor_id'];break;}}
-    $limits=labSponsorLocked(function($v)use($ids,$matchingId){$limits=null;foreach($ids as $id=>$revision){$r=$v['sponsors'][$id] ?? null;if(!$r || !$r['active'] || $r['revision']!==$revision)throw new RuntimeException('تغير مفتاح الراعي أو توقف؛ المراحل المكتملة محفوظة. حدّث الجلسة قبل المتابعة.');if($id===$matchingId)$limits=['daily'=>$r['budget_daily_usd'] ?? null,'total'=>$r['budget_total_usd'] ?? null];}return $limits;});
+    $limits=labSponsorLocked(function($v)use($ids,$matchingId){$limits=null;foreach($ids as $id=>$revision){$r=$v['sponsors'][$id] ?? null;if(!$r || !$r['active'] || $r['revision']!==$revision)throw new RuntimeException(labT('sponsors.GuardFunding.1'));if($id===$matchingId)$limits=['daily'=>$r['budget_daily_usd'] ?? null,'total'=>$r['budget_total_usd'] ?? null];}return $limits;});
     if(!$limits || ($limits['daily']===null && $limits['total']===null))return;
     $usage=labIdentityHttp('https://openrouter.ai/api/v1/key',['Authorization: Bearer '.$requestKey])['data'] ?? [];
     foreach(['daily'=>'usage_daily','total'=>'usage'] as $type=>$field)if($limits[$type]!==null){
-        if(!is_numeric($usage[$field] ?? null) || !is_finite((float)$usage[$field]) || (float)$usage[$field]<0)throw new RuntimeException('تعذر التحقق من إنفاق الراعي؛ المراحل المكتملة محفوظة.');
+        if(!is_numeric($usage[$field] ?? null) || !is_finite((float)$usage[$field]) || (float)$usage[$field]<0)throw new RuntimeException(labT('sponsors.GuardFunding.2'));
         $byok=$type==='daily'?'byok_usage_daily':'byok_usage';
         $spent=(float)$usage[$field]+(is_numeric($usage[$byok] ?? null)?max(0,(float)$usage[$byok]):0);
-        if($spent >= (float)$limits[$type])throw new RuntimeException($type==='daily'?'بلغ الراعي حد إنفاقه اليومي؛ المراحل المكتملة محفوظة.':'بلغ الراعي حد إنفاقه الإجمالي؛ المراحل المكتملة محفوظة.');
+        if($spent >= (float)$limits[$type])throw new RuntimeException($type==='daily'?labT('sponsors.GuardFunding.3'):labT('sponsors.GuardFunding.4'));
     }
 }
 

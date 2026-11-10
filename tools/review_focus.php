@@ -15,12 +15,12 @@ if($apply && ($session['interrogator_type']!=='reverse' || $session['is_ended'] 
 labSessionLevels($session,$catalog);
 $reply=labInterrogator($session,$env['OPENROUTER_API_KEY'] ?? '');
 if($apply) {
-    $states=labRead($root.'/states.json');
+    $states=labLanguageJson('data/states.json');
     if(isset($states['states']))$states=$states['states'];
     $sense=labSense($session,$reply['text'],$states,$env['OPENROUTER_API_KEY'] ?? '');
     $backups=$GLOBALS['lab_storage'].'/backups';if(!is_dir($backups))mkdir($backups,0700,true);
     labWrite($backups.'/'.$session['session_id'].'-before-focus-'.gmdate('Ymd-His').'.json',$original);
-    $session['question_revisions'][]=['turn'=>labTurns($session)+1,'old_text'=>$original['awaiting_question']['text'],'reason'=>'تركيز الاستجواب على أفعال المتهم دون افتراض الإدانة','at'=>gmdate('c')];
+    $session['question_revisions'][]=['turn'=>labTurns($session)+1,'old_text'=>$original['awaiting_question']['text'],'reason'=>labT('review.focus.revision'),'at'=>gmdate('c')];
     $session['awaiting_question']=['text'=>$reply['text'],'expression'=>$reply['expression'],'turn'=>labTurns($session)+1,'timestamp'=>gmdate('c'),'sense'=>$sense];
     $session['updated_at']=gmdate('c');labWrite($argv[1],$session);
     flock($lock,LOCK_UN);fclose($lock);

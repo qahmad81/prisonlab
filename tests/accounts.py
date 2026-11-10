@@ -21,8 +21,8 @@ class Client:
     def init(self):
         status,data,_=self.request('/api.php?action=init_data');assert status==200,data;self.csrf=data['csrf_token'];return data
     def post(self,action,key=None,**payload):return self.request('/api.php',dict(action=action,**payload),key)[:2]
-    def begin(self):
-        status,_,headers=self.request('/auth.php?action=login');assert status==302
+    def begin(self,language='ar'):
+        status,_,headers=self.request('/auth.php?action=login&lang='+language);assert status==302
         assert 'SameSite=Lax' in headers.get('Set-Cookie','') and 'HttpOnly' in headers.get('Set-Cookie','')
         params=urllib.parse.parse_qs(urllib.parse.urlparse(headers['Location']).query)
         assert params['scope']==['openid profile'] and params['redirect_uri']==[BASE+'/auth.php?action=callback']
@@ -41,6 +41,10 @@ class Client:
 
 def run(storage):
     a,b,guest=Client(),Client(),Client();anonymous=guest.init();assert anonymous['participant_profile'] is None
+    english=Client();state=english.begin('en')
+    assert english.request('/ar/home')[0]==200  # The preference cookie changes while OAuth is pending.
+    status,_,headers=english.request('/auth.php?action=callback&'+urllib.parse.urlencode({'state':state,'code':'language-fixture'}))
+    assert status==303 and headers['Location']==BASE+'/en/home?signed_in=1'
     assert guest.start()[0]==401
     assert guest.post('key_balance','sk-or-test')[0]==401
     state=a.begin();assert a.request('/auth.php?action=callback&state=wrong&code=alice')[0]==400
@@ -65,11 +69,13 @@ def run(storage):
     assert 'PRIVATE_REVIEW_SENTINEL' not in json.dumps(guest.init())
     assert guest.request('/api.php?action=leaderboard')[1]['total']==0
     assert guest.request('/public.php?session_id='+sid)[0]==404
+    assert guest.request('/en/public/session/'+sid)[0]==404
     assert a.post('publish_session',session_id=sid)[0]==200
     pub=guest.request('/api.php?action=load_session&public=1&session_id='+sid)[1]['session']
     assert pub['read_only'] and not pub['can_delete'] and pub['operator_profile']['public_id']==profile['public_id']
     assert not pub['rankings']['prisoner']['provisional']
     public_meta=guest.request('/public.php?session_id='+sid);assert public_meta[0]==200 and 'og:title' in public_meta[1]
+    canonical=guest.request('/en/public/session/'+sid);assert canonical[0]==200 and BASE+'/en/public/session/'+sid in canonical[1]
     assert guest.request('/api.php?action=leaderboard&role=prisoner')[1]['total']==1
     public_profile=guest.request('/api.php?action=public_profile&profile_id='+profile['public_id'])[1]
     assert len(public_profile['logs'])==1 and public_profile['logs'][0]['user_reviews']['prisoner']['text']=='PRIVATE_REVIEW_SENTINEL'
@@ -121,7 +127,7 @@ if __name__=='__main__':
         subprocess.run(['php',str(ROOT/'tests/free_sponsor_fixture.php'),tmp],check=True)
         storage=Path(tmp);env={**os.environ,'LAB_DATA_DIR':tmp,'LAB_TEST_LEGACY_IDENTITY':'0'}
         with (storage/'server.log').open('w') as log:
-            p=subprocess.Popen(['php','-d','auto_prepend_file='+str(ROOT/'tests/mock-provider.php'),'-S','127.0.0.1:8494','router.php'],cwd=ROOT,env=env,stdout=log,stderr=log,creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
+            p=subprocess.Popen(['php','-d','auto_prepend_file='+str(ROOT/'tests/mock-provider.php'),'-S','127.0.0.1:8494','tests/router.php'],cwd=ROOT,env=env,stdout=log,stderr=log,creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
             try:
                 for _ in range(70):
                     try:

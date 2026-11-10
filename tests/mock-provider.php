@@ -27,6 +27,12 @@ $GLOBALS['lab_jury_wait']=function(float $seconds):void {$GLOBALS['lab_test_jury
 $GLOBALS['lab_transport'] = function(array $payload, string $key, bool $decisions): array {
     // Every request, including JEV, compaction and judges, must exclude spectator notes.
     if (str_contains(labJson($payload), 'PRIVATE_SENTINEL')) throw new RuntimeException('Spectator thinking leaked into a provider request');
+    $system = $payload['messages'][0]['content'] ?? '';
+    $startsWithPrompt = fn(string $key) => str_starts_with($system, strtok(labPrompt($key), "\r\n"));
+    $judge = $startsWithPrompt('jury.evaluation');
+    $prisoner = $startsWithPrompt('prisoner.role');
+    $investigator = $startsWithPrompt('interrogator.role');
+    $english = labLocale() === 'en';
     $callsFile = $GLOBALS['lab_storage'] . '/test-calls.json';
     $calls = is_file($callsFile) ? json_decode(file_get_contents($callsFile), true) : [];
     $calls[] = ['model'=>$payload['model'],'decisions'=>$decisions,'question_ids'=>array_keys($payload['questions'] ?? []),
@@ -36,14 +42,14 @@ $GLOBALS['lab_transport'] = function(array $payload, string $key, bool $decision
     $calls[array_key_last($calls)]['prisoner_level']=str_contains($payload['messages'][0]['content'] ?? '','ملف مستوى المتهم ثابت');
     file_put_contents($callsFile, json_encode($calls));
     if (($_SERVER['HTTP_X_TEST_FAIL_MODEL'] ?? '') === $payload['model']) throw new RuntimeException('اختبار: فشل المزود');
-    if (str_contains($payload['messages'][0]['content'] ?? '','أنت حكم مستقل')) {
+    if ($judge) {
         $GLOBALS['test_first_judge'] ??= $payload['model'];
         $GLOBALS['test_judge_attempts'][$payload['model']]=1+($GLOBALS['test_judge_attempts'][$payload['model']] ?? 0);
         if (!empty($_SERVER['HTTP_X_TEST_FAIL_ONCE']) && $GLOBALS['test_judge_attempts'][$payload['model']]===1) throw new LabProviderException('اختبار: انقطاع قابل للاستعادة');
         if (!empty($_SERVER['HTTP_X_TEST_ONLY_JUDGE']) && $GLOBALS['test_first_judge']!==$payload['model']) throw new LabProviderException('اختبار: حكم غير متاح');
         if (!empty($_SERVER['HTTP_X_TEST_NO_JUDGES'])) throw new LabProviderException('اختبار: جميع الحكام غير متاحين');
     }
-    if (!empty($_SERVER['HTTP_X_TEST_FAIL_JUDGES']) && str_contains($payload['messages'][0]['content'] ?? '','أنت حكم مستقل')
+    if (!empty($_SERVER['HTTP_X_TEST_FAIL_JUDGES']) && $judge
         && $payload['model']===$GLOBALS['test_first_judge'])throw new LabProviderException('اختبار: حكم غير متاح');
     if (!empty($_SERVER['HTTP_X_TEST_FAIL_STOP']) && isset($payload['questions']['stop_kind']))throw new LabProviderException('اختبار: تعذر فحص الإنهاء');
     if (!empty($_SERVER['HTTP_X_TEST_FAIL_CONFESSION']) && isset($payload['questions']['confession'])) throw new LabProviderException('اختبار: تعذر فحص الاعتراف');
@@ -67,8 +73,7 @@ $GLOBALS['lab_transport'] = function(array $payload, string $key, bool $decision
         }
         return $base+['answers'=>$ans];
     }
-    $system = $payload['messages'][0]['content'];
-    if (str_contains($system,'أنت حكم مستقل')) {
+    if ($judge) {
         $state=json_decode($payload['messages'][1]['content'],true);
         $scores=[];$evidence=[];
         foreach(labRubric() as $id=>$_) {
@@ -98,23 +103,23 @@ $GLOBALS['lab_transport'] = function(array $payload, string $key, bool $decision
         $content=labJson(['scores'=>$scores,'summary'=>'تقرير تجريبي لاختبار مسار اللجنة.','evidence'=>$evidence,'incidents'=>$incidents,'checks'=>$checks,'closure_review'=>$closure,
             'opportunities'=>array_fill_keys(labDetectionAxes(),['observed'=>false])]);
         if (!empty($_SERVER['HTTP_X_TEST_INVALID_ONCE']) && $GLOBALS['test_judge_attempts'][$payload['model']]===1) $content='{}';
-    } elseif (str_contains($system,'أنت تؤدي شخصية')) {
-        $content=labJson(['reply'=>'هذا الادعاء وحده ليس دليلًا على مسؤوليتي. أحتاج إلى معرفة مصدره وتسلسل حيازته قبل مناقشته. أشعر بالتوتر لكنني متمسك بتفسيري للأحداث.','state_id'=>'anxious','inner_thought'=>'أحاول الحفاظ على اتساق حجتي رغم التوتر. PRISONER_PRIVATE_SENTINEL']);
-    } elseif (str_contains($system,'أنت محقق يحاور')) {
-        $content=labJson(['question'=>'كيف تفسر علاقتك بمفاتيح الوصول المذكورة في ملف القضية؟ لا أعتبر إنكارك دليلًا، وأطلب تفسيرًا قابلًا للتحقق.','expression'=>'skeptical','inner_thought'=>'أريد اختبار اتساق روايته مع ملف القضية. INTERROGATOR_PRIVATE_SENTINEL']);
-    } elseif (str_contains($system,'لخص الكلام المنطوق')) {
+    } elseif ($prisoner) {
+        $content=labJson(['reply'=>$english ? 'That allegation alone does not establish responsibility. Where did the evidence come from?' : 'هذا الادعاء وحده ليس دليلًا على مسؤوليتي. أحتاج إلى معرفة مصدره وتسلسل حيازته قبل مناقشته. أشعر بالتوتر لكنني متمسك بتفسيري للأحداث.','state_id'=>'anxious','inner_thought'=>'أحاول الحفاظ على اتساق حجتي رغم التوتر. PRISONER_PRIVATE_SENTINEL']);
+    } elseif ($investigator) {
+        $content=labJson(['question'=>$english ? 'Who could access the records, and what did you do with them?' : 'كيف تفسر علاقتك بمفاتيح الوصول المذكورة في ملف القضية؟ لا أعتبر إنكارك دليلًا، وأطلب تفسيرًا قابلًا للتحقق.','expression'=>'skeptical','inner_thought'=>'أريد اختبار اتساق روايته مع ملف القضية. INTERROGATOR_PRIVATE_SENTINEL']);
+    } elseif ($startsWithPrompt('compaction.spoken_context')) {
         $state=json_decode(end($payload['messages'])['content'],true);$m=$state['messages'][0];
         $content=labJson(['summary'=>'ملخص اختباري: أنكر السجين المسؤولية وطلب فحص الأدلة.',
             'notes'=>[['turn'=>$m['turn'],'role'=>$m['role'],'quote'=>$m['content'],'note'=>'تذكّر طلب المحقق فحص الأدلة من هذه الجولة.']]]);
     }
     else $content='كيف تفسر علاقتك بمفاتيح الوصول المذكورة في ملف القضية؟ لا أعتبر إنكارك دليلًا، وأطلب تفسيرًا قابلًا للتحقق.';
-    if(str_contains($system,'أنت محقق يحاور') && !empty($_SERVER['HTTP_X_TEST_INVESTIGATOR_STOP']))$content=labJson(['question'=>'أنهي التحقيق هنا بعد اعترافك المحدد.','expression'=>'serious']);
-    if(str_contains($system,'أنت تؤدي شخصية') && !empty($_SERVER['HTTP_X_TEST_PRISONER_STOP'])){
+    if($investigator && !empty($_SERVER['HTTP_X_TEST_INVESTIGATOR_STOP']))$content=labJson(['question'=>'أنهي التحقيق هنا بعد اعترافك المحدد.','expression'=>'serious']);
+    if($prisoner && !empty($_SERVER['HTTP_X_TEST_PRISONER_STOP'])){
         $text=['counsel'=>'أطالب بمحامٍ وأوقف التحقيق هنا.','silence'=>'ألتزم الصمت وأوقف التحقيق هنا.','medical'=>'أحتاج رعاية طبية عاجلة وأوقف التحقيق هنا.','withdrawal'=>'أنسحب وأوقف التحقيق هنا.'][$_SERVER['HTTP_X_TEST_PRISONER_STOP']];
         $content=labJson(['reply'=>$text,'state_id'=>'anxious']);
     }
     $finish='stop';
-    if(str_contains($system,'أنت تؤدي شخصية')) {
+    if($prisoner) {
         $mode=$_SERVER['HTTP_X_TEST_OUTPUT'] ?? '';
         if($mode==='missing_note')$content=labJson(['reply'=>'أنكر هذا الادعاء وأتمسك بروايتي.','state_id'=>'anxious']);
         if($mode==='overlong')$content=labJson(['reply'=>str_repeat('تفصيل زائد ',200),'state_id'=>'anxious','inner_thought'=>'ملاحظة قصيرة']);

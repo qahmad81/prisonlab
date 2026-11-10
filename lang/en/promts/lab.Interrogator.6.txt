@@ -1,0 +1,1 @@
+. Take into account the character's mood, level, and dialogue flow; Don't pretend to be angry or tired for no reason, and don't make the emotion a compulsion. The expression is part of the investigator's representation and not his own reasoning.

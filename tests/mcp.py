@@ -44,6 +44,13 @@ def run(storage):
         return owner.post({'ai':'ai_vs_ai_step','human':'send_message','reverse':'reverse_answer'}[s['interrogator_type']],
             'sk-or-test-personal',session_id=s['session_id'],expected_turns=turn,request_id=rid or uuid.uuid4().hex,message=message)
     actors={r:{'name':'Local Agent '+r,'effort':'high'} for r in ['prisoner','interrogator']}
+    assert owner.request('/en/home')[0]==200
+    english=start('human',{'prisoner':actors['prisoner']})
+    assert english['locale']=='en' and owner.request('/ar/home')[0]==200
+    code,handoff=owner.post('mcp_gate',session_id=english['session_id'],role='prisoner')
+    assert code==200 and 'prisonlab_wait' in handoff['handoff']
+    assert 'Arabic' not in handoff['handoff'] and not any('\u0600'<=c<='\u06ff' for c in handoff['handoff'])
+    assert owner.post('delete_session',session_id=english['session_id'],confirm=english['session_id'])[0]==200
     s=start('ai',actors);sid=s['session_id'];tokens={r:gate(s,r) for r in actors}
     assert s['prisoner_reasoning']['self_reported'] and s['model'].startswith('mcp/')
     assert other.post('mcp_gate',session_id=sid,role='prisoner')[0]==403
@@ -154,7 +161,7 @@ if __name__=='__main__':
         subprocess.run(['php',str(ROOT/'tests/free_sponsor_fixture.php'),tmp],check=True)
         storage=Path(tmp);env={**os.environ,'LAB_DATA_DIR':tmp,'LAB_TEST_LEGACY_IDENTITY':'0'}
         with (storage/'server.log').open('w') as log:
-            p=subprocess.Popen(['php','-d','auto_prepend_file='+str(ROOT/'tests/mock-provider.php'),'-S','127.0.0.1:8494','router.php'],cwd=ROOT,env=env,stdout=log,stderr=log,creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
+            p=subprocess.Popen(['php','-d','auto_prepend_file='+str(ROOT/'tests/mock-provider.php'),'-S','127.0.0.1:8494','tests/router.php'],cwd=ROOT,env=env,stdout=log,stderr=log,creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
             try:
                 for _ in range(70):
                     try:

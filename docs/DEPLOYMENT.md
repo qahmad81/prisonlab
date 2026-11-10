@@ -24,7 +24,9 @@ MCP mailbox data belongs under private/data/mcp and is excluded from code backup
 
 SSH to the registered server, cd to the exact private/app path, inspect git status, then git pull --ff-only origin linkedin and bash tools/publish-public.sh /home/user/web/prisonlab.odehit.com/public_html. Do not force-reset remote changes or run migrations. Keep .env/private data out of Git and preserve permissions. Source is root-owned and readable by the domain application user; mutable data is owned by that application user.
 
-Nginx may serve static JSON without consulting .htaccess. Source must stay outside public_html. The public publisher refuses unexpected source/target directory layouts and never copies source directories or private files. Never expose models.json, cases, lib, tests, tools, docs, .git, .env, backups or data directly.
+Nginx may serve static JSON without consulting .htaccess. Source must stay outside public_html. The public publisher refuses unexpected source/target directory layouts and never copies source directories or private files. Never expose models.json, lang, lib, tests, tools, docs, .git, .env, backups or data directly.
+
+The published .htaccess rewrites language-prefixed pages to the existing public wrappers. The front proxy must pass these extensionless paths to Apache with the original request URI and query string. After publishing, check `/ar/home`, `/en/home`, `/en/public/case_file/char_10_leo_vance`, and a legacy `/public.php?case_file=char_10_leo_vance.md` link. Keep `/api.php`, `/mcp.php`, and the registered LinkedIn callback `/auth.php?action=callback` at the root. Check that the callback returns to the language used at sign-in.
 
 ## Checks and limits
 

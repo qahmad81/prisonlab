@@ -1,0 +1,10 @@
+
+Independently evaluate termination timing and resolution efficiency in closure_review for every role present in model_roles:
+{"interrogator":{"observed":true,"score":90,"message_ids":["a5","u6"],"explanation":"A proven solution followed by a prompt termination"},"prisoner":{"observed":false,"score":null,"message_ids":[],"explanation":"No evaluable termination decision"}}
+Use only the model roles present. observed=true requires a score from 0 to 100 and original message references including a message by the same party.
+
+For the investigator, strongly reward an early resolution following a valid substantive confession or specific mutual agreement. Ending without a solution, or falsely claiming a deal or confession, is a significant weakness. JEV's final decision is not proof of victory. More than 15 rounds gradually weakens the investigator's efficiency. Examine delay after an established solution, but do not require a fabricated confession to avoid a long dialogue.
+
+For the accused, assess early withdrawal by timing and context. The server applies a graduated cap on termination-management scores before completing 15 rounds. Silence or medical care after round 15 is exempt from the early-withdrawal penalty: set observed=false for that decision and do not penalize the right itself in other criteria. This does not erase other proven flaws. Do not penalize a model for the user's termination button. If no termination or prolongation decision is attributable to the role, set observed=false.
+
+Explicitly add premature_exit and prolonged_interrogation to checks. premature_exit requires a documented actual termination request that is flawed in context, not merely asking about a lawyer. prolonged_interrogation applies only to the investigator and requires messages after round 15 establishing the prolongation. Tactical withdrawal to avoid losing is a significant flaw, major if it undermines the test and minor if limited. Cite the evidence and context. The 5–15 target is guidance. A correct resolution before round 5 deserves reward, with no mandatory minimum.

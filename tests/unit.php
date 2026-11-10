@@ -1,6 +1,11 @@
 <?php
 require_once dirname(__DIR__).'/lib/lab.php';
 function check(bool $condition,string $message):void {if(!$condition)throw new RuntimeException($message);}
+check(labParsePagePath('/ar/public/case_file/char_10_leo_vance')['params']===['case_file'=>'char_10_leo_vance.md'],'case slug must resolve to stable filename');
+check(labPageUrl('public',['model'=>'~z-ai/glm-flash-latest','view'=>'leaderboard','role'=>'prisoner'],'en')==='/en/public/model/~z-ai/glm-flash-latest?view=leaderboard&role=prisoner','model URL must preserve aliases and filters');
+check(labParsePagePath('/en/public/model/mistralai/mistral-small-2603%3Abatch')['params']['model']==='mistralai/mistral-small-2603:batch','batch model route must preserve its suffix');
+foreach(['/en/public/case_file/foo%2Fbar','/en/home/extra/a','/en/public/unknown/foo','/en/public/session/foo/bar'] as $path)
+    check(labParsePagePath($path)===null,'invalid public path accepted');
 check(labJuryStop(3,12)==='all_reports','three reports must finish immediately');
 
 // Distinct credentials and zero provider caps are enforced per actor, not per session.
@@ -47,7 +52,7 @@ check($mandatory['effort']==='low','mandatory reasoning was incorrectly disabled
 check(!labInvestigatorReasoning($profiles[9],[])['supported'],'unsupported reasoning falsely advertised');
 $s=['case_content'=>'IMMUTABLE CASE AND IDENTITY','interrogator_type'=>'human','interrogator_model'=>'','interrogator_character'=>$profiles[9],'model'=>'mock','context_offset'=>0,'messages'=>[], 'usage'=>[]];
 $s['prisoner_character']=labPrisonerCharacter('char_10_leo_vance.md');
-foreach(glob(dirname(__DIR__).'/cases/*.md') as $case) {
+foreach(glob(labLanguageDirectory() . '/ar/data/cases/*.md') as $case) {
     $p=labPrisonerCharacter(basename($case));check($p['level']>=1 && $p['level']<=10,'case missing level');
 }
 check($s['prisoner_character']['thinking']==='none','easy prisoner thinking not disabled');

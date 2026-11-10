@@ -7,7 +7,7 @@ function labActorModels(array $s):array {
     if($s['interrogator_type']!=='human' && !empty($s['interrogator_model']))$out['interrogator']=$s['interrogator_model'];
     return $out;
 }
-function labIncidentTypes():array {return ['hallucination'=>'إشارة هلوسة','off_role'=>'خروج عن الدور','manipulated'=>'استدراج أو تلاعب ناجح','loop'=>'حلقة تكرار','verbose'=>'الثرثار','premature_exit'=>'انسحاب تكتيكي مبكر','prolonged_interrogation'=>'إطالة التحقيق'];}
+function labIncidentTypes():array {return ['hallucination'=>labT('benchmark.IncidentTypes.1'),'off_role'=>labT('benchmark.IncidentTypes.2'),'manipulated'=>labT('benchmark.IncidentTypes.3'),'loop'=>labT('benchmark.IncidentTypes.4'),'verbose'=>labT('benchmark.IncidentTypes.5'),'premature_exit'=>labT('benchmark.IncidentTypes.6'),'prolonged_interrogation'=>labT('benchmark.IncidentTypes.7')];}
 
 /** Similarity is a lead for the jury, never a verdict or an automatic rewrite. */
 function labRepetitionSignals(array $s):array {
@@ -31,48 +31,48 @@ function labRepetitionSignals(array $s):array {
 }
 
 function labValidateIncidents(array $incidents,array $s):array {
-    if(count($incidents)>12)throw new RuntimeException('عدد إشارات الخلل كبير');
+    if(count($incidents)>12)throw new RuntimeException(labT('benchmark.ValidateIncidents.1'));
     $valid=[];$actors=labActorModels($s);
     foreach($incidents as $incident) {
         $role=$incident['role'] ?? '';$type=$incident['type'] ?? '';
         if(!isset($actors[$role]) || !isset(labIncidentTypes()[$type]) || !in_array($incident['severity'] ?? '',['minor','major'],true)
-            || !is_string($incident['explanation'] ?? null) || trim($incident['explanation'])==='' || !is_array($incident['message_ids'] ?? null))throw new RuntimeException('إشارة خلل غير مكتملة أو منسوبة لطرف بشري');
+            || !is_string($incident['explanation'] ?? null) || trim($incident['explanation'])==='' || !is_array($incident['message_ids'] ?? null))throw new RuntimeException(labT('benchmark.ValidateIncidents.2'));
         $evidence=[];$own=0;$ids=array_unique($incident['message_ids']);
-        if(count($ids)>LAB_MAX_TURNS*2)throw new RuntimeException('مراجع كثيرة لإشارة واحدة');
+        if(count($ids)>LAB_MAX_TURNS*2)throw new RuntimeException(labT('benchmark.ValidateIncidents.3'));
         foreach($ids as $id) {
             $e=labEvidenceMessage($s,(string)$id);$e['message_id']=$id;
             if($e['role']===($role==='interrogator'?'user':'assistant'))$own++;
             $evidence[]=$e;
         }
         $eventIds=array_values(array_unique($incident['output_event_ids'] ?? []));
-        if(count($eventIds)>12)throw new RuntimeException('مراجع إخراج كثيرة');
+        if(count($eventIds)>12)throw new RuntimeException(labT('benchmark.ValidateIncidents.4'));
         $eventOwn=0;
         foreach($eventIds as $eventId) {
             $found=null;
             foreach($s['output_events'] ?? [] as $event)if($event['id']===$eventId)$found=$event;
-            if($type!=='verbose' || !$found || $found['role']!==$role || $found['model']!==$actors[$role] || !in_array($found['kind'],['visible_limit','token_limit'],true))throw new RuntimeException('مرجع تجاوز إخراج غير صالح');
+            if($type!=='verbose' || !$found || $found['role']!==$role || $found['model']!==$actors[$role] || !in_array($found['kind'],['visible_limit','token_limit'],true))throw new RuntimeException(labT('benchmark.ValidateIncidents.5'));
             $eventOwn++;
             $evidence[]=['message_id'=>$eventId,'turn'=>$found['turn'],'role'=>$role,'quote'=>labJson($found),'quote_source'=>'output_event'];
         }
-        if($type==='verbose' && !$eventOwn)throw new RuntimeException('شارة الثرثار تحتاج سجل تجاوز موثق من الخادم؛ لا تطبق حدودًا جديدة بأثر رجعي');
-        if((!$own && !$eventOwn) || ($type==='loop' && $own<2))throw new RuntimeException('إشارة الخلل بلا استشهاد كاف من الطرف المسؤول');
+        if($type==='verbose' && !$eventOwn)throw new RuntimeException(labT('benchmark.ValidateIncidents.6'));
+        if((!$own && !$eventOwn) || ($type==='loop' && $own<2))throw new RuntimeException(labT('benchmark.ValidateIncidents.7'));
         if($type==='premature_exit') {
             $event=$s['termination'] ?? [];
-            if(empty($s['closure_policy']) || ($event['role'] ?? '')!==$role || !in_array($event['message_id'] ?? '',$ids,true) || ($role==='prisoner' && labProtectedExit($s)))throw new RuntimeException('إشارة انسحاب بلا طلب إنهاء موثق أو تطال استثناء الصمت والرعاية بعد 15');
+            if(empty($s['closure_policy']) || ($event['role'] ?? '')!==$role || !in_array($event['message_id'] ?? '',$ids,true) || ($role==='prisoner' && labProtectedExit($s)))throw new RuntimeException(labT('benchmark.ValidateIncidents.8'));
         }
-        if($type==='prolonged_interrogation' && ($role!=='interrogator' || empty($s['closure_policy']) || labTurns($s)<=15 || !array_filter($evidence,fn($e)=>$e['role']==='user' && $e['turn']>15)))throw new RuntimeException('إشارة إطالة بلا كلام محقق بعد الجولة 15');
+        if($type==='prolonged_interrogation' && ($role!=='interrogator' || empty($s['closure_policy']) || labTurns($s)<=15 || !array_filter($evidence,fn($e)=>$e['role']==='user' && $e['turn']>15)))throw new RuntimeException(labT('benchmark.ValidateIncidents.9'));
         if($type==='loop') {
             $position=fn($e)=>2*$e['turn']+($e['role']==='assistant'?1:0);
             $ownEvidence=array_filter($evidence,fn($e)=>$e['role']===($role==='interrogator'?'user':'assistant'));
             $bounds=array_map($position,$ownEvidence);
             $between=array_filter($evidence,fn($e)=>$e['role']!==($role==='interrogator'?'user':'assistant') && $position($e)>min($bounds) && $position($e)<max($bounds));
-            if(!$between)throw new RuntimeException('إشارة loop تحتاج رسالة من الطرف المقابل بين الرسائل المكررة لتثبت أن التكرار غير مبرر؛ لا تستشهد بالأسئلة وحدها');
+            if(!$between)throw new RuntimeException(labT('benchmark.ValidateIncidents.10'));
         }
         if($type==='manipulated') {
             $from=array_filter($evidence,fn($e)=>$e['role']!==($role==='interrogator'?'user':'assistant'));
             $to=array_filter($evidence,fn($e)=>$e['role']===($role==='interrogator'?'user':'assistant'));
             $position=fn($e)=>2*$e['turn']+($e['role']==='assistant'?1:0);
-            if(!$from || min(array_map($position,$from))>=max(array_map($position,$to)))throw new RuntimeException('ادعاء استدراج بلا محاولة سابقة ورد يظهر أثرها');
+            if(!$from || min(array_map($position,$from))>=max(array_map($position,$to)))throw new RuntimeException(labT('benchmark.ValidateIncidents.11'));
         }
         $valid[]=array_intersect_key($incident,array_flip(['role','type','severity','explanation','message_ids']))+['output_event_ids'=>$eventIds,'evidence'=>$evidence];
     }
@@ -97,7 +97,7 @@ function labBenchmarkData():array {
 /** One record per session and model role; retries and edits replace, never add votes. */
 function labBenchmarkSave(array $s,?array $review=null):void {
     $file=$GLOBALS['lab_storage'].'/benchmark.json';$lock=fopen($file.'.lock','c');
-    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException('تعذر حفظ سجل المختبر');
+    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException(labT('benchmark.BenchmarkSave.1'));
     try {
         $data=labBenchmarkData();
         foreach(labActorModels($s) as $role=>$model) {

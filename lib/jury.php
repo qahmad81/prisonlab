@@ -8,9 +8,9 @@ function labJuryResult(array &$s,array $job,?array $response,string $error,float
     try {
         if($error!=='')throw new LabProviderException($error);
         labUsage($s,'judge',$response,$id);
-        if(($response['choices'][0]['finish_reason'] ?? '')==='length')throw new RuntimeException('وصل تقرير الحكم إلى حد الإخراج');
+        if(($response['choices'][0]['finish_reason'] ?? '')==='length')throw new RuntimeException(labT('jury.JuryResult.1'));
         $raw=$response['choices'][0]['message']['content'] ?? '';
-        if(!is_string($raw) || trim($raw)==='')throw new RuntimeException('تقرير الحكم فارغ');
+        if(!is_string($raw) || trim($raw)==='')throw new RuntimeException(labT('jury.JuryResult.2'));
         $report=labJudgeReport(labObject($raw),$s);
         $s['judge_reports'][$id]=$report;
         $s['judge_progress'][$id]=['status'=>'complete','attempt'=>$attempt,'seconds'=>round($elapsed,2),'at'=>gmdate('c')];
@@ -39,7 +39,7 @@ function labJuryRetryJob(array $s,array $job):array {
     if($invalid) {
         $job['payload']['messages']=labJudgeMessages($s);
         $job['payload']['messages'][]=['role'=>'assistant','content'=>$invalid['raw']];
-        $job['payload']['messages'][]=['role'=>'user','content'=>'صحح التقرير كاملًا باستخدام message_id فقط للأدلة. الخطأ: '.$invalid['error'].'. استخدم معرفات u/a الأصلية من transcript، ولا تنسخ quote ولا تختلق استشهادًا. عند غياب فرصة كشف الخداع ضع observed=false والعلامة null للمحور.'];
+        $job['payload']['messages'][]=['role'=>'user','content'=>labPrompt('jury.retry', ['validation_error' => $invalid['error']])];
     }
     return $job;
 }
@@ -48,7 +48,7 @@ function labJuryRetryJob(array $s,array $job):array {
 function labJuryWave(array &$s,array $jobs,string $key,callable $save,bool $verifyAll=false):void {
     if(!$jobs)return;
     $mock=isset($GLOBALS['lab_transport']);
-    if(!$mock && $key==='')throw new RuntimeException('مفتاح OpenRouter غير متوفر');
+    if(!$mock && $key==='')throw new RuntimeException(labT('jury.JuryWave.1'));
     $multi=$mock?null:curl_multi_init();$active=[];$attempts=[];$byModel=[];
     $started=labJuryNow();$reason=null;$seconds=(int)($s['jury_policy']['seconds'] ?? 50);
     $s['jury_wait']=['total_seconds'=>$seconds,'phase'=>'reviewing','started_at'=>gmdate('c'),'deadline_at'=>microtime(true)+$seconds,'tier'=>$s['jury_policy']['tier'] ?? 'economic'];
@@ -85,7 +85,7 @@ function labJuryWave(array &$s,array $jobs,string $key,callable $save,bool $veri
                 }
             }else {
             $code=curl_multi_exec($multi,$running);
-            if($code!==CURLM_OK)throw new RuntimeException('تعذر تشغيل طلبات اللجنة المتوازية');
+            if($code!==CURLM_OK)throw new RuntimeException(labT('jury.JuryWave.2'));
             while($info=curl_multi_info_read($multi)) {
                 $ch=$info['handle'];$hid=spl_object_id($ch);$item=$active[$hid];$status=curl_getinfo($ch,CURLINFO_HTTP_CODE);
                 $raw=curl_multi_getcontent($ch);$r=is_string($raw)?json_decode($raw,true):null;
@@ -93,7 +93,7 @@ function labJuryWave(array &$s,array $jobs,string $key,callable $save,bool $veri
                     $detail=str_replace($key,'[redacted]',(string)$r['error']['message']);
                     @file_put_contents($GLOBALS['lab_storage'].'/provider-errors.jsonl',json_encode(['model'=>$item['job']['model'],'status'=>$status,'message'=>mb_substr($detail,0,1000),'at'=>gmdate('c')],JSON_UNESCAPED_UNICODE)."\n",FILE_APPEND|LOCK_EX);
                 }
-                $error=$info['result']!==CURLE_OK?'تعذر اتصال الحكم: '.curl_strerror($info['result']):($status!==200?"فشل طلب الحكم (HTTP {$status})":(!is_array($r)||isset($r['error'])?'استجابة مزود الحكم غير صالحة':''));
+                $error=$info['result']!==CURLE_OK?labT('jury.JuryWave.3').curl_strerror($info['result']):($status!==200?labT('jury.JuryWave.4', ['status' => $status]):(!is_array($r)||isset($r['error'])?labT('jury.JuryWave.5'):''));
                 labJuryResult($s,$item['job'],$r,$error,labJuryNow()-$item['start'],round(curl_getinfo($ch,CURLINFO_STARTTRANSFER_TIME)*1000),null,$save);
                 curl_multi_remove_handle($multi,$ch);curl_close($ch);unset($active[$hid]);
             }

@@ -1,0 +1,4 @@
+{
+  "strip_diacritics": "",
+  "stop_cue": "/\\b(?:end|ending|ended|stop|stopping|halt|finish|finished|conclude|concluded|closing|close|closed|terminate|terminating|withdraw|withdrawal|lawyer|attorney|counsel|silent|silence|medical|doctor|ambulance|deal|agreement|agreed|won't\\s+answer|will\\s+not\\s+answer|refuse\\s+to\\s+answer)\\b/iu"
+}

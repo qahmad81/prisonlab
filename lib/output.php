@@ -7,7 +7,7 @@ function labOutputLimits(string $role):array {
 }
 function labOutputInstruction(string $role):string {
     $l=labOutputLimits($role);
-    return "\nحد الإخراج المنطوق: {$l['words']} كلمة و{$l['characters']} محرف كحد أقصى، أيهما أسبق. استهدف نصف هذا الحد، وأغلق JSON كاملاً. الملاحظة التمثيلية اختيارية عند ضيق المساحة، جملة واحدة لا تتجاوز 240 محرفاً. لا تسرد استدلالك الخاص. أجب عن النقطة الجديدة دون إعادة مقدمة أو دفاع سبق قوله.";
+    return labPrompt('output.spoken_limits', ['words' => $l['words'], 'characters' => $l['characters']]);
 }
 function labOutputEvent(array &$s,string $role,string $model,string $kind,array $details=[]):void {
     $s['output_events'][]=['id'=>'o'.(count($s['output_events'] ?? [])+1),'role'=>$role,'model'=>$model,
@@ -19,7 +19,7 @@ function labVisibleOutput(array &$s,string $role,string $model,string $text):str
     if($characters>$l['characters'] || $words>$l['words']) {
         labOutputEvent($s,$role,$model,'visible_limit',['characters'=>$characters,'words'=>$words,'limits'=>$l]);
         labHealthInvalid($model,$GLOBALS['lab_last_call_id'] ?? null);
-        throw new LabProviderException('تجاوز النموذج حد الرد المنطوق؛ سيعاد طلب جواب موجز مع حفظ المراحل المكتملة.');
+        throw new LabProviderException(labT('output.VisibleOutput.1'));
     }
     return $text;
 }

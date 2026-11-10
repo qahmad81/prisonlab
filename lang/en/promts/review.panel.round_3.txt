@@ -1,0 +1,1 @@
+Distinguish between what you know and what you assume. What information can you provide now, and what realistic guarantees do you require in exchange for cooperation?

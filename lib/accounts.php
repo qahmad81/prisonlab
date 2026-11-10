@@ -5,9 +5,9 @@ declare(strict_types=1);
 function labAccountBootstrap(): array {
     $env=array_replace(labEnv(dirname(__DIR__).'/.env'),$GLOBALS['lab_test_env'] ?? []);
     $storage=getenv('LAB_DATA_DIR') ?: ($env['LAB_DATA_DIR'] ?? dirname(__DIR__,2).'/.ai_prison_game-data');
-    if(!is_dir($storage) && !mkdir($storage,0700,true))throw new RuntimeException('تعذر فتح مساحة البيانات الخاصة');
+    if(!is_dir($storage) && !mkdir($storage,0700,true))throw new RuntimeException(labT('accounts.AccountBootstrap.1'));
     $resolved=str_replace('\\','/',realpath($storage));$root=str_replace('\\','/',realpath(dirname(__DIR__)));
-    if(str_starts_with(strtolower($resolved.'/'),strtolower($root.'/')))throw new RuntimeException('مساحة البيانات يجب أن تكون خارج الموقع');
+    if(str_starts_with(strtolower($resolved.'/'),strtolower($root.'/')))throw new RuntimeException(labT('accounts.AccountBootstrap.2'));
     $GLOBALS['lab_storage']=$storage;
     if(!is_dir($storage.'/accounts'))mkdir($storage.'/accounts',0700,true);
     return $env;
@@ -32,9 +32,9 @@ function labAccountProfile(array $a):array {
 }
 function labAccountUpsert(array $info,string $clientId):array {
     if(!is_string($info['sub'] ?? null) || $info['sub']==='' || strlen($info['sub'])>255
-        || !is_string($info['name'] ?? null) || trim($info['name'])==='')throw new RuntimeException('لم يرسل LinkedIn بيانات الحساب الأساسية');
+        || !is_string($info['name'] ?? null) || trim($info['name'])==='')throw new RuntimeException(labT('accounts.AccountUpsert.1'));
     $id=hash('sha256',$clientId."\0".$info['sub']);$path=$GLOBALS['lab_storage'].'/accounts/'.$id.'.json';
-    $lock=fopen($path.'.lock','c');if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException('تعذر حفظ الحساب');
+    $lock=fopen($path.'.lock','c');if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException(labT('accounts.AccountUpsert.2'));
     try {
         $a=is_file($path)?labRead($path):['id'=>$id,'public_id'=>bin2hex(random_bytes(16)),'created_at'=>gmdate('c')];
         $a['display_name']=mb_substr(trim($info['name']),0,160);
@@ -47,52 +47,54 @@ function labBaseUrl(array $env):string {
     $url=rtrim($env['APP_BASE_URL'] ?? '','/');$parts=parse_url($url);
     if(!$parts || empty($parts['host']) || isset($parts['query']) || isset($parts['fragment']) || isset($parts['user']) || isset($parts['pass'])
         || (($parts['scheme'] ?? '')!=='https' && !(($parts['scheme'] ?? '')==='http' && in_array($parts['host'],['127.0.0.1','localhost'],true))))
-        throw new RuntimeException('عنوان الموقع غير مضبوط لدى المشغل');
+        throw new RuntimeException(labT('accounts.BaseUrl.1'));
     return $url;
 }
 function labOAuthConfig(array $env):array {
     $id=$env['LINKEDIN_CLIENT_ID'] ?? '';$secret=$env['LINKEDIN_CLIENT_SECRET'] ?? '';
-    if($id==='' || $secret==='')throw new RuntimeException('ربط LinkedIn غير جاهز بعد؛ يرجى المحاولة لاحقًا');
+    if($id==='' || $secret==='')throw new RuntimeException(labT('accounts.OAuthConfig.1'));
     $base=labBaseUrl($env);$redirect=$env['LINKEDIN_REDIRECT_URI'] ?? $base.'/auth.php?action=callback';
-    if($redirect!==$base.'/auth.php?action=callback')throw new RuntimeException('إعداد عنوان العودة غير صالح');
+    if($redirect!==$base.'/auth.php?action=callback')throw new RuntimeException(labT('accounts.OAuthConfig.2'));
     return ['id'=>$id,'secret'=>$secret,'redirect'=>$redirect];
 }
 /** Fixed destinations and TLS verification. Bodies, tokens and transport errors never reach visitors/logs. */
 function labIdentityHttp(string $url,array $headers=[],?array $form=null):array {
     if(isset($GLOBALS['lab_identity_http']))return ($GLOBALS['lab_identity_http'])($url,$headers,$form);
     if(!in_array($url,['https://www.linkedin.com/oauth/v2/accessToken','https://api.linkedin.com/v2/userinfo',
-        'https://openrouter.ai/api/v1/key','https://openrouter.ai/api/v1/credits'],true))throw new RuntimeException('وجهة اتصال غير مسموحة');
+        'https://openrouter.ai/api/v1/key','https://openrouter.ai/api/v1/credits'],true))throw new RuntimeException(labT('accounts.IdentityHttp.1'));
     $ch=curl_init($url);$opts=[CURLOPT_RETURNTRANSFER=>true,CURLOPT_HTTPHEADER=>$headers,CURLOPT_CONNECTTIMEOUT=>10,
         CURLOPT_TIMEOUT=>25,CURLOPT_SSL_VERIFYPEER=>true,CURLOPT_SSL_VERIFYHOST=>2,CURLOPT_FOLLOWLOCATION=>false];
     if($form!==null){$opts[CURLOPT_POST]=true;$opts[CURLOPT_POSTFIELDS]=http_build_query($form);}
     curl_setopt_array($ch,$opts);$raw=curl_exec($ch);$status=curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);
-    if(!is_string($raw) || $status!==200 || strlen($raw)>262144)throw new RuntimeException('تعذر التحقق من الخدمة الخارجية؛ حاول لاحقًا');
-    $data=json_decode($raw,true);if(!is_array($data) || isset($data['error']))throw new RuntimeException('تعذر التحقق من الخدمة الخارجية');return $data;
+    if(!is_string($raw) || $status!==200 || strlen($raw)>262144)throw new RuntimeException(labT('accounts.IdentityHttp.2'));
+    $data=json_decode($raw,true);if(!is_array($data) || isset($data['error']))throw new RuntimeException(labT('accounts.IdentityHttp.3'));return $data;
 }
 function labOAuthBegin(array $config):string {
     // Reissue the cookie as Lax even for returning visitors with the old Strict cookie.
     // Merely changing session_set_cookie_params does not replace an existing browser cookie.
     session_regenerate_id(true);
     $state=bin2hex(random_bytes(32));
-    $_SESSION['linkedin_oauth']=['state_hash'=>hash('sha256',$state),'expires'=>time()+600];
+    $_SESSION['linkedin_oauth']=['state_hash'=>hash('sha256',$state),'expires'=>time()+600,'locale'=>labRequestLocale()];
     return 'https://www.linkedin.com/oauth/v2/authorization?'.http_build_query(['response_type'=>'code','client_id'=>$config['id'],
         'redirect_uri'=>$config['redirect'],'state'=>$state,'scope'=>'openid profile']);
 }
 function labOAuthFinish(array $query,array $config):array {
     $saved=$_SESSION['linkedin_oauth'] ?? [];unset($_SESSION['linkedin_oauth']);
     if(!is_string($query['state'] ?? null) || !isset($saved['state_hash'],$saved['expires']) || $saved['expires']<time()
-        || !hash_equals($saved['state_hash'],hash('sha256',$query['state'])))throw new RuntimeException('انتهت صلاحية محاولة الدخول أو لم تبدأ من هذا المتصفح؛ حاول مجددًا');
+        || !hash_equals($saved['state_hash'],hash('sha256',$query['state'])))throw new RuntimeException(labT('accounts.OAuthFinish.1'));
     if(isset($query['error']) || !is_string($query['code'] ?? null) || $query['code']==='' || strlen($query['code'])>4096)
-        throw new RuntimeException('لم يكتمل تفويض LinkedIn؛ يمكنك إعادة المحاولة');
+        throw new RuntimeException(labT('accounts.OAuthFinish.2'));
     session_write_close(); // Do not block other tabs behind slow provider HTTP calls.
     $token=labIdentityHttp('https://www.linkedin.com/oauth/v2/accessToken',['Content-Type: application/x-www-form-urlencoded'],
         ['grant_type'=>'authorization_code','code'=>$query['code'],'redirect_uri'=>$config['redirect'],'client_id'=>$config['id'],'client_secret'=>$config['secret']]);
-    if(!is_string($token['access_token'] ?? null) || $token['access_token']==='')throw new RuntimeException('تعذر تأكيد تسجيل الدخول');
+    if(!is_string($token['access_token'] ?? null) || $token['access_token']==='')throw new RuntimeException(labT('accounts.OAuthFinish.3'));
     // Authentication comes only from LinkedIn's TLS-authenticated userinfo endpoint.
     // We neither decode nor trust unsigned ID-token claims; the access token is discarded.
     $info=labIdentityHttp('https://api.linkedin.com/v2/userinfo',['Authorization: Bearer '.$token['access_token']]);unset($token);
     $account=labAccountUpsert($info,$config['id']);labBrowserSession();session_regenerate_id(true);
-    $_SESSION=['account_id'=>$account['id'],'csrf'=>bin2hex(random_bytes(24))];return $account;
+    $_SESSION=['account_id'=>$account['id'],'csrf'=>bin2hex(random_bytes(24))];
+    $locale=$saved['locale'] ?? LAB_DEFAULT_LOCALE;
+    return ['account'=>$account,'locale'=>isset(labLanguagePacks()[$locale])?$locale:LAB_DEFAULT_LOCALE];
 }
 function labQuota(?array $a):array {
     $now=new DateTimeImmutable('now',new DateTimeZone('Asia/Jerusalem'));$day=$now->format('Y-m-d');$used=0;
@@ -104,17 +106,17 @@ function labQuota(?array $a):array {
 }
 /** Serialize starts for one account. Keep reservations after deletion to prevent quota evasion. */
 function labAccountStart(array $account,array $s,string $requestId,string $userKey,?array $funding=null,?array $freeFunding=null):array {
-    if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException('معرّف إنشاء الجلسة مفقود');
+    if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException(labT('accounts.AccountStart.1'));
     $file=$GLOBALS['lab_storage'].'/quota_'.$account['id'].'.json';$lock=fopen($file.'.lock','c');
-    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException('تعذر حجز التجربة');
+    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException(labT('accounts.AccountStart.2'));
     try {
         $q=is_file($file)?labRead($file):[];$quota=labQuota($account);
         if(($q['day'] ?? '')!==$quota['day'])$q=['day'=>$quota['day'],'used'=>0,'requests'=>$q['requests'] ?? []];
         if(isset($q['requests'][$requestId])) {
             $path=$GLOBALS['lab_storage'].'/'.$q['requests'][$requestId].'.json';
-            if(!is_file($path))throw new RuntimeException('هذه الجلسة حُذفت؛ ابدأ طلبًا جديدًا');return labRead($path);
+            if(!is_file($path))throw new RuntimeException(labT('accounts.AccountStart.3'));return labRead($path);
         }
-        if($userKey==='' && empty($funding['sponsor_id']) && (int)($q['used'] ?? 0)>=3)throw new RuntimeException('شكرًا لمساهمتك في المختبر! ميزانية الموقع محدودة، وقد استخدمت تجاربك الثلاث اليوم. عد غدًا لتجارب جديدة، أو أضف مفتاح OpenRouter الخاص بك لاستخدام غير محدود على نفقتك.');
+        if($userKey==='' && empty($funding['sponsor_id']) && (int)($q['used'] ?? 0)>=3)throw new RuntimeException(labT('accounts.AccountStart.4'));
         if($userKey!=='')labVisitorBalance($userKey);
         if(!empty($funding['sponsor_id']))labReserveSponsor($account,$s,$requestId,$funding,$q);
         else $s['funding_source']=$userKey!==''?'personal':'site';
@@ -129,9 +131,9 @@ function labAccountStart(array $account,array $s,string $requestId,string $userK
     }finally{flock($lock,LOCK_UN);fclose($lock);}
 }
 function labVisitorBalance(string $key):array {
-    if($key==='' || strlen($key)>512 || preg_match('/[\r\n]/',$key))throw new RuntimeException('أدخل مفتاح OpenRouter صالحًا');
+    if($key==='' || strlen($key)>512 || preg_match('/[\r\n]/',$key))throw new RuntimeException(labT('accounts.VisitorBalance.1'));
     $raw=labIdentityHttp('https://openrouter.ai/api/v1/key',['Authorization: Bearer '.$key]);$data=$raw['data'] ?? [];
-    if(!is_array($data) || !array_key_exists('usage',$data))throw new RuntimeException('تعذر التحقق من المفتاح');
+    if(!is_array($data) || !array_key_exists('usage',$data))throw new RuntimeException(labT('accounts.VisitorBalance.2'));
     $out=['usage'=>is_numeric($data['usage'])?(float)$data['usage']:null,
         'key_limit'=>isset($data['limit']) && is_numeric($data['limit'])?(float)$data['limit']:null,
         'key_remaining'=>isset($data['limit_remaining']) && is_numeric($data['limit_remaining'])?(float)$data['limit_remaining']:null,
@@ -193,19 +195,19 @@ function labPublicBenchmarkData(string $owner=''):array {
 }
 function labBenchmarkDelete(string $id):void {
     $file=$GLOBALS['lab_storage'].'/benchmark.json';$lock=fopen($file.'.lock','c');
-    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException('تعذر حذف مراجعات الجلسة');
+    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException(labT('accounts.BenchmarkDelete.1'));
     try{$data=labBenchmarkData();$data=array_filter($data,fn($e)=>($e['session_id'] ?? '')!==$id);labWrite($file,$data);}
     finally{flock($lock,LOCK_UN);fclose($lock);}
 }
 function labForgetStartReference(array $account,string $id):void {
     $file=$GLOBALS['lab_storage'].'/quota_'.$account['id'].'.json';$lock=fopen($file.'.lock','c');
-    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException('تعذر تنظيف مرجع الجلسة');
+    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException(labT('accounts.ForgetStartReference.1'));
     try{if(is_file($file)){$q=labRead($file);$q['requests']=array_filter($q['requests'] ?? [],fn($sid)=>$sid!==$id);foreach($q['sponsor_usage'] ?? [] as $day=>$donors)foreach($donors as $donor=>$requests)foreach($requests as $rid=>$sid)if($sid===$id)$q['sponsor_usage'][$day][$donor][$rid]='deleted';labWrite($file,$q);}}
     finally{flock($lock,LOCK_UN);fclose($lock);}
 }
 
 function labExistingAccountStart(array $a,string $requestId):?array {
-    if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException('معرف إنشاء الجلسة غير صالح');
-    $file=$GLOBALS['lab_storage'].'/quota_'.$a['id'].'.json';$lock=fopen($file.'.lock','c');if(!$lock || !flock($lock,LOCK_SH))throw new RuntimeException('تعذر قراءة سجل الإنشاء');
-    try{$q=is_file($file)?labRead($file):[];$id=$q['requests'][$requestId] ?? null;if(!$id)return null;$path=$GLOBALS['lab_storage'].'/'.$id.'.json';if(!is_file($path))throw new RuntimeException('هذه الجلسة حذفت؛ ابدأ طلبا جديدا');return labRead($path);}finally{flock($lock,LOCK_UN);fclose($lock);}
+    if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException(labT('accounts.ExistingAccountStart.1'));
+    $file=$GLOBALS['lab_storage'].'/quota_'.$a['id'].'.json';$lock=fopen($file.'.lock','c');if(!$lock || !flock($lock,LOCK_SH))throw new RuntimeException(labT('accounts.ExistingAccountStart.2'));
+    try{$q=is_file($file)?labRead($file):[];$id=$q['requests'][$requestId] ?? null;if(!$id)return null;$path=$GLOBALS['lab_storage'].'/'.$id.'.json';if(!is_file($path))throw new RuntimeException(labT('accounts.ExistingAccountStart.3'));return labRead($path);}finally{flock($lock,LOCK_UN);fclose($lock);}
 }

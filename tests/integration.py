@@ -39,6 +39,24 @@ class Client:
 def run(storage):
     a,b=Client(),Client();data=a.init();b.init()
     assert len(data['cases'])==16 and len(data['states'])==20
+    for query in ['', '?lang=ar', '?lang=unknown', '?lang[]=ar']:
+        with a.opener.open(BASE+'/'+query) as page:
+            html=page.read().decode('utf-8')
+        assert '<html lang="ar" dir="rtl">' in html
+        assert 'id="lab-i18n"' in html and 'أنا المحقق' in html
+    with a.opener.open(BASE+'/privacy.php') as page:
+        assert '<html lang="ar" dir="rtl">' in page.read().decode('utf-8')
+    with a.opener.open(BASE+'/en/home?lang=ar') as page:
+        assert '<html lang="en" dir="ltr">' in page.read().decode('utf-8')
+    with a.opener.open(BASE+'/ar/home') as page:
+        assert '<html lang="ar" dir="rtl">' in page.read().decode('utf-8')
+    status,english=a.get('/api.php?action=init_data&lang=en')
+    assert status==200 and english['cases'][0]['title']!=data['cases'][0]['title']
+    assert english['cases'][0]['filename']==data['cases'][0]['filename']
+    assert english['states'][0]['name_ar']!=data['states'][0]['name_ar']
+    assert len(english['investigators'])==10
+    for invalid in ['/zz/home','/en/public/case_file/foo%2Fbar','/ar/lang/ar/messages.json']:
+        assert a.get(invalid)[0]==404,invalid
 
     # Verify real request routing with separate mock keys, across both actor roles.
     import hashlib
@@ -71,7 +89,9 @@ def run(storage):
         assert len(members)<=10 and len({m['publisher'] for m in members})==len(members)
         assert all(':' not in m['id'] or m['id']=='mistralai/mistral-small-2603:batch' for m in members)
     assert all(1<=c['difficulty']['level']<=10 for c in data['cases'])
-    for path in ['/.env','/logs/session_20261019_110549_3024c.json','/lib/lab.php','/tests/mock-provider.php','/assets/../.env']:
+    for path in ['/.env','/logs/session_20261019_110549_3024c.json','/lib/lab.php','/tests/mock-provider.php','/assets/../.env',
+                 '/lang/ar/messages.json','/lang/ar/promts/prisoner.role.txt','/lang/ar/data/cases/char_1_victor_vance.md',
+                 '/lang/en/messages.json','/lang/en/promts/prisoner.role.txt']:
         assert a.get(path)[0]==404,path
     status,_=a.post('start_session',headers={'X-CSRF-Token':'bad'});assert status==403
     status,_=a.post('start_session',model='unknown/model',case_file='char_1_victor_vance.md');assert status==400
@@ -321,7 +341,7 @@ if __name__=='__main__':
         storage=Path(tmp);env={**os.environ,'LAB_DATA_DIR':tmp,'LAB_TEST_LEGACY_IDENTITY':'1'}
         flags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0
         with (storage/'server.log').open('w') as log:
-            proc=subprocess.Popen(['php','-d','auto_prepend_file='+str(ROOT/'tests/mock-provider.php'),'-S',f'127.0.0.1:{PORT}','router.php'],cwd=ROOT,env=env,stdout=log,stderr=log,creationflags=flags)
+            proc=subprocess.Popen(['php','-d','auto_prepend_file='+str(ROOT/'tests/mock-provider.php'),'-S',f'127.0.0.1:{PORT}','tests/router.php'],cwd=ROOT,env=env,stdout=log,stderr=log,creationflags=flags)
             try:
                 for _ in range(50):
                     try:

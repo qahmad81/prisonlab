@@ -22,7 +22,6 @@
   "jury": {
     "economic": {
       "seconds": 50,
-      "label_ar": "اقتصادية",
       "models": [
         "~deepseek/deepseek-flash-latest",
         "~z-ai/glm-flash-latest",
@@ -34,7 +33,6 @@
     },
     "medium": {
       "seconds": 80,
-      "label_ar": "متوسطة",
       "models": [
         "xiaomi/mimo-v2.6-pro",
         "minimax/minimax-m3",
@@ -46,7 +44,6 @@
     },
     "professional": {
       "seconds": 180,
-      "label_ar": "احترافية",
       "models": [
         "openai/gpt-6.1-sol",
         "anthropic/claude-opus-5.5",

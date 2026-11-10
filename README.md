@@ -1,6 +1,6 @@
 # Prisonlab — AI Under Pressure Lab
 
-An Arabic RTL laboratory for comparing AI models through character-based interrogation, psychological simulation, evidence-based judging and role-specific model reviews. It supports a human investigator, AI versus AI, and a human playing the accused.
+A laboratory with Arabic and English editions for comparing AI models through character-based interrogation, psychological simulation, evidence-based judging and role-specific model reviews. It supports a human investigator, AI versus AI, and a human playing the accused.
 
 Open source under the [MIT license](LICENSE). Third-party assets retain their respective terms; see [notices](docs/THIRD_PARTY_NOTICES.md).
 
@@ -13,6 +13,23 @@ php -S 127.0.0.1:8488 router.php
 ```
 
 Alternatively run start.bat. Open http://127.0.0.1:8488/. Always use router.php: it applies a public allowlist. The PHP development server is not a production server. Apache requires mod_rewrite and AllowOverride; a fronting Nginx server needs equivalent protection or a minimal public directory. See [deployment](docs/DEPLOYMENT.md).
+
+## Language packs
+
+Arabic (`lang/ar/`) is the default pack, and English lives in `lang/en/`. The language prefix determines the page language. The root URL redirects to the preferred language's home page and defaults to Arabic on a first visit.
+
+- Home: `/ar/home`, `/en/home`
+- Case: `/en/public/case_file/char_10_leo_vance`
+- Published conversation: `/en/public/session/<session_id>`
+- Model leaderboard: `/en/public/model/openai/gpt-6.1-sol?view=leaderboard&role=prisoner`
+
+Existing `index.php`, `public.php`, and `privacy.php` links continue to work. The language switch keeps the current page and its filters. To add a language, copy a pack to another locale folder and set its display `name` and direction (`ltr` or `rtl`) in `locale.json`. The new language appears in the header and is available under its own URL prefix.
+
+- `messages.json` contains server and template text. `browser.json` contains browser UI text. Translate the values and preserve keys and named placeholders such as `{round}`.
+- `promts/` contains the model prompts and reusable prompt sections. Preserve placeholders, protocol field names and expected output schemas.
+- `data/cases.json` indexes the case files in `data/cases/`. `data/personalities/` holds investigator profiles and prisoner difficulty assignments. Keep case filenames, profile and state IDs, scores and technical values stable. Update `data/dialogue.json` with stop cues appropriate to the language.
+
+Missing message keys and resource files fall back to Arabic. The language selected when starting a conversation stays with that conversation. Keep `lang/` outside the public document root, and use the language helpers in `lib/i18n.php` and `assets/i18n.js` for new text.
 
 ## Conversation lifecycle
 

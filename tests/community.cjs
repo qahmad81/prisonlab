@@ -9,7 +9,7 @@ try{
     assert.equal(await page.locator('#send-btn').isDisabled(),true);assert.equal(await page.locator('#account-controls a').innerText(),'الدخول عبر LinkedIn');
     await page.screenshot({path:'test-results/accounts-guest.png',fullPage:true});
     await ctx.route('https://www.linkedin.com/**',route=>route.abort());
-    await page.route('**/auth.php?action=login',async route=>{
+    await page.route(/\/auth\.php\?action=login(?:&|$)/,async route=>{
         const response=await route.fetch({maxRedirects:0});assert.equal(response.status(),302);
         const url=new URL(response.headers().location),redirect=new URL(url.searchParams.get('redirect_uri'));
         assert.equal(url.searchParams.get('scope'),'openid profile');redirect.searchParams.set('state',url.searchParams.get('state'));redirect.searchParams.set('code','alice');
@@ -67,7 +67,7 @@ try{
     assert(await page.locator('.model-card.locked').count()>0,'Removing key must restore price restrictions');
     await page.locator('#model-modal .modal-close-btn').click();
     const fixtureDeadline=Date.now()/1000+3;
-    await page.route('**/api.php?action=load_session&session_id=countdown-fixture',route=>route.fulfill({json:{ok:true,session:{jury_wait:{tier:'medium',total_seconds:80,deadline_at:fixtureDeadline,phase:'reviewing'},judge_progress:{one:{status:'complete'}}}}}));
+    await page.route(url=>url.pathname==='/api.php' && url.searchParams.get('session_id')==='countdown-fixture',route=>route.fulfill({json:{ok:true,session:{jury_wait:{tier:'medium',total_seconds:80,deadline_at:fixtureDeadline,phase:'reviewing'},judge_progress:{one:{status:'complete'}}}}}));
     await page.evaluate(()=>{window.stopCountdownFixture=App.watchJury('countdown-fixture');});
     await page.waitForSelector('.jury-countdown');
     assert((await page.locator('#jury-live-status').innerText()).includes('1/3'));
@@ -76,16 +76,16 @@ try{
     await page.evaluate(()=>window.stopCountdownFixture());
     assert.equal(await page.locator('#jury-live-status').isVisible(),false);
     const publicPage=await ctx.newPage();publicPage.on('pageerror',e=>errors.push(e.message));
-    await publicPage.goto(base+'/public.php?profile='+process.env.TEST_PROFILE_ID);await publicPage.waitForFunction(()=>publishedSessions.length===1);
+    await publicPage.goto(base+'/ar/public/profile/'+process.env.TEST_PROFILE_ID);await publicPage.waitForFunction(()=>publishedSessions.length===1);
     assert.equal(await publicPage.locator('[role=tab]').count(),4);assert.equal(await publicPage.locator('#public-grid .test-card').count(),1);await publicPage.getByRole('tab',{name:/محاكاة بين النماذج/}).click();assert.equal(await publicPage.locator('#public-grid .archive-card').count(),1);assert(!(await publicPage.locator('body').innerText()).includes('PRIVATE UI SENTINEL'));
     assert((await publicPage.locator('#public-profile-heading').innerText()).includes('Test Operator <safe>'));
     await publicPage.goto(base+'/public.php?profile='+process.env.TEST_PROFILE_ID+'&tab=investigator');await publicPage.waitForSelector('#public-grid .test-card');assert(new URL(publicPage.url()).searchParams.get('tab')==='all');
-    assert.equal(await publicPage.locator('.share-link-button').count(),1);assert.equal(await publicPage.locator('.share-link-button').innerText(),'');assert(await publicPage.locator('.share-link-button').getAttribute('title'));assert.equal(await publicPage.locator('.brand-home').getAttribute('href'),'index.php');
+    assert.equal(await publicPage.locator('.share-link-button').count(),1);assert.equal(await publicPage.locator('.share-link-button').innerText(),'');assert(await publicPage.locator('.share-link-button').getAttribute('title'));assert.equal(await publicPage.locator('.brand-home').getAttribute('href'),'/ar/home');
     const pageShare=new URL(await publicPage.locator('.page-linkedin-share').getAttribute('href'));assert.equal(pageShare.searchParams.get('url'),publicPage.url());
     assert.equal(await publicPage.locator('#public-grid .test-investigator-portrait').count(),1);
     await publicPage.locator('#show-leaderboard').click();await publicPage.waitForSelector('#board-rows .test-card');
     assert.equal(await publicPage.locator('#public-grid').isVisible(),false);assert.equal(await publicPage.locator('#board-rows .test-card').count(),1);
-    await publicPage.locator('#board-role').selectOption('interrogator');await publicPage.waitForSelector('#board-rows .test-card .test-actor:last-child a[href*="mistralai%2F"]');
+    await publicPage.locator('#board-role').selectOption('interrogator');await publicPage.waitForSelector('#board-rows .test-card .test-actor:last-child a[href*="/model/mistralai/"]');
     await publicPage.setViewportSize({width:390,height:844});assert.equal(await publicPage.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
     await publicPage.screenshot({path:'test-results/community-leaderboard-mobile.png',fullPage:true});
     assert.equal(await publicPage.locator('#board-rows table').count(),0);
@@ -94,7 +94,7 @@ try{
     assert(!(await publicPage.locator('#board-rows .test-card').innerText()).includes('mistralai/'));
     assert.equal(await publicPage.locator('#board-rows .stat-link[target]').count(),0);
     assert.match(await publicPage.locator('#board-rows .test-cost').innerText(),/\$\d+\.\d{3}/);
-    const fundingLink=await publicPage.locator('#board-rows .test-credit').last().locator('a').getAttribute('href');assert(fundingLink.includes('funder=') && fundingLink.includes('funding=personal'));
+    const fundingLink=await publicPage.locator('#board-rows .test-credit').last().locator('a').getAttribute('href');assert(fundingLink.includes('/public/funder/') && fundingLink.includes('funding=personal'));
     const funded=await publicPage.request.get(base+'/api.php?action=leaderboard&funder='+process.env.TEST_PROFILE_ID+'&funding=personal');assert.equal((await funded.json()).total,2);
     const absent=await publicPage.request.get(base+'/api.php?action=leaderboard&sponsor=sp_missing');assert.equal((await absent.json()).total,0);
     const modelUrl=await publicPage.locator('#board-rows .test-card .test-actor:last-child .test-model').locator('a').getAttribute('href');assert(modelUrl.includes('role=interrogator'));
@@ -105,7 +105,7 @@ try{
     assert(await publicPage.locator('#public-context-heading a[href*="case_file="]').count()>0);
     await publicPage.goto(base+'/public.php?session_id='+pub);await publicPage.waitForSelector('#session-reader-modal.active');
     const share=publicPage.getByRole('link',{name:'مشاركة التجربة على LinkedIn ↗'});assert(await share.isVisible());
-    const href=new URL(await share.getAttribute('href'));assert.equal(href.origin,'https://www.linkedin.com');assert.equal(href.searchParams.get('url'),base+'/public.php?session_id='+pub);
+    const href=new URL(await share.getAttribute('href'));assert.equal(href.origin,'https://www.linkedin.com');assert.equal(href.searchParams.get('url'),base+'/ar/public/session/'+pub);
     assert((await publicPage.locator('.session-total-cost').innerText()).includes('بالمفتاح الشخصي'));
     await publicPage.screenshot({path:'test-results/community-public-share.png',fullPage:true});
     // Only the disposable private fixture is deleted. The public fixture must remain.
@@ -126,10 +126,10 @@ try{
     assert(attribution.fullLabel.includes('Fixture Free'));assert(attribution.mixedLabel.includes('الدور المجاني: Fixture Free'));
     assert.equal(attribution.selected,attribution.after);assert.equal(attribution.before,attribution.afterModel);assert(attribution.toast.includes('غير متاح'));
     // A dropped transport must end with a bounded error, not permanent loading.
-    const errorPage=await ctx.newPage();await errorPage.route('**/api.php?action=init_data',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({ok:false,error:'تعذر تحميل البيانات (اختبار)'})}));
+    const errorPage=await ctx.newPage();await errorPage.route(url=>url.pathname==='/api.php' && url.searchParams.get('action')==='init_data',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({ok:false,error:'تعذر تحميل البيانات (اختبار)'})}));
     await errorPage.goto(base);await errorPage.waitForSelector('#connection-toast.is-error');
     assert(await errorPage.getByRole('link',{name:'الدخول عبر LinkedIn',exact:true}).isVisible());
-    await publicPage.route('**/api.php?timeout_fixture=1',async route=>{await new Promise(r=>setTimeout(r,250));await route.abort().catch(()=>{});});
+    await publicPage.route(url=>url.pathname==='/api.php' && url.searchParams.get('timeout_fixture')==='1',async route=>{await new Promise(r=>setTimeout(r,250));await route.abort().catch(()=>{});});
     const timeout=await publicPage.evaluate(()=>LabCommunity.fetchJson('api.php?timeout_fixture=1',40).then(()=>false,e=>e.message));
     assert(timeout.includes('انتهت مهلة الاتصال'));
     assert.deepEqual(errors,[]);console.log('PASS community UI: sign-in gate, mock OAuth, authenticated performer, private rank, key balance, public-only profile/leaderboard, safe share link, mobile layout, deletion.');

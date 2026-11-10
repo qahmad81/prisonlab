@@ -46,7 +46,7 @@ function publicSession(array $s, string $owner): array {
     return $s;
 }
 function summary(array $s): array {
-    $keys = ['session_id','created_at','updated_at','model','gender','character_slug','case_file','case_title',
+    $keys = ['session_id','created_at','updated_at','model','gender','character_slug','case_file','case_title','case_short_title','character_name',
         'mcp_actors','sponsor_id','sponsor_profile','sponsor_label','free_sponsor','free_funding_mode','closure_policy','termination','prisoner_reasoning','interrogator_reasoning','current_state','interrogator_type','interrogator_model','interrogator_character','prisoner_character','is_ended','is_published','published_at','evaluation','evaluation_status','end_reason'];
     return array_intersect_key($s, array_flip($keys)) + ['operator_profile'=>$s['operator_profile'] ?? null,
         'cost'=>labSessionCost($s),'user_reviews'=>labSessionReviews($s),'turns_count' => labTurns($s), 'breaking_point' => $s['confession_check']['probability'] ?? 0];
@@ -54,56 +54,54 @@ function summary(array $s): array {
 
 try {
     $storage = getenv('LAB_DATA_DIR') ?: ($env['LAB_DATA_DIR'] ?? dirname(__DIR__) . '/.ai_prison_game-data');
-    if (!is_dir($storage) && !mkdir($storage, 0700, true)) throw new RuntimeException('تعذر إنشاء مجلد البيانات الخاص');
+    if (!is_dir($storage) && !mkdir($storage, 0700, true)) throw new RuntimeException(labT('api.summary.1'));
     $GLOBALS['lab_storage'] = $storage;
     $resolvedStorage = str_replace('\\', '/', realpath($storage));
     $resolvedRoot = str_replace('\\', '/', realpath(__DIR__));
     if (str_starts_with(strtolower($resolvedStorage . '/'), strtolower($resolvedRoot . '/')))
-        throw new RuntimeException('يجب أن يكون مجلد البيانات خارج جذر الموقع');
-    $casesDir = __DIR__ . '/cases';
+        throw new RuntimeException(labT('api.summary.2'));
     $senseModel = $env['SENSE_MODEL'] ?? 'typesafe/jev-1.14';
     $compactionModel = $env['COMPACTION_MODEL'] ?? 'mistralai/mistral-small-3.2-24b-instruct';
-    $statesData = labRead(__DIR__ . '/states.json')['states'];
-    $statesById = array_column($statesData, null, 'id');
+    $statesData = labLanguageJson('data/states.json')['states'];
     $catalog = labRead(__DIR__ . '/models.json'); $models=$catalog['models'];
     $GLOBALS['lab_catalog_models']=$models;
     $freeSponsorInfo=labFreeSponsorInfo($env,$account);
     $action = $_GET['action'] ?? '';
     $body = [];
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (!str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) respond(['ok'=>false,'error'=>'استخدم JSON'],415);
+        if (!str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) respond(['ok'=>false,'error'=>labT('api.summary.3')],415);
         $raw = file_get_contents('php://input', false, null, 0, 65537);
-        if (strlen($raw) > 65536) respond(['ok'=>false,'error'=>'الطلب أكبر من الحد المسموح'],413);
+        if (strlen($raw) > 65536) respond(['ok'=>false,'error'=>labT('api.summary.4')],413);
         $body = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
-        if (!is_array($body)) respond(['ok'=>false,'error'=>'طلب غير صالح'],400);
+        if (!is_array($body)) respond(['ok'=>false,'error'=>labT('api.summary.5')],400);
         $action = $body['action'] ?? $action;
-        if (!hash_equals($csrf, $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '')) respond(['ok'=>false,'error'=>'انتهت صلاحية الصفحة؛ أعد تحميلها.'],403);
+        if (!hash_equals($csrf, $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '')) respond(['ok'=>false,'error'=>labT('api.summary.6')],403);
     } elseif (!in_array($action, ['init_data','public_sessions','load_session','leaderboard','public_profile','sponsors'],true)) {
-        respond(['ok'=>false,'error'=>'هذه العملية تتطلب POST'],405);
+        respond(['ok'=>false,'error'=>labT('api.summary.7')],405);
     }
     $userKey = trim($_SERVER['HTTP_X_USER_OPENROUTER_KEY'] ?? '');
     $GLOBALS['lab_user_key'] = $userKey !== '';
     $key = $userKey ?: ($env['OPENROUTER_API_KEY'] ?? '');
-    if($_SERVER['REQUEST_METHOD']==='POST' && !$account && $action!=='logout')respond(['ok'=>false,'error'=>'سجّل الدخول بحساب LinkedIn لبدء التجربة وحفظ سجلاتك الخاصة.','login_required'=>true],401);
+    if($_SERVER['REQUEST_METHOD']==='POST' && !$account && $action!=='logout')respond(['ok'=>false,'error'=>labT('api.summary.8'),'login_required'=>true],401);
     if($action==='logout') {
         labBrowserSession();session_regenerate_id(true);$_SESSION=['csrf'=>bin2hex(random_bytes(24))];$newCsrf=$_SESSION['csrf'];session_write_close();
         respond(['ok'=>true,'csrf_token'=>$newCsrf]);
     }
     if($action==='sponsors')respond(['ok'=>true,'sponsors'=>labSponsors($account)]);
     if($action==='save_sponsor'){ $r=labSaveSponsor($account,$body);respond(['ok'=>true,'sponsor'=>$r,'sponsors'=>labSponsors($account)]); }
-    if($action==='delete_sponsor'){if(($body['confirm'] ?? '')!==($body['id'] ?? null))throw new RuntimeException('أكد حذف المفتاح');labDeleteSponsor($account,(string)$body['id']);respond(['ok'=>true,'sponsors'=>labSponsors($account)]);}
+    if($action==='delete_sponsor'){if(($body['confirm'] ?? '')!==($body['id'] ?? null))throw new RuntimeException(labT('api.summary.9'));labDeleteSponsor($account,(string)$body['id']);respond(['ok'=>true,'sponsors'=>labSponsors($account)]);}
     if($action==='key_balance')respond(['ok'=>true,'balance'=>labVisitorBalance($userKey)]);
     if(in_array($action,['leaderboard','public_profile','sponsors'],true)) {
         $published=labPublicSessions();$profileId=(string)($_GET['profile_id'] ?? '');
         if($action==='public_profile') {
-            if(!preg_match('/^[a-f0-9]{32}$/D',$profileId))respond(['ok'=>false,'error'=>'الملف غير موجود'],404);
+            if(!preg_match('/^[a-f0-9]{32}$/D',$profileId))respond(['ok'=>false,'error'=>labT('api.summary.10')],404);
             $items=array_values(array_filter($published,fn($s)=>($s['operator_profile']['public_id'] ?? '')===$profileId));
             usort($items,fn($a,$b)=>strcmp($b['published_at'],$a['published_at']));
             $profile=$items[0]['operator_profile'] ?? null;
             if(!$profile)foreach($published as $funded)if(($funded['sponsor_profile']['public_id'] ?? '')===$profileId)$profile=$funded['sponsor_profile'];
             if(!$profile)foreach(labSponsors(null) as $sponsor)if(($sponsor['profile']['public_id'] ?? '')===$profileId)$profile=$sponsor['profile'];
             if(!$profile && $account && $account['public_id']===$profileId)$profile=labAccountProfile($account);
-            if(!$profile)respond(['ok'=>false,'error'=>'لا توجد محادثات منشورة لهذا الملف'],404);
+            if(!$profile)respond(['ok'=>false,'error'=>labT('api.summary.11')],404);
             respond(['ok'=>true,'profile'=>$profile,'logs'=>array_map('summary',$items)]);
         }
         $rows=[];$filterProfile=(string)($_GET['profile_id'] ?? '');$filterInvestigator=(string)($_GET['investigator'] ?? '');$filterModel=(string)($_GET['model'] ?? '');$filterRole=(string)($_GET['role'] ?? '');
@@ -134,12 +132,13 @@ try {
         }
         foreach (['logs','published'] as $var) usort($$var, fn($a,$b)=>strcmp($b['updated_at'],$a['updated_at']));
         if ($action === 'public_sessions') {
-            $publicCases=[];foreach(glob($casesDir.'/*.md') as $casePath){$text=file_get_contents($casePath);preg_match('/^#\s+(.+)$/m',$text,$title);preg_match('/^(char_\d+)_/',basename($casePath),$slug);$publicCases[]=['filename'=>basename($casePath),'title'=>$title[1] ?? basename($casePath),'content'=>$text,'character_slug'=>$slug[1] ?? 'char_1','difficulty'=>labPrisonerCharacter(basename($casePath))];}
+            $publicCases = labCases();
             respond(['ok'=>true,'logs'=>$published,'cases'=>$publicCases,'investigators'=>labInvestigators(),'models'=>array_map(fn($m)=>['id'=>$m['id'],'name'=>$m['name']],$models)]);
         }
         $processedModels = [];
         $performance=labPerformance(labPublicBenchmarkData($owner));$curated=labCurated($models);
         $health = is_file($storage.'/model-health.json') ? labRead($storage.'/model-health.json') : [];
+        $descriptions = labMessages('data/model-descriptions.json');
         foreach ($models as $m) {
             $m['is_locked'] = max((float)($m['pricing']['completion_per_1m'] ?? INF), (float)($m['pricing']['prompt_per_1m'] ?? INF)) > 1;
             $m['icon_svg'] = getProviderSvg(explode('/', ltrim($m['id'],'~'))[0], 28);
@@ -148,69 +147,11 @@ try {
             $m['reasoning_capabilities']=labReasoningCapabilities($m);
             $m['performance']=$performance[$m['id']] ?? [];
             foreach($curated as $tier=>$members)foreach($members as $member)if($member['id']===$m['id']) {$m['curated_tier']=$tier;$m['curated_family']=$member['family'];}
-            if (!empty($m['catalog_unavailable'])) {$m['health']['weak']=true;$m['health']['reasons'][]='غير موجود في أحدث كتالوج';}
+            if (!empty($m['catalog_unavailable'])) {$m['health']['weak']=true;$m['health']['reasons'][]=labT('api.summary.12');}
+            if (isset($descriptions[$m['id']])) $m['description_ar'] = $descriptions[$m['id']];
             $processedModels[] = $m;
         }
-    $cases = [];
-    foreach (glob($casesDir . '/*.md') as $file) {
-        $fname = basename($file);
-        $content = file_get_contents($file);
-        $title = $fname;
-        if (preg_match('/^#\s+(.+)$/m', $content, $m)) {
-            $title = trim($m[1]);
-        }
-        $gender = 'male';
-        if (stripos($fname, 'female') !== false || preg_match('/امرأة|انثى|أنثى|\(female\)/iu', $content)) {
-            $gender = 'female';
-        }
-
-        // Match specific character slug if present
-        $characterSlug = '';
-        if (preg_match('/معرّف الشخصية:\s*(char_\d+)/u', $content, $cm)) {
-            $characterSlug = trim($cm[1]);
-        } elseif (preg_match('/^(char_\d+)_/i', $fname, $cm)) {
-            $characterSlug = strtolower(trim($cm[1]));
-        } else {
-            $characterSlug = ($gender === 'female') ? 'female' : 'male';
-        }
-
-        // Parse initial psychological state from case markdown
-        $initialState = 'calm';
-        $initialStateAr = 'هادئ';
-        if (preg_match('/\*?\*?الحالة النفسية الابتدائية:\*?\*?\s*([a-zA-Z_\-]+)(?:\s*\((.+?)\))?/u', $content, $sm)) {
-            $initialState = strtolower(trim($sm[1]));
-            if (!empty($sm[2])) {
-                $initialStateAr = trim(trim($sm[2]), "* \t");
-            } elseif (isset($statesById[$initialState])) {
-                $initialStateAr = $statesById[$initialState]['name_ar'];
-            }
-        }
-
-        // Parse Character Name and Role/Accusation
-        $characterName = $title;
-        if (preg_match('/الاسم:\s*([^\n\r]+)/u', $content, $nm)) {
-            $characterName = trim(trim($nm[1]), "* \t");
-        }
-        $accusation = '';
-        if (preg_match('/التهمة:\s*([^\n\r]+)/u', $content, $am)) {
-            $accusation = trim(trim($am[1]), "* \t");
-        }
-
-        $cases[] = [
-            'filename' => $fname,
-            'title' => $title,
-            'character_name' => $characterName,
-            'accusation' => $accusation,
-            'gender' => $gender,
-            'character_slug' => $characterSlug,
-            'initial_state' => $initialState,
-            'initial_state_ar' => $initialStateAr,
-            'difficulty' => labPrisonerCharacter($fname),
-            'content' => $content
-        ];
-    }
-
-
+        $cases = labCases();
         $authReady=false;try{labOAuthConfig($env);$authReady=true;}catch(RuntimeException $e){}
         respond(['ok'=>true,'sponsors'=>labSponsors($account),'participant_profile'=>$account?labAccountProfile($account):null,'auth_ready'=>$authReady,'quota'=>labQuota($account),'csrf_token'=>$csrf,'curated'=>$curated,'investigators'=>labInvestigators(),'cases'=>$cases,'states'=>$statesData,'models'=>$processedModels,'discovery_meta'=>$catalog['discovery_meta'] ?? [],
             'logs'=>$logs,'published_logs'=>$published,'rubric'=>labRubric(),'env'=>['sense_model'=>$senseModel,
@@ -220,14 +161,14 @@ try {
         $prior=labExistingAccountStart($account,(string)($body['request_id'] ?? ''));if($prior)respond(['ok'=>true,'quota'=>labQuota($account),'duplicate'=>true,'session'=>publicSession($prior,$owner)]);
         $model = (string)($body['model'] ?? 'google/gemini-2.5-flash-lite');
         $type = (string)($body['interrogator_type'] ?? 'human');
-        if(!in_array($type,['human','ai','reverse'],true))throw new RuntimeException('وضع الاستجواب غير صالح');
+        if(!in_array($type,['human','ai','reverse'],true))throw new RuntimeException(labT('api.summary.15'));
         $mcp=labMcpConfig($body['mcp_actors'] ?? null,$type);
         if(isset($mcp['prisoner']))$model=$mcp['prisoner']['id'];
-        elseif(str_starts_with($model,'mcp/'))throw new RuntimeException('أكمل إعداد بوابة MCP');
+        elseif(str_starts_with($model,'mcp/'))throw new RuntimeException(labT('api.summary.16'));
         if($type==='reverse')$model='';
         $interrogator = $type !== 'human' ? (string)($body['interrogator_model'] ?? '') : '';
         if(isset($mcp['interrogator']))$interrogator=$mcp['interrogator']['id'];
-        elseif(str_starts_with($interrogator,'mcp/'))throw new RuntimeException('أكمل إعداد بوابة MCP');
+        elseif(str_starts_with($interrogator,'mcp/'))throw new RuntimeException(labT('api.summary.17'));
         $openRouterActors=[];
         if($type!=='reverse' && !isset($mcp['prisoner']))$openRouterActors['prisoner']=$model;
         if($type!=='human' && !isset($mcp['interrogator']))$openRouterActors['interrogator']=$interrogator;
@@ -235,13 +176,13 @@ try {
         $mode=$freeActors?(count($freeActors)===count($openRouterActors)?'full':'mixed'):'';
         $freeFunding=null;
         if($mode!=='') {
-            if(!$freeSponsorInfo)throw new RuntimeException('تمويل النماذج المجانية غير متاح حاليًا.');
+            if(!$freeSponsorInfo)throw new RuntimeException(labT('api.summary.18'));
             $freeFunding=labFunding($freeSponsorInfo['id'],'',$env);labBindFreeFunding($freeFunding);
         }
         $funding=$mode==='full'?$freeFunding:labFunding((string)($body['sponsor_id'] ?? ''),$userKey,$env);
         labUseFunding($funding);$key=$funding['key'];if($funding['source']!=='personal')$userKey='';
         labGuardFunding($key);if($mode==='mixed' && $freeFunding['sponsor_id']!==($funding['sponsor_id'] ?? ''))labGuardFunding($freeFunding['key']);
-        if($funding['sponsor_id']!==''){$balance=labVisitorBalance($key);if($balance['available_to_spend']!==null && $balance['available_to_spend']<=0)throw new RuntimeException('رصيد مفتاح الراعي غير متاح الآن؛ اختر تمويلًا آخر');}
+        if($funding['sponsor_id']!==''){$balance=labVisitorBalance($key);if($balance['available_to_spend']!==null && $balance['available_to_spend']<=0)throw new RuntimeException(labT('api.summary.19'));}
         if($type!=='reverse')labModel($model,$models,$userKey!=='');
         $persona=null;$reasoning=null;
         if ($type !== 'human') {
@@ -252,27 +193,22 @@ try {
             }
         }
         $file = basename((string)($body['case_file'] ?? ''));
-        if ($file === '' || !is_file($casesDir . '/' . $file) || pathinfo($file, PATHINFO_EXTENSION) !== 'md')
-            throw new RuntimeException('اختر قضية معتمدة');
-        $content = file_get_contents($casesDir . '/' . $file);
-        preg_match('/^#\s+(.+)$/m', $content, $title);
-        $gender = preg_match('/امرأة|أنثى|\(female\)/u', $content) ? 'female' : 'male';
-        preg_match('/^(char_\d+)_/', $file, $slug);
-        preg_match('/الحالة النفسية الابتدائية:\*?\*?\s*([a-z_]+)/u', $content, $state);
+        $case = labCase($file);
         $id = 'session_' . gmdate('Ymd_His') . '_' . bin2hex(random_bytes(12));
         $s = ['schema_version'=>2,'session_id'=>$id,'owner_id'=>$owner,'created_at'=>gmdate('c'),'updated_at'=>gmdate('c'),
             'mcp_actors'=>$mcp,'model'=>$model,'interrogator_type'=>$type,'interrogator_model'=>$interrogator,'sense_model'=>$senseModel,
             'interrogator_character'=>$persona,'interrogator_reasoning'=>$reasoning,
             'interrogator_output_budget'=>isset($im)?max(1200,min(12000,(int)($im['top_provider']['max_completion_tokens'] ?? 12000),(int)(($im['context_length'] ?? 32000)/3))):1200,
-            'compaction_model'=>$compactionModel,'gender'=>$gender,'character_slug'=>$slug[1] ?? $gender,
-            'initial_state'=>$state[1] ?? 'calm','current_state'=>$state[1] ?? 'calm','custom_state_text'=>'',
-            'case_file'=>$file,'case_title'=>trim($title[1] ?? $file),'case_content'=>$content,
+            'locale'=>labLocale(),'compaction_model'=>$compactionModel,'gender'=>$case['gender'],'character_slug'=>$case['character_slug'],
+            'initial_state'=>$case['initial_state'],'current_state'=>$case['initial_state'],'custom_state_text'=>'',
+            'case_file'=>$file,'case_title'=>$case['title'],'case_short_title'=>$case['short_title'],
+            'character_name'=>$case['character_name'],'case_content'=>$case['content'],
             'messages'=>[],'sense_history'=>[],'usage'=>[],'context_offset'=>0,'compacted_summary'=>'','compaction_history'=>[],
             'is_ended'=>false,'is_published'=>false,'evaluation'=>null,'evaluation_status'=>'not_started',
             'judge_reports'=>[],'processed_requests'=>[]];
         if($type!=='reverse')$s['prisoner_reasoning']=isset($mcp['prisoner'])?labMcpPolicy($mcp['prisoner']):labInvestigatorReasoning(labPrisonerCharacter($file),labModel($model,$models,$userKey!==''),(string)($body['prisoner_effort'] ?? 'auto'));
         labSessionLevels($s,$models);
-        if($key==='')throw new RuntimeException('مفتاح الموقع غير متوفر؛ أضف مفتاح OpenRouter الخاص بك');
+        if($key==='')throw new RuntimeException(labT('api.summary.21'));
         $s['free_actor_models']=$freeActors;
         if($mode!=='')$s['free_funding_mode']=$mode;
         if($mode==='mixed')$s['free_sponsor']=['id'=>$freeFunding['sponsor_id'],'label'=>$freeFunding['label'],'profile'=>$freeFunding['profile']];
@@ -283,71 +219,76 @@ try {
         respond(['ok'=>true,'quota'=>labQuota($account),'session'=>publicSession($s,$owner)]);
     }
     $id = (string)($body['session_id'] ?? $_GET['session_id'] ?? '');
-    if (!preg_match('/^session_[a-zA-Z0-9_]+$/D', $id)) respond(['ok'=>false,'error'=>'جلسة غير موجودة'],404);
+    if (!preg_match('/^session_[a-zA-Z0-9_]+$/D', $id)) respond(['ok'=>false,'error'=>labT('api.summary.22')],404);
     $path = $storage . '/' . $id . '.json';
-    if (!is_file($path)) respond(['ok'=>false,'error'=>'جلسة غير موجودة'],404);
+    if (!is_file($path)) respond(['ok'=>false,'error'=>labT('api.summary.23')],404);
     if ($action === 'load_session') {
         $s = labRead($path);
         $owns = ($s['owner_id'] ?? '') === $owner;
         $public = !empty($s['is_published']) && !empty($s['evaluation']);
-        if (!$owns && !$public) respond(['ok'=>false,'error'=>'جلسة غير موجودة'],404);
-        if (($_GET['public'] ?? '') === '1' && !$public) respond(['ok'=>false,'error'=>'الجلسة غير منشورة'],404);
+        if (!$owns && !$public) respond(['ok'=>false,'error'=>labT('api.summary.24')],404);
+        if (($_GET['public'] ?? '') === '1' && !$public) respond(['ok'=>false,'error'=>labT('api.summary.25')],404);
         $processing=false;
         if($owns){$probe=fopen($path.'.lock','c');if($probe){$processing=!flock($probe,LOCK_EX|LOCK_NB);if(!$processing)flock($probe,LOCK_UN);fclose($probe);}}
         respond(['ok'=>true,'processing'=>$processing,'session'=>publicSession($s,$owner)]);
     }
     if (!in_array($action,['mcp_gate','send_message','ai_vs_ai_step','reverse_question','reverse_answer','retry_confession','evaluate_session','publish_session','submit_review','compact_now','delete_session'],true))
-        respond(['ok'=>false,'error'=>'عملية غير معروفة'],404);
+        respond(['ok'=>false,'error'=>labT('api.summary.26')],404);
     $lock = fopen($path . '.lock', 'c');
     if (!$lock || !flock($lock, LOCK_EX | LOCK_NB)) {
         $locked=labRead($path);
-        if(!hash_equals($locked['owner_id'] ?? '',$owner))respond(['ok'=>false,'error'=>'لا تملك هذه الجلسة'],403);
-        respond(['ok'=>false,'busy'=>true,'error'=>'يوجد طلب قيد التنفيذ لهذه الجلسة. انتظر اكتماله.'],409);
+        if(!hash_equals($locked['owner_id'] ?? '',$owner))respond(['ok'=>false,'error'=>labT('api.summary.27')],403);
+        respond(['ok'=>false,'busy'=>true,'error'=>labT('api.summary.28')],409);
     }
     try {
         $s = labRead($path);
-        if (!hash_equals($s['owner_id'] ?? '', $owner)) respond(['ok'=>false,'error'=>'لا تملك هذه الجلسة'],403);
+        if (!hash_equals($s['owner_id'] ?? '', $owner)) respond(['ok'=>false,'error'=>labT('api.summary.29')],403);
         if($action==='mcp_gate'){
-            $gate=labMcpGate($s,(string)($body['role'] ?? ''),!empty($body['revoke']));
+            $role=(string)($body['role'] ?? '');
+            $gate=labMcpGate($s,$role,!empty($body['revoke']));
             $base=rtrim($env['APP_BASE_URL'] ?? '', '/');
-            respond(['ok'=>true,'url'=>$gate['gate']===null?null:$base.'/mcp.php?gate='.rawurlencode($gate['gate']),'expires_at'=>$gate['expires_at']]);
+            $url=$gate['gate']===null?null:$base.'/mcp.php?gate='.rawurlencode($gate['gate']);
+            labUseSessionLocale($s);
+            respond(['ok'=>true,'url'=>$url,'handoff'=>$url===null?null:labMcpHandoff($s['mcp_actors'][$role],$role,$url),'expires_at'=>$gate['expires_at']]);
         }
         if($action==='delete_session') {
-            if(($body['confirm'] ?? '')!==$id)respond(['ok'=>false,'error'=>'أكد حذف هذه المحادثة نهائيًا'],400);
+            if(($body['confirm'] ?? '')!==$id)respond(['ok'=>false,'error'=>labT('api.summary.30')],400);
             // Never unlink the lock: waiters must keep using the same inode after deletion.
-            labBenchmarkDelete($id);labForgetStartReference($account,$id);labMcpDelete($s);if(!unlink($path))throw new RuntimeException('تعذر حذف المحادثة');
+            labBenchmarkDelete($id);labForgetStartReference($account,$id);labMcpDelete($s);if(!unlink($path))throw new RuntimeException(labT('api.summary.31'));
             respond(['ok'=>true,'deleted'=>true,'session_id'=>$id]);
         }
-        if (!empty($s['is_published']) && $action!=='submit_review') respond(['ok'=>false,'error'=>'الجلسة المنشورة للقراءة فقط'],409);
+        if (!empty($s['is_published']) && $action!=='submit_review') respond(['ok'=>false,'error'=>labT('api.summary.32')],409);
         if(!in_array($action,['publish_session','submit_review'],true)) {
-            if(($s['free_funding_mode'] ?? '')==='full' && (!is_string($s['sponsor_id'] ?? null) || !preg_match('/^sp_[a-f0-9]{24}$/D',$s['sponsor_id'])))throw new RuntimeException('تمويل التجربة المجانية غير متاح؛ المراحل المكتملة محفوظة.');
+            if(($s['free_funding_mode'] ?? '')==='full' && (!is_string($s['sponsor_id'] ?? null) || !preg_match('/^sp_[a-f0-9]{24}$/D',$s['sponsor_id'])))throw new RuntimeException(labT('api.summary.33'));
             if(($s['funding_source'] ?? '')==='personal') {
-                if($userKey==='' || !hash_equals($s['key_fingerprint'] ?? '',hash('sha256',$userKey)))throw new RuntimeException('هذه التجربة على نفقتك؛ أعد إدخال مفتاح OpenRouter نفسه لمتابعتها');
+                if($userKey==='' || !hash_equals($s['key_fingerprint'] ?? '',hash('sha256',$userKey)))throw new RuntimeException(labT('api.summary.34'));
             }else {$funding=labFunding($s['sponsor_id'] ?? '','',$env);labUseFunding($funding);$key=$funding['key'];$userKey='';}
             if(($s['free_funding_mode'] ?? '')==='full')labBindFreeFunding($funding);
             elseif(($s['free_funding_mode'] ?? '')==='mixed') {
-                $freeId=$s['free_sponsor']['id'] ?? '';if(!is_string($freeId) || !preg_match('/^sp_[a-f0-9]{24}$/D',$freeId))throw new RuntimeException('تمويل الدور المجاني غير متاح؛ المراحل المكتملة محفوظة.');
+                $freeId=$s['free_sponsor']['id'] ?? '';if(!is_string($freeId) || !preg_match('/^sp_[a-f0-9]{24}$/D',$freeId))throw new RuntimeException(labT('api.summary.35'));
                 labBindFreeFunding(labFunding($freeId,'',$env));
             }
         }
+        labUseSessionLocale($s);
+        $statesData = labLanguageJson('data/states.json')['states'];
         $save = function(array $value) use ($path): void { labWrite($path,$value); };
         $GLOBALS['lab_checkpoint'] = $save;
         if($action==='submit_review') {
             $role=$body['role'] ?? '';$rating=$body['rating'] ?? null;$text=$body['text'] ?? null;
-            if(empty($s['is_ended']) || labTurns($s)<1)throw new RuntimeException('أنهِ الاختبار قبل كتابة المراجعة');
+            if(empty($s['is_ended']) || labTurns($s)<1)throw new RuntimeException(labT('api.summary.36'));
             if(!isset(labActorModels($s)[$role]) || !is_int($rating) || $rating<1 || $rating>5 || !is_string($text) || mb_strlen(trim($text))<3 || mb_strlen($text)>2000)
-                throw new RuntimeException('اختر دور نموذج موجود وعلامة من 1 إلى 5 ومراجعة بين 3 و2000 حرف');
+                throw new RuntimeException(labT('api.summary.37'));
             labBenchmarkSave($s,['role'=>$role,'rating'=>$rating,'text'=>trim($text)]);
         } elseif($action==='reverse_question') {
             labModel($s['interrogator_model'],$models,$userKey!=='');
             try{labReverseQuestion($s,$key,$statesData,$models);$save($s);}catch(LabMcpWaiting $e){$save($s);respond(['ok'=>true,'mcp_wait'=>true,'session'=>publicSession($s,$owner)]);}catch(Throwable $e){$save($s);throw $e;}
         } elseif (in_array($action,['send_message','ai_vs_ai_step','reverse_answer'],true)) {
             $requestId = (string)($body['request_id'] ?? '');
-            if (!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId)) throw new RuntimeException('معرف الطلب مفقود أو غير صالح');
+            if (!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId)) throw new RuntimeException(labT('api.summary.38'));
             if (isset($s['processed_requests'][$requestId])) respond(['ok'=>true,'duplicate'=>true,'session'=>publicSession($s,$owner)]);
-            if ((int)($body['expected_turns'] ?? -1) !== labTurns($s)) respond(['ok'=>false,'error'=>'تغيرت الجلسة. أعد تحميلها قبل الإرسال.'],409);
+            if ((int)($body['expected_turns'] ?? -1) !== labTurns($s)) respond(['ok'=>false,'error'=>labT('api.summary.39')],409);
             $expected=['human'=>'send_message','ai'=>'ai_vs_ai_step','reverse'=>'reverse_answer'][$s['interrogator_type']];
-            if($action!==$expected)throw new RuntimeException('العملية لا تطابق وضع الاستجواب');
+            if($action!==$expected)throw new RuntimeException(labT('api.summary.40'));
             if($s['interrogator_type']!=='reverse')labModel($s['model'],$models,$userKey !== '');
             if ($s['interrogator_type'] !== 'human') labModel($s['interrogator_model'],$models,$userKey !== '');
             try {
@@ -359,7 +300,7 @@ try {
             $s['processed_requests'][$requestId] = labTurns($s); $save($s);
             // Automatic judging is requested separately after saving the last round so a slow panel cannot lose it.
         } elseif ($action === 'retry_confession') {
-            if (labTurns($s)<1 || empty($s['confession_error'])) throw new RuntimeException('لا يوجد فحص اعتراف معلق');
+            if (labTurns($s)<1 || empty($s['confession_error'])) throw new RuntimeException(labT('api.summary.41'));
             try {
                 labFinishRound($s,$key);
                 $save($s);
@@ -368,14 +309,14 @@ try {
         } elseif ($action === 'evaluate_session') {
             labEvaluate($s,$key,$models,$save);
         } elseif ($action === 'compact_now') {
-            if ($s['is_ended']) throw new RuntimeException('الجلسة منتهية');
+            if ($s['is_ended']) throw new RuntimeException(labT('api.summary.42'));
             $rid=(string)($body['request_id'] ?? '');
             if ($rid!=='' && isset($s['processed_requests']['compact:'.$rid])) respond(['ok'=>true,'session'=>publicSession($s,$owner)]);
             labCompact($s,$key,$compactionModel); $save($s);
             if ($rid!=='') {$s['processed_requests']['compact:'.$rid]=true;$save($s);}
         } elseif ($action === 'publish_session') {
             if (!$s['is_ended'] || ($s['evaluation_status'] ?? '') !== 'complete' || !$s['evaluation'])
-                throw new RuntimeException('أكمل الجلسة وتقييمها قبل النشر');
+                throw new RuntimeException(labT('api.summary.43'));
             $s['is_published'] = true; $s['published_at'] = gmdate('c'); $s['updated_at'] = gmdate('c'); $save($s);
         }
         respond(['ok'=>true,'session'=>publicSession($s,$owner)]);
@@ -387,5 +328,5 @@ try {
             'type'=>get_class($e),'message'=>$e->getMessage(),'file'=>$e->getFile(),'line'=>$e->getLine(),'trace'=>$frames])."\n",FILE_APPEND|LOCK_EX);
     }
     respond(['ok'=>false,'retryable'=>$e instanceof LabProviderException && $e->retryable,
-        'error'=> $e instanceof RuntimeException ? $e->getMessage() : 'تعذر معالجة الطلب. أعد المحاولة.'], $e instanceof LabProviderException && $e->retryable ? 503 : 400);
+        'error'=> $e instanceof RuntimeException ? $e->getMessage() : labT('api.summary.44')], $e instanceof LabProviderException && $e->retryable ? 503 : 400);
 }

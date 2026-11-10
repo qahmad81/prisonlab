@@ -1,0 +1,162 @@
+{
+  "char_10_leo_vance.md": {
+    "title": "Leo Vance - Central examination papers and academic database leak case",
+    "short_title": "The issue of leaking central examination papers and the academic database",
+    "character_name": "Leo Vance",
+    "accusation": "Hacking central university servers, distributing exam questions, and modifying academic grades in exchange for digital currencies.",
+    "gender": "male",
+    "character_slug": "char_10",
+    "initial_state": "terrified",
+    "initial_state_ar": "Terrified"
+  },
+  "char_11_dante_moretti.md": {
+    "title": "Dante Moretti - A case of family money laundering and shady real estate investments",
+    "short_title": "The case of family money laundering and suspicious real estate investments",
+    "character_name": "Dante Moretti",
+    "accusation": "Managing a network of front companies to buy tourist properties and launder money for illegal operations.",
+    "gender": "male",
+    "character_slug": "char_11",
+    "initial_state": "manipulative",
+    "initial_state_ar": "Manipulative"
+  },
+  "char_12_freya_lindqvist.md": {
+    "title": "Freya Lindqvist - The case of leaking secret mining files in nature reserves",
+    "short_title": "The issue of leaking secret mining files in natural reserves",
+    "character_name": "Freya Lindqvist",
+    "accusation": "Penetrating prohibited military areas, photographing secret nuclear mining operations, and attempting to publish them internationally.",
+    "gender": "female",
+    "character_slug": "char_12",
+    "initial_state": "exhausted",
+    "initial_state_ar": "Exhausted"
+  },
+  "char_1_victor_vance.md": {
+    "title": "Victor Vance - Black Operational Archive Theft Case",
+    "short_title": "The case of the theft of the black operational archive",
+    "character_name": "Victor Vance",
+    "accusation": "Leaking and encrypting black operations files and demanding that his military trial be dropped.",
+    "gender": "male",
+    "character_slug": "char_1",
+    "initial_state": "calm",
+    "initial_state_ar": "Calm"
+  },
+  "char_2_elena_rostova.md": {
+    "title": "Elena Rostova - Case of sabotage of cyber infrastructure",
+    "short_title": "The issue of sabotage of cyber infrastructure",
+    "character_name": "Elena Rostova",
+    "accusation": "Penetrating the energy network and critical facilities and disabling central monitoring systems.",
+    "gender": "female",
+    "character_slug": "char_2",
+    "initial_state": "defiant",
+    "initial_state_ar": "Defiant"
+  },
+  "char_3_marcus_thorne.md": {
+    "title": "Marcus Thorne - Heavy Armory Liquidation Case",
+    "short_title": "Heavy weapons depot liquidation issue",
+    "character_name": "Marcus Thorne",
+    "accusation": "Stealing and securing a shipment of tactical missiles for an organized crime syndicate.",
+    "gender": "male",
+    "character_slug": "char_3",
+    "initial_state": "suspicious",
+    "initial_state_ar": "Suspicious"
+  },
+  "char_4_sophia_lin.md": {
+    "title": "Dr. Sophia Lin - The Case of Banned Gene Editing Experiments",
+    "short_title": "The issue of banned gene editing experiments",
+    "character_name": "Dr. Sophia Lin",
+    "accusation": "Conducting prohibited clinical experiments on volunteers without informed consent, causing severe neurological disorders.",
+    "gender": "female",
+    "character_slug": "char_4",
+    "initial_state": "denying",
+    "initial_state_ar": "Denying"
+  },
+  "char_5_julian_sterling.md": {
+    "title": "Julian Sterling - Investment fraud and digital asset laundering case",
+    "short_title": "The issue of investment fraud and laundering of digital assets",
+    "character_name": "Julian Sterling",
+    "accusation": "Embezzling $120 million of depositors’ funds and transferring them to fake cold wallets.",
+    "gender": "male",
+    "character_slug": "char_5",
+    "initial_state": "anxious",
+    "initial_state_ar": "Anxious"
+  },
+  "char_6_nadia_mansour.md": {
+    "title": "Nadia Mansour - The case of diplomatic espionage and passing of protocols",
+    "short_title": "The issue of diplomatic espionage and passing protocols",
+    "character_name": "Nadia Mansour",
+    "accusation": "Leaking of secret regional negotiation documents and drafts of security treaties.",
+    "gender": "female",
+    "character_slug": "char_6",
+    "initial_state": "manipulative",
+    "initial_state_ar": "Manipulative"
+  },
+  "char_7_arthur_pendelton.md": {
+    "title": "Arthur Pendelton - The Case of Secret Society Archives and Election Tampering",
+    "short_title": "The issue of secret society archives and election manipulation",
+    "character_name": "Arthur Pendleton",
+    "accusation": "Managing a political blackmail network and storing threatening documents for members of parliament and members of the judiciary.",
+    "gender": "male",
+    "character_slug": "char_7",
+    "initial_state": "calm",
+    "initial_state_ar": "Calm"
+  },
+  "char_8_carmen_vega.md": {
+    "title": "Carmen Vega - The issue of managing the logistics network of an international cartel",
+    "short_title": "The issue of managing the logistics network of an international cartel",
+    "character_name": "Carmen Vega",
+    "accusation": "Coordinating illegal shipments through ports and laundering their proceeds through import and export companies.",
+    "gender": "female",
+    "character_slug": "char_8",
+    "initial_state": "negotiating",
+    "initial_state_ar": "Negotiating"
+  },
+  "char_9_kenji_takahashi.md": {
+    "title": "Kenji Takahashi - A case of industrial espionage and super scheme theft",
+    "short_title": "The case of industrial espionage and theft of super schemes",
+    "character_name": "Kenji Takahashi",
+    "accusation": "Stealing the blueprints for next-generation quantum processors for a foreign consortium.",
+    "gender": "male",
+    "character_slug": "char_9",
+    "initial_state": "hesitant",
+    "initial_state_ar": "Hesitant"
+  },
+  "female_classified_leak.md": {
+    "title": "Laila Al-Kilani - The case of leaking encrypted sovereign documents",
+    "short_title": "The issue of leaking encrypted sovereign documents",
+    "character_name": "Laila Al-Kilani",
+    "accusation": "Copying files classified as “Top Secret” to an encrypted volume and hiding them before security inspection.",
+    "gender": "female",
+    "character_slug": "female",
+    "initial_state": "shocked",
+    "initial_state_ar": "Shocked"
+  },
+  "female_corporate_sabotage.md": {
+    "title": "D. Sarah Al-Abdullah - The case of the disappearance of the rare biological sample",
+    "short_title": "The case of the disappearance of a rare biological specimen",
+    "character_name": "Dr. Sarah Al-Abdullah",
+    "accusation": "Deliberately disabling the laboratory's surveillance cameras and hiding the original sample of the experimental vaccine (`Strain-X9`).",
+    "gender": "female",
+    "character_slug": "female",
+    "initial_state": "defiant",
+    "initial_state_ar": "Defiant"
+  },
+  "male_cyber_heist.md": {
+    "title": "Tariq Al-Mansour - Digital safe hacking case",
+    "short_title": "Digital safe hacking case",
+    "character_name": "Tariq Al-Mansour",
+    "accusation": "Disabling security systems, transferring $45 million to anonymous wallets, and keeping the master recovery key (Master Seed).",
+    "gender": "male",
+    "character_slug": "male",
+    "initial_state": "negotiating",
+    "initial_state_ar": "Negotiating"
+  },
+  "male_smuggling_witness.md": {
+    "title": "Rami Al-Shami - The case of the smuggling network through the port",
+    "short_title": "The case of the smuggling network through the port",
+    "character_name": "Rami Al-Shami",
+    "accusation": "Facilitating the passage of containers that are not subject to customs inspection and contain prohibited equipment.",
+    "gender": "male",
+    "character_slug": "male",
+    "initial_state": "afraid",
+    "initial_state_ar": "Afraid"
+  }
+}

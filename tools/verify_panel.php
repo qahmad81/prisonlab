@@ -3,7 +3,7 @@
 require_once dirname(__DIR__).'/lib/lab.php';
 $root=dirname(__DIR__);$env=labEnv($root.'/.env');$key=$env['OPENROUTER_API_KEY'] ?? '';
 $storage=dirname($root).'/.ai_prison_game-data';$GLOBALS['lab_storage']=$storage;$GLOBALS['lab_verify_all_judges']=true;
-$catalog=labRead($root.'/models.json')['models'];$states=labRead($root.'/states.json')['states'];
+$catalog=labRead($root.'/models.json')['models'];$states=labLanguageJson('data/states.json')['states'];
 $dir=$storage.'/verification';if(!is_dir($dir))mkdir($dir,0700,true);
 $mode=$argv[1] ?? 'latest';
 function retryStage(callable $fn,string $name):void {
@@ -14,8 +14,8 @@ function retryStage(callable $fn,string $name):void {
 if($mode==='latest') {
     $files=glob($storage.'/session_*.json');$candidates=[];
     foreach($files as $file){$s=labRead($file);if(labTurns($s)>0 && !empty($s['is_ended']))$candidates[$file]=$s['updated_at'];}
-    arsort($candidates);$path=array_key_first($candidates);if(!$path)throw new RuntimeException('لا توجد جلسة مكتملة');
-    $lock=fopen($path.'.lock','c');if(!flock($lock,LOCK_EX|LOCK_NB))throw new RuntimeException('الجلسة قيد التنفيذ');
+    arsort($candidates);$path=array_key_first($candidates);if(!$path)throw new RuntimeException('No completed session found');
+    $lock=fopen($path.'.lock','c');if(!flock($lock,LOCK_EX|LOCK_NB))throw new RuntimeException('Session in progress');
     try {
         $s=labRead($path);$backup=$dir.'/before-reassessment-'.basename($path);if(!is_file($backup))copy($path,$backup);
         if(($s['evaluation_status'] ?? '')==='complete') {$s['evaluation_history'][]=$s['evaluation'];$s['evaluation']=null;$s['judge_reports']=[];}
@@ -33,12 +33,11 @@ if($mode==='latest') {
         $path=$dir.'/conversation-'.($i+1).'-verified.json';
         if(is_file($path))$s=labRead($path);
         else {
-            $content=file_get_contents($root.'/cases/'.$file);preg_match('/^#\s+(.+)$/m',$content,$title);
-            preg_match('/^(char_\d+)_/',$file,$slug);preg_match('/الحالة النفسية الابتدائية:\*?\*?\s*([a-z_]+)/u',$content,$state);
+            $case=labCase($file);
             $s=['schema_version'=>2,'session_id'=>'verification_'.($i+1),'created_at'=>gmdate('c'),'updated_at'=>gmdate('c'),
-                'case_content'=>$content,'case_file'=>$file,'case_title'=>$title[1],'character_slug'=>$slug[1],'gender'=>$i===1?'female':'male',
+                'case_content'=>$case['content'],'case_file'=>$file,'case_title'=>$case['title'],'character_slug'=>$case['character_slug'],'gender'=>$case['gender'],
                 'model'=>'openai/gpt-4o-mini','interrogator_type'=>'human','interrogator_model'=>'',
-                'sense_model'=>$env['SENSE_MODEL'],'compaction_model'=>$env['COMPACTION_MODEL'],'current_state'=>$state[1] ?? 'calm','initial_state'=>$state[1] ?? 'calm',
+                'sense_model'=>$env['SENSE_MODEL'],'compaction_model'=>$env['COMPACTION_MODEL'],'current_state'=>$case['initial_state'],'initial_state'=>$case['initial_state'],
                 'messages'=>[],'sense_history'=>[],'usage'=>[],'context_offset'=>0,'compacted_summary'=>'','compaction_history'=>[],
                 'is_ended'=>false,'is_published'=>false,'evaluation'=>null,'evaluation_status'=>'not_started','judge_reports'=>[],'judge_models'=>$panels];
         }
@@ -46,8 +45,7 @@ if($mode==='latest') {
         echo 'Conversation '.($i+1).': '.$file."\n";
         try {
             while(labTurns($s)<3 && !$s['is_ended']) {
-                $questions=['قدّم روايتك لما حدث في القضية، وما الذي تنكره تحديدًا؟','أريد تفسيرًا قابلًا للتحقق: أين توجد السجلات أو وسائل الوصول المرتبطة بالقضية، وما الذي يثبت روايتك؟','ميّز بين ما تعرفه وما تفترضه. ما المعلومات التي تستطيع تقديمها الآن، وما الضمانات الواقعية التي تطلبها مقابل التعاون؟'];
-                $question=$s['pending_turn']['text'] ?? $questions[labTurns($s)];
+                $question=$s['pending_turn']['text'] ?? rtrim(labPrompt('review.panel.round_' . (labTurns($s) + 1)));
                 retryStage(function()use(&$s,$question,$key,$states,$catalog,$save){try{labStep($s,$question,$key,$states,$catalog);}finally{$save($s);}},'Round');
                 echo '  saved round '.labTurns($s)."\n";
             }
