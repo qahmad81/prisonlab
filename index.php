@@ -20,15 +20,17 @@
 <header class="top-bar">
     <div class="brand">
         <a class="brand-home" href="<?= labPageHref('home') ?>" aria-label="<?= labE('index.html.2') ?>" title="<?= labE('index.html.3') ?>"><img class="brand-logo" src="/assets/branding/prisonlab-128.png" alt="PrisonLab" width="48" height="48"></a>
-        <div class="brand-copy"><span class="brand-name" dir="ltr">PrisonLab</span><h1><?= labE('index.html.4') ?></h1></div>
+        <div class="brand-copy">
+            <div class="brand-title-row"><span class="brand-name" dir="ltr">PrisonLab</span><?php labLanguageMenu(); ?></div>
+            <h1><?= labE('index.html.4') ?></h1>
+        </div>
     </div>
     <div class="header-actions">
-        <?php labLanguageMenu(); ?>
         <div id="account-controls" class="account-controls"><a href="<?= labLoginHref() ?>" class="btn linkedin-share"><?= labE('index.html.5') ?></a></div>
-        <button type="button" class="sponsor-header-button" id="open-sponsors-btn" title="<?= labE('index.html.6') ?>" onclick="SponsorUI.open()"><strong><?= labE('index.html.7') ?></strong><small id="active-sponsor-label"><?= labE('index.html.8') ?></small></button><nav class="brand-links" aria-label="<?= labE('index.html.9') ?>"><a href="<?= labPageHref('public', ['view'=>'leaderboard']) ?>"><?= labE('index.html.10') ?></a><a href="<?= labPageHref('privacy') ?>"><?= labE('index.html.11') ?></a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer"><?= labE('index.html.12') ?></a></nav>
         <button type="button" id="open-key-modal-btn" class="user-key-btn" onclick="App.openKeyModal()">
             <?= labE('index.html.13') ?>
         </button>
+        <button type="button" class="sponsor-header-button" id="open-sponsors-btn" title="<?= labE('index.html.6') ?>" onclick="SponsorUI.open()"><strong><?= labE('index.html.7') ?></strong><small id="active-sponsor-label"><?= labE('index.html.8') ?></small></button><nav class="brand-links" aria-label="<?= labE('index.html.9') ?>"><a href="<?= labPageHref('public', ['view'=>'leaderboard']) ?>"><?= labE('index.html.10') ?></a><a href="<?= labPageHref('privacy') ?>"><?= labE('index.html.11') ?></a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer"><?= labE('index.html.12') ?></a></nav>
     </div>
 </header>
 

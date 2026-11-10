@@ -86,9 +86,9 @@ try{
     await publicPage.locator('#show-leaderboard').click();await publicPage.waitForSelector('#board-rows .test-card');
     assert.equal(await publicPage.locator('#public-grid').isVisible(),false);assert.equal(await publicPage.locator('#board-rows .test-card').count(),1);
     await publicPage.locator('#board-role').selectOption('interrogator');await publicPage.waitForSelector('#board-rows .test-card .test-actor:last-child a[href*="/model/mistralai/"]');
-    const englishOption=new URL(await publicPage.locator('option[data-lab-language="en"]').getAttribute('value'),base);
-    assert.equal(englishOption.searchParams.get('role'),'interrogator');
-    assert.equal(englishOption.searchParams.get('view'),'leaderboard');
+    const englishLink=new URL(await publicPage.locator('.language-switch a[data-lab-language="en"]').getAttribute('href'),base);
+    assert.equal(englishLink.searchParams.get('role'),'interrogator');
+    assert.equal(englishLink.searchParams.get('view'),'leaderboard');
     await publicPage.setViewportSize({width:390,height:844});assert.equal(await publicPage.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
     await publicPage.screenshot({path:'test-results/community-leaderboard-mobile.png',fullPage:true});
     assert.equal(await publicPage.locator('#board-rows table').count(),0);

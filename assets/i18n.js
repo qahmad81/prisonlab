@@ -46,9 +46,8 @@ const LabI18n = (() => {
     }
     function replacePublic(params) {
         history.replaceState(null, '', pageUrl('public', params));
-        for (const option of document.querySelectorAll('.language-select option')) {
-            const url = pageUrl('public', params, option.dataset.labLanguage);
-            option.value = url.pathname + url.search;
+        for (const link of document.querySelectorAll('.language-switch a')) {
+            link.href = pageUrl('public', params, link.dataset.labLanguage);
         }
     }
     return {

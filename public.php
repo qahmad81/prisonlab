@@ -109,10 +109,12 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
 <header class="top-bar">
     <div class="brand">
         <a class="brand-home" href="<?= labPageHref('home') ?>" aria-label="<?= labE('public.html.1') ?>" title="<?= labE('public.html.2') ?>"><img class="brand-logo" src="/assets/branding/prisonlab-128.png" alt="PrisonLab" width="48" height="48"></a>
-        <div class="brand-copy"><span class="brand-name" dir="ltr">PrisonLab</span><h1><?= labE('public.html.3') ?></h1></div>
+        <div class="brand-copy">
+            <div class="brand-title-row"><span class="brand-name" dir="ltr">PrisonLab</span><?php labLanguageMenu(); ?></div>
+            <h1><?= labE('public.html.3') ?></h1>
+        </div>
     </div>
     <div class="header-actions">
-        <?php labLanguageMenu(); ?>
         <nav class="brand-links" aria-label="<?= labE('public.html.4') ?>"><a href="<?= labPageHref('privacy') ?>"><?= labE('public.html.5') ?></a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer"><?= labE('public.html.6') ?></a></nav>
         <a href="<?= labPageHref('home') ?>" class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
             <?= labE('public.html.7') ?>

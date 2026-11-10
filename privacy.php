@@ -31,8 +31,10 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
 </head>
 <body>
 <main class="privacy-wrap">
-    <nav class="privacy-nav" aria-label="<?= labE('privacy.html.2') ?>"><span class="privacy-brand"><img src="/assets/branding/prisonlab-128.png" width="44" height="44" alt="" style="vertical-align:middle;border-radius:10px;margin-inline-end:8px">PrisonLab</span><div><a href="<?= labPageHref('home') ?>"><?= labE('privacy.html.3') ?></a> · <a href="<?= labPageHref('public') ?>"><?= labE('privacy.html.4') ?></a></div></nav>
-    <?php labLanguageMenu(); ?>
+    <nav class="privacy-nav" aria-label="<?= labE('privacy.html.2') ?>">
+        <div class="brand-title-row"><span class="privacy-brand"><img src="/assets/branding/prisonlab-128.png" width="44" height="44" alt="" style="vertical-align:middle;border-radius:10px;margin-inline-end:8px">PrisonLab</span><?php labLanguageMenu(); ?></div>
+        <div><a href="<?= labPageHref('home') ?>"><?= labE('privacy.html.3') ?></a> · <a href="<?= labPageHref('public') ?>"><?= labE('privacy.html.4') ?></a></div>
+    </nav>
     <h1><?= labE('privacy.html.5') ?></h1>
     <p class="privacy-meta"><?= labE('privacy.html.6') ?></p>
     <p><?= labE('privacy.html.7') ?></p>

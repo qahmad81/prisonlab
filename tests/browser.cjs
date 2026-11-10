@@ -23,12 +23,12 @@ if(!chrome && process.platform==='win32') {
         await page.waitForSelector('#public-context-heading h2');
         assert.equal(await page.locator('html').getAttribute('dir'),'ltr');
         assert.match(await page.locator('#public-context-heading h2').innerText(),/Leo Vance/);
-        const language=page.locator('select.language-select');
-        assert.equal(await language.inputValue(),'/en/public/case_file/char_10_leo_vance');
-        await Promise.all([page.waitForURL('**/ar/public/case_file/char_10_leo_vance'),language.selectOption('/ar/public/case_file/char_10_leo_vance')]);
+        const language=page.locator('.brand-title-row .language-switch');
+        assert.equal(await language.locator('[aria-current="page"]').getAttribute('data-lab-language'),'en');
+        await Promise.all([page.waitForURL('**/ar/public/case_file/char_10_leo_vance'),language.getByRole('link',{name:'العربية'}).click()]);
         await page.waitForSelector('#public-context-heading h2');
         assert.equal(await page.locator('html').getAttribute('dir'),'rtl');
-        await Promise.all([page.waitForURL('**/en/public/case_file/char_10_leo_vance'),language.selectOption('/en/public/case_file/char_10_leo_vance')]);
+        await Promise.all([page.waitForURL('**/en/public/case_file/char_10_leo_vance'),language.getByRole('link',{name:'English'}).click()]);
         await page.waitForSelector('#public-context-heading h2');
         const startLink=page.locator('#public-context-heading a[href*="/en/home"]');
         await Promise.all([page.waitForURL('**/en/home?case_file=char_10_leo_vance.md'),startLink.click()]);
@@ -37,6 +37,7 @@ if(!chrome && process.platform==='win32') {
         assert.match(await page.locator('#selected-case-summary').innerText(),/Leo Vance/);
         assert.match(await page.locator('#mode-btn-human').innerText(),/investigator|interrogator/i);
         await page.setViewportSize({width:390,height:844});
+        assert((await language.boundingBox()).width<96);
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
         await page.setViewportSize({width:1560,height:1024});
         const englishSession=await page.evaluate(async()=>{

@@ -35,6 +35,7 @@ header.top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
     backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
@@ -45,6 +46,7 @@ header.top-bar {
     display: flex;
     align-items: center;
     gap: 12px;
+    max-inline-size: 100%;
 }
 
 .brand-dot {
@@ -68,14 +70,19 @@ header.top-bar {
 }
 
 .brand-logo {flex:0 0 auto;display:block;border:1px solid rgba(251,191,36,.28);border-radius:12px;box-shadow:0 4px 16px #0003;}
-.brand-copy {display:flex;flex-direction:column;gap:3px;}
+.brand-copy {display:flex;flex-direction:column;gap:3px;min-width:0;}
+.brand-title-row {display:flex;align-items:center;flex-wrap:wrap;gap:8px;}
 .brand-name {font-size:1.35rem;font-weight:800;color:#fbbf24;line-height:1.15;align-self:flex-start;letter-spacing:.2px;}
 .brand-copy h1 {font-size:.82rem;font-weight:500;color:#cbd5e1;letter-spacing:0;}
 .brand-links {display:flex;gap:14px;align-items:center;font-size:.8rem;white-space:nowrap;}
 .brand-links a {color:var(--text-muted);text-decoration:none;}
 .brand-links a:hover {color:#fbbf24;}
 .brand-links a:focus-visible {outline:2px solid #fbbf24;outline-offset:5px;}
-.language-select {color:var(--text-main);background:var(--bg-card);border:1px solid var(--border);border-radius:7px;padding:6px 8px;font:inherit;font-size:.8rem;cursor:pointer;color-scheme:dark;}
+.language-switch {display:inline-flex;align-items:center;flex:0 0 auto;gap:2px;padding:2px;background:var(--bg-dark);border:1px solid var(--border);border-radius:8px;}
+.language-switch .language-link {display:inline-grid;place-items:center;min-inline-size:30px;min-block-size:26px;padding:2px 5px;border-radius:5px;color:#cbd5e1;font-size:.72rem;font-weight:700;line-height:1;letter-spacing:.03em;text-decoration:none;}
+.language-switch .language-link:hover {background:var(--bg-card);color:var(--text-main);}
+.language-switch .language-link[aria-current="page"] {background:#352b16;color:#fbbf24;}
+.language-switch .language-link:focus-visible {outline:2px solid #fbbf24;outline-offset:2px;}
 .account-controls {display:flex;align-items:center;gap:10px;max-width:240px;}
 .account-name {color:#e2e8f0;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .account-notice {padding:14px 16px;font-size:.82rem;line-height:1.7;background:#0d1a2a;border-bottom:1px solid var(--border);color:#cbd5e1;}
@@ -115,8 +122,11 @@ header.top-bar {
 .header-actions {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    max-inline-size: 100%;
     gap: 14px;
 }
+.header-actions > .btn-primary {width:auto;}
 
 .env-pills {
     display: flex;

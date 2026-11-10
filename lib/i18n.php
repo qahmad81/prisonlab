@@ -132,15 +132,17 @@ function labLanguageMenu(): void
         return;
     }
     $current = labRequestLocale();
-    echo '<select class="language-select" aria-label="', labE('language.menu'), '" onchange="location.assign(this.value)">';
+    echo '<div class="language-switch" dir="ltr" role="group" aria-label="', labE('language.menu'), '">';
     foreach ($packs as $code => $pack) {
         $url = labPageUrl($GLOBALS['lab_page'] ?? 'home', $_GET, $code);
-        echo '<option data-lab-language="', $code, '" lang="', $code, '" dir="', $pack['dir'], '" value="',
+        $name = htmlspecialchars($pack['name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        echo '<a class="language-link" data-lab-language="', $code, '" lang="', $code, '" href="',
             htmlspecialchars($url, ENT_QUOTES, 'UTF-8'), '"',
-            $code === $current ? ' selected' : '', '>',
-            htmlspecialchars($pack['name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), '</option>';
+            ' aria-label="', $name, '" title="', $name, '"',
+            $code === $current ? ' aria-current="page"' : '', '>',
+            strtoupper($code), '</a>';
     }
-    echo '</select>';
+    echo '</div>';
 }
 
 function labLocaleScript(): void
