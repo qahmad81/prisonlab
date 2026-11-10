@@ -2,7 +2,8 @@
 declare(strict_types=1);
 require_once __DIR__ . '/routes.php';
 
-const LAB_DEFAULT_LOCALE = 'ar';
+const LAB_DEFAULT_LOCALE = 'en';
+const LAB_SOURCE_LOCALE = 'ar';
 
 function labLanguageDirectory(): string
 {
@@ -34,8 +35,12 @@ function labLanguagePacks(): array
 function labRequestLocale(): string
 {
     $route = labParsePagePath(labRequestPath());
-    $requested = $route['locale'] ?? $_GET['lang'] ?? $_COOKIE['prisonlab_lang'] ?? LAB_DEFAULT_LOCALE;
-    return is_string($requested) && isset(labLanguagePacks()[$requested]) ? $requested : LAB_DEFAULT_LOCALE;
+    foreach ([$route['locale'] ?? null, $_GET['lang'] ?? null, $_COOKIE['prisonlab_lang'] ?? null] as $locale) {
+        if (is_string($locale) && isset(labLanguagePacks()[$locale])) {
+            return $locale;
+        }
+    }
+    return LAB_DEFAULT_LOCALE;
 }
 
 function labLocale(): string
@@ -45,8 +50,8 @@ function labLocale(): string
 
 function labUseSessionLocale(array $session): void
 {
-    $locale = $session['locale'] ?? LAB_DEFAULT_LOCALE;
-    $GLOBALS['lab_session_locale'] = is_string($locale) && isset(labLanguagePacks()[$locale]) ? $locale : LAB_DEFAULT_LOCALE;
+    $locale = $session['locale'] ?? LAB_SOURCE_LOCALE;
+    $GLOBALS['lab_session_locale'] = is_string($locale) && isset(labLanguagePacks()[$locale]) ? $locale : LAB_SOURCE_LOCALE;
 }
 
 function labSetLocaleCookie(?string $locale = null): void
@@ -70,7 +75,7 @@ function labLanguageFile(string $relative, ?string $locale = null): string
             return $path;
         }
     }
-    return $directory . '/' . LAB_DEFAULT_LOCALE . '/' . $relative;
+    return $directory . '/' . LAB_SOURCE_LOCALE . '/' . $relative;
 }
 
 function labLanguageJson(string $relative, ?string $locale = null): array
@@ -84,7 +89,7 @@ function labMessages(string $file, ?string $locale = null): array
 {
     static $catalogs = [];
     $locale ??= labLocale();
-    return $catalogs[$locale][$file] ??= labLanguageJson($file, $locale) + labLanguageJson($file, LAB_DEFAULT_LOCALE);
+    return $catalogs[$locale][$file] ??= labLanguageJson($file, $locale) + labLanguageJson($file, LAB_SOURCE_LOCALE);
 }
 
 function labInterpolate(string $text, array $values): string
@@ -116,7 +121,7 @@ function labPrompt(string $key, array $values = []): string
 function labLocaleAttributes(): string
 {
     $code = labRequestLocale();
-    $dir = labLanguagePacks()[$code]['dir'] ?? 'rtl';
+    $dir = labLanguagePacks()[$code]['dir'] ?? 'ltr';
     return 'lang="' . $code . '" dir="' . $dir . '"';
 }
 
@@ -127,15 +132,15 @@ function labLanguageMenu(): void
         return;
     }
     $current = labRequestLocale();
-    echo '<nav class="brand-links" aria-label="', labE('language.menu'), '">';
+    echo '<select class="language-select" aria-label="', labE('language.menu'), '" onchange="location.assign(this.value)">';
     foreach ($packs as $code => $pack) {
         $url = labPageUrl($GLOBALS['lab_page'] ?? 'home', $_GET, $code);
-        echo '<a data-lab-language="', $code, '" lang="', $code, '" dir="', $pack['dir'], '" href="',
+        echo '<option data-lab-language="', $code, '" lang="', $code, '" dir="', $pack['dir'], '" value="',
             htmlspecialchars($url, ENT_QUOTES, 'UTF-8'), '"',
-            $code === $current ? ' aria-current="true"' : '', '>',
-            htmlspecialchars($pack['name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), '</a>';
+            $code === $current ? ' selected' : '', '>',
+            htmlspecialchars($pack['name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), '</option>';
     }
-    echo '</nav>';
+    echo '</select>';
 }
 
 function labLocaleScript(): void

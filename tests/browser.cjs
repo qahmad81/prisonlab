@@ -23,12 +23,12 @@ if(!chrome && process.platform==='win32') {
         await page.waitForSelector('#public-context-heading h2');
         assert.equal(await page.locator('html').getAttribute('dir'),'ltr');
         assert.match(await page.locator('#public-context-heading h2').innerText(),/Leo Vance/);
-        const arabic=page.locator('[data-lab-language="ar"]');
-        assert.equal(new URL(await arabic.getAttribute('href'),base).pathname,'/ar/public/case_file/char_10_leo_vance');
-        await Promise.all([page.waitForURL('**/ar/public/case_file/char_10_leo_vance'),arabic.click()]);
+        const language=page.locator('select.language-select');
+        assert.equal(await language.inputValue(),'/en/public/case_file/char_10_leo_vance');
+        await Promise.all([page.waitForURL('**/ar/public/case_file/char_10_leo_vance'),language.selectOption('/ar/public/case_file/char_10_leo_vance')]);
         await page.waitForSelector('#public-context-heading h2');
         assert.equal(await page.locator('html').getAttribute('dir'),'rtl');
-        await Promise.all([page.waitForURL('**/en/public/case_file/char_10_leo_vance'),page.locator('[data-lab-language="en"]').click()]);
+        await Promise.all([page.waitForURL('**/en/public/case_file/char_10_leo_vance'),language.selectOption('/en/public/case_file/char_10_leo_vance')]);
         await page.waitForSelector('#public-context-heading h2');
         const startLink=page.locator('#public-context-heading a[href*="/en/home"]');
         await Promise.all([page.waitForURL('**/en/home?case_file=char_10_leo_vance.md'),startLink.click()]);
@@ -209,7 +209,7 @@ if(!chrome && process.platform==='win32') {
         await page.locator('.btn-archive-local').click();assert.equal(await page.locator('#archive-modal-grid .archive-card').count(),1);
         await page.locator('#archive-modal .modal-close-btn').click();
         const pub=await browser.newPage();pub.on('pageerror',e=>errors.push(e.message));
-        await pub.goto(base+'/public.php?session_id='+sid);
+        await pub.goto(base+'/public.php?lang=ar&session_id='+sid);
         await pub.waitForSelector('#session-reader-modal.active');
         assert.equal(await pub.locator('.duel-scores > div').count(),2);
         assert.equal(await pub.locator('.msg-face-portrait').count(),1);

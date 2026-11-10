@@ -37,9 +37,10 @@ class Client:
         return self.post({'ai':'ai_vs_ai_step','human':'send_message','reverse':'reverse_answer'}[s['interrogator_type']],session_id=s['session_id'],message='ما الدليل الذي تستند إليه في إنكارك؟',expected_turns=n,request_id=request_id or f'test_request_{n:04d}',headers=headers)
 
 def run(storage):
-    a,b=Client(),Client();data=a.init();b.init()
-    assert len(data['cases'])==16 and len(data['states'])==20
-    for query in ['', '?lang=ar', '?lang=unknown', '?lang[]=ar']:
+    a,b=Client(),Client()
+    with a.opener.open(BASE+'/') as page:
+        assert page.url==BASE+'/en/home' and '<html lang="en" dir="ltr">' in page.read().decode('utf-8')
+    for query in ['?lang=ar', '', '?lang=unknown', '?lang[]=ar']:
         with a.opener.open(BASE+'/'+query) as page:
             html=page.read().decode('utf-8')
         assert '<html lang="ar" dir="rtl">' in html
@@ -50,6 +51,8 @@ def run(storage):
         assert '<html lang="en" dir="ltr">' in page.read().decode('utf-8')
     with a.opener.open(BASE+'/ar/home') as page:
         assert '<html lang="ar" dir="rtl">' in page.read().decode('utf-8')
+    data=a.init();b.init()
+    assert len(data['cases'])==16 and len(data['states'])==20
     status,english=a.get('/api.php?action=init_data&lang=en')
     assert status==200 and english['cases'][0]['title']!=data['cases'][0]['title']
     assert english['cases'][0]['filename']==data['cases'][0]['filename']

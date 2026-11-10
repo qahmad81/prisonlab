@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /** Difficulty belongs to the case persona, never to a claim made in chat. */
 function labPrisonerCharacter(string $case):array {
-    $levels=labLanguageJson('data/personalities/prisoners.json', LAB_DEFAULT_LOCALE)['levels'];
+    $levels=labLanguageJson('data/personalities/prisoners.json', LAB_SOURCE_LOCALE)['levels'];
     if(!isset($levels[$case]))throw new RuntimeException(labT('prisoners.PrisonerCharacter.1'));
     $n=$levels[$case];
     if($n<=3) {

@@ -16,7 +16,7 @@ class Client:
     def login(self,alias='alice'):
         self.csrf=self.request('/api.php?action=init_data')[1]['csrf_token']
         if (ROOT/'lib/accounts.php').exists():
-            _,_,h=self.request('/auth.php?action=login');state=urllib.parse.parse_qs(urllib.parse.urlparse(h['Location']).query)['state'][0]
+            _,_,h=self.request('/auth.php?action=login&lang=ar');state=urllib.parse.parse_qs(urllib.parse.urlparse(h['Location']).query)['state'][0]
             assert self.request('/auth.php?action=callback&'+urllib.parse.urlencode({'state':state,'code':alias}))[0]==303
             self.csrf=self.request('/api.php?action=init_data')[1]['csrf_token']
     def post(self,action,key=None,**args):return self.request('/api.php',dict(action=action,**args),key)[:2]

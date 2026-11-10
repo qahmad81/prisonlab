@@ -1,6 +1,11 @@
 <?php
 require_once dirname(__DIR__).'/lib/lab.php';
 function check(bool $condition,string $message):void {if(!$condition)throw new RuntimeException($message);}
+check(labRequestLocale()==='en','first visit must use English');
+labUseSessionLocale([]);
+check(labLocale()==='ar','legacy conversations must keep Arabic prompts');
+unset($GLOBALS['lab_session_locale']);
+$_GET['lang']='ar';
 check(labParsePagePath('/ar/public/case_file/char_10_leo_vance')['params']===['case_file'=>'char_10_leo_vance.md'],'case slug must resolve to stable filename');
 check(labPageUrl('public',['model'=>'~z-ai/glm-flash-latest','view'=>'leaderboard','role'=>'prisoner'],'en')==='/en/public/model/~z-ai/glm-flash-latest?view=leaderboard&role=prisoner','model URL must preserve aliases and filters');
 check(labParsePagePath('/en/public/model/mistralai/mistral-small-2603%3Abatch')['params']['model']==='mistralai/mistral-small-2603:batch','batch model route must preserve its suffix');

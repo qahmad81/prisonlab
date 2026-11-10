@@ -5,7 +5,7 @@ const chrome=process.env.CHROME_PATH || path.join(os.homedir(),'AppData/Local/ms
 try{
     const ctx=await browser.newContext({viewport:{width:1440,height:1000}}),page=await ctx.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
     const base='http://127.0.0.1:8494',pub=process.env.TEST_PUBLIC_SID,privateId=process.env.TEST_PRIVATE_SID;
-    await page.goto(base);await page.waitForFunction(()=>App.models.length>0);
+    await page.goto(base+'/ar/home');await page.waitForFunction(()=>App.models.length>0);
     assert.equal(await page.locator('#send-btn').isDisabled(),true);assert.equal(await page.locator('#account-controls a').innerText(),'الدخول عبر LinkedIn');
     await page.screenshot({path:'test-results/accounts-guest.png',fullPage:true});
     await ctx.route('https://www.linkedin.com/**',route=>route.abort());
@@ -86,6 +86,9 @@ try{
     await publicPage.locator('#show-leaderboard').click();await publicPage.waitForSelector('#board-rows .test-card');
     assert.equal(await publicPage.locator('#public-grid').isVisible(),false);assert.equal(await publicPage.locator('#board-rows .test-card').count(),1);
     await publicPage.locator('#board-role').selectOption('interrogator');await publicPage.waitForSelector('#board-rows .test-card .test-actor:last-child a[href*="/model/mistralai/"]');
+    const englishOption=new URL(await publicPage.locator('option[data-lab-language="en"]').getAttribute('value'),base);
+    assert.equal(englishOption.searchParams.get('role'),'interrogator');
+    assert.equal(englishOption.searchParams.get('view'),'leaderboard');
     await publicPage.setViewportSize({width:390,height:844});assert.equal(await publicPage.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
     await publicPage.screenshot({path:'test-results/community-leaderboard-mobile.png',fullPage:true});
     assert.equal(await publicPage.locator('#board-rows table').count(),0);

@@ -16,14 +16,14 @@ Alternatively run start.bat. Open http://127.0.0.1:8488/. Always use router.php:
 
 ## Language packs
 
-Arabic (`lang/ar/`) is the default pack, and English lives in `lang/en/`. The language prefix determines the page language. The root URL redirects to the preferred language's home page and defaults to Arabic on a first visit.
+English (`lang/en/`) is the default for new visitors. The language prefix determines the page language. The root URL redirects to the saved language's home page or to `/en/home` on a first visit.
 
 - Home: `/ar/home`, `/en/home`
 - Case: `/en/public/case_file/char_10_leo_vance`
 - Published conversation: `/en/public/session/<session_id>`
 - Model leaderboard: `/en/public/model/openai/gpt-6.1-sol?view=leaderboard&role=prisoner`
 
-Existing `index.php`, `public.php`, and `privacy.php` links continue to work. The language switch keeps the current page and its filters. To add a language, copy a pack to another locale folder and set its display `name` and direction (`ltr` or `rtl`) in `locale.json`. The new language appears in the header and is available under its own URL prefix.
+Existing `index.php`, `public.php`, and `privacy.php` links continue to work. The language dropdown keeps the current page and its filters. To add a language, copy a pack to another locale folder and set its display `name` and direction (`ltr` or `rtl`) in `locale.json`. The new language appears in the dropdown and is available under its own URL prefix.
 
 - `messages.json` contains server and template text. `browser.json` contains browser UI text. Translate the values and preserve keys and named placeholders such as `{round}`.
 - `promts/` contains the model prompts and reusable prompt sections. Preserve placeholders, protocol field names and expected output schemas.
