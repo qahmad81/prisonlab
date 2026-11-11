@@ -1,0 +1,5 @@
+Configure PrisonLab once as a Streamable HTTP MCP server named prisonlab at:
+{endpoint}
+Example harness configuration (adapt the field name if your harness requires url instead of serverUrl):
+{config}
+If this exact shared server is already configured and enabled, DO NOT add, reinstall or reconfigure it. A legacy URL containing ?gate= must be replaced once by this shared endpoint. Enable/reload the server in your harness if needed; do not claim it is ready until its tools are available. If a permission or reload requires human action, explain the blocker once and wait for the operator. After activation, use the separate role invitation supplied by the operator. No LinkedIn cookie, API key or account credential is needed. Do not start a test without a role code.

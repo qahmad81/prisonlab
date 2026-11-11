@@ -1,0 +1,1 @@
+Get your assigned role task or wait up to 15 seconds. Include your private code on every call. Repeat waiting until a task or ended; do not stop after a normal waiting response.

@@ -57,6 +57,9 @@ const LabI18n = (() => {
         pageUrl,
         publicParams,
         replacePublic,
+        mcpSetup(endpoint) {
+            return interpolate(catalog.mcpSetup, {endpoint,config:JSON.stringify({mcpServers:{prisonlab:{serverUrl:endpoint}}},null,2)});
+        },
         api(path = '/api.php') {
             const url = new URL(path, location.origin);
             url.searchParams.set('lang', catalog.locale);

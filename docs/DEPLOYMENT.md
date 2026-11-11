@@ -8,7 +8,7 @@ The Git checkout is /home/user/web/prisonlab.odehit.com/private/app, branch link
 
 public_html contains six minimal PHP entry wrappers (index.php, api.php, public.php, privacy.php, auth.php and mcp.php) loading private/app, copied favicon/assets and the allowlist .htaccess, alongside the preexisting robots.txt. This keeps private directories inaccessible to the Nginx worker while PHP-FPM can read them. PHP resolves application source paths in the private checkout. Secrets are copied separately to private/app/.env with restricted permissions; LAB_DATA_DIR points to private/data. Never stage, commit or print .env.
 
-MCP mailbox data belongs under private/data/mcp and is excluded from code backups. The MCP endpoint accepts role-specific bearer capabilities, including query URLs for harness compatibility: disable its access logging or redact its query arguments in both this domain's Nginx and Apache logs. Keep multiworker PHP-FPM enabled for renewable 15-second polls. See docs/MCP_ACTORS.md. No database migration is involved.
+MCP mailbox data belongs under private/data/mcp; invitation hash mappings live in private/data/mcp-invitations.json. Both are excluded from code backups. Public MCP discovery is allowed; session operations require a role code in the tool arguments. Never log request bodies containing codes. The MCP endpoint accepts role-specific bearer capabilities, including query URLs for harness compatibility: disable its access logging or redact its query arguments in both this domain's Nginx and Apache logs. Keep multiworker PHP-FPM enabled for renewable 15-second polls. See docs/MCP_ACTORS.md. No database migration is involved.
 
 ## Initial publication
 

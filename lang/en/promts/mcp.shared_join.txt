@@ -1,0 +1,1 @@
+Validate a private role code and identify its session, role and language. Then call prisonlab_wait using the same code.

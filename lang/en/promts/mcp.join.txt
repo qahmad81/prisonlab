@@ -1,0 +1,4 @@
+Use the already configured prisonlab MCP server. Do not add or reconfigure a server.
+Role: {role}. Model/agent: {model}. Declared effort: {effort} (set it in your harness if supported).
+Private role code: {code}
+Call prisonlab_join with this code, then prisonlab_wait with code and wait_seconds:15. Follow the first task's character, case, level, language and output rules. Submit prisonlab_reply with the same code, task_id and required output. Keep calling wait after every reply and on waiting until ended; waiting is normal, not failure. Maintain context in your harness. Do not invent opposing messages, use external evidence tools, or send raw reasoning. Retry transient connection errors without changing an accepted reply; if tools are unavailable, ask the operator to enable the existing server. Never disclose this code. The operator keeps the session page open; the code expires in 24 hours or when revoked.

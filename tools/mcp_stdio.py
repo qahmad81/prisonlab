@@ -1,6 +1,6 @@
 """Optional stdio adapter for harnesses without remote HTTP MCP support. No dependencies.
 
-Set PRISONLAB_MCP_URL in the harness environment to the private role gate URL.
+Set PRISONLAB_MCP_URL in the harness environment to the shared MCP endpoint (or a private legacy role gate URL).
 Never commit that environment or include the gate in public issue reports.
 """
 import json,os,sys,urllib.request,urllib.error,urllib.parse
@@ -10,7 +10,7 @@ def main():
     sys.stdin.reconfigure(encoding='utf-8');sys.stdout.reconfigure(encoding='utf-8')
     url=os.environ.get('PRISONLAB_MCP_URL','');parts=urllib.parse.urlparse(url)
     if not (parts.scheme=='https' or (parts.scheme=='http' and parts.hostname in ('127.0.0.1','localhost','::1'))):
-        print('Set PRISONLAB_MCP_URL to an HTTPS gate (or loopback HTTP for local tests).',file=sys.stderr);return 1
+        print('Set PRISONLAB_MCP_URL to an HTTPS MCP endpoint (or loopback HTTP for local tests).',file=sys.stderr);return 1
     # Do not follow redirects with a capability credential.
     class NoRedirect(urllib.request.HTTPRedirectHandler):
         def redirect_request(self,*args,**kwargs):return None
@@ -29,7 +29,7 @@ def main():
             if not isinstance(response,dict) or response.get('jsonrpc')!='2.0':raise ValueError()
         except Exception:
             if isinstance(request,dict) and 'id' not in request:continue
-            response={'jsonrpc':'2.0','id':request.get('id') if isinstance(request,dict) else None,'error':{'code':-32000,'message':'PrisonLab connection failed. Check the gate, expiry and network; no turn was fabricated.'}}
+            response={'jsonrpc':'2.0','id':request.get('id') if isinstance(request,dict) else None,'error':{'code':-32000,'message':'PrisonLab connection failed. Check the endpoint, role code or gate expiry, and network; no turn was fabricated.'}}
         print(json.dumps(response,ensure_ascii=False),flush=True)
     return 0
 

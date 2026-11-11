@@ -15,6 +15,16 @@ function labMcpHandoff(array $actor, string $role, string $url): string
     ]);
 }
 
+function labMcpJoinHandoff(array $actor, string $role, string $code): string
+{
+    return labPrompt('mcp.join', [
+        'role' => labT($role === 'prisoner' ? 'roles.prisoner' : 'roles.interrogator'),
+        'model' => $actor['name'],
+        'effort' => $actor['effort'],
+        'code' => $code,
+    ]);
+}
+
 /** A gate is a revocable, session/role-scoped capability, never a funding credential. */
 class LabMcpWaiting extends RuntimeException {}
 
@@ -47,28 +57,80 @@ function labMcpLocked(string $sid,string $role,callable $fn):mixed {
     try{
         $g=is_file($path)?labRead($path):[];
         $auth=$GLOBALS['lab_mcp_authorization'] ?? null;
-        if($auth && $auth['sid']===$sid && $auth['role']===$role && (empty($g['gate_hash']) || !hash_equals($g['gate_hash'],$auth['hash']) || ($g['expires_at'] ?? 0)<time()))throw new RuntimeException(labT('mcp.McpLocked.2'));
+        $field=$auth['field'] ?? 'gate_hash';
+        if($auth && $auth['sid']===$sid && $auth['role']===$role && (empty($g[$field]) || !hash_equals($g[$field],$auth['hash']) || ($g['expires_at'] ?? 0)<time()))throw new RuntimeException(labT('mcp.McpLocked.2'));
         $before=$g;$result=$fn($g);if($g!==$before || !is_file($path)){labWrite($path,$g);@chmod($path,0600);}return $result;
     }
     finally{flock($lock,LOCK_UN);fclose($lock);}
 }
-function labMcpGate(array $s,string $role,bool $revoke=false):array {
-    if(empty($s['mcp_actors'][$role]) || !empty($s['is_ended']) || !empty($s['is_published']))throw new RuntimeException(labT('mcp.McpGate.1'));
-    $secret=bin2hex(random_bytes(32));
-    labMcpLocked($s['session_id'],$role,function(&$g)use($secret,$revoke){$g['gate_hash']=$revoke?'':hash('sha256',$secret);$g['expires_at']=time()+86400;$g['connected_at']=null;});
-    return ['gate'=>$revoke?null:$s['session_id'].'.'.$role.'.'.$secret,'expires_at'=>gmdate('c',time()+86400)];
+/** Registry locks are always acquired before mailbox locks when both are needed. */
+function labMcpInvitations(callable $fn,bool $write=false):mixed {
+    $path=$GLOBALS['lab_storage'].'/mcp-invitations.json';
+    $lock=fopen($path.'.lock','c');
+    if(!$lock || !flock($lock,$write?LOCK_EX:LOCK_SH))throw new RuntimeException(labT('mcp.invitation.unavailable'));
+    @chmod($path.'.lock',0600);
+    try {
+        $entries=is_file($path)?labRead($path):[];
+        $before=$entries;$result=$fn($entries);
+        if($write && $entries!==$before){
+            $mask=umask(0077);
+            try {labWrite($path,$entries);chmod($path,0600);}
+            finally {umask($mask);}
+        }
+        return $result;
+    }finally{flock($lock,LOCK_UN);fclose($lock);}
 }
+
+function labMcpIssueCapability(array $s,string $role,bool $revoke,bool $invitation):array {
+    if(empty($s['mcp_actors'][$role]) || !empty($s['is_ended']) || !empty($s['is_published']))throw new RuntimeException(labT('mcp.McpGate.1'));
+    $secret=$invitation?'PL-'.rtrim(strtr(base64_encode(random_bytes(18)),'+/','-_'),'='):bin2hex(random_bytes(32));
+    $hash=hash('sha256',$secret);$expires=time()+86400;$sid=$s['session_id'];
+    labMcpInvitations(function(&$entries)use($sid,$role,$hash,$expires,$revoke,$invitation){
+        foreach($entries as $key=>$entry)if(($entry['session_id']===$sid && $entry['role']===$role) || $entry['expires_at']<time())unset($entries[$key]);
+        labMcpLocked($sid,$role,function(&$g)use($hash,$expires,$revoke,$invitation){
+            $g['gate_hash']=!$revoke && !$invitation?$hash:'';
+            $g['join_hash']=!$revoke && $invitation?$hash:'';
+            $g['expires_at']=$expires;$g['connected_at']=null;
+        });
+        if(!$revoke && $invitation)$entries[$hash]=['session_id'=>$sid,'role'=>$role,'expires_at'=>$expires];
+    },true);
+    return ['secret'=>$revoke?null:$secret,'expires_at'=>gmdate('c',$expires)];
+}
+
+function labMcpGate(array $s,string $role,bool $revoke=false):array {
+    $capability=labMcpIssueCapability($s,$role,$revoke,false);
+    return ['gate'=>$capability['secret']===null?null:$s['session_id'].'.'.$role.'.'.$capability['secret'],'expires_at'=>$capability['expires_at']];
+}
+
+function labMcpInvitation(array $s,string $role,bool $revoke=false):array {
+    $capability=labMcpIssueCapability($s,$role,$revoke,true);
+    return ['code'=>$capability['secret'],'expires_at'=>$capability['expires_at']];
+}
+
 function labMcpAuthorize(string $token):array {
     if(!preg_match('/^(session_[a-zA-Z0-9_]+)\.(prisoner|interrogator)\.([a-f0-9]{64})$/D',$token,$m))throw new RuntimeException(labT('mcp.McpAuthorize.1'));
-    [$all,$sid,$role,$secret]=$m;$path=$GLOBALS['lab_storage'].'/'.$sid.'.json';
+    return labMcpAuthorizeCapability($m[1],$m[2],hash('sha256',$m[3]),'gate_hash');
+}
+
+function labMcpAuthorizeCode(string $code):array {
+    if(!preg_match('/^PL-[a-zA-Z0-9_-]{24}$/D',$code))throw new RuntimeException(labT('mcp.invitation.invalid'));
+    $hash=hash('sha256',$code);
+    $entry=labMcpInvitations(fn($entries)=>$entries[$hash] ?? null);
+    if(!$entry || $entry['expires_at']<time())throw new RuntimeException(labT('mcp.invitation.invalid'));
+    return labMcpAuthorizeCapability($entry['session_id'],$entry['role'],$hash,'join_hash');
+}
+
+function labMcpAuthorizeCapability(string $sid,string $role,string $hash,string $field):array {
+    labMcpPath($sid,$role);
+    $path=$GLOBALS['lab_storage'].'/'.$sid.'.json';
     if(!is_file($path))throw new RuntimeException(labT('mcp.McpAuthorize.2'));
     $s=labRead($path);
     if(empty($s['mcp_actors'][$role]) || !empty($s['is_published']))throw new RuntimeException(labT('mcp.McpAuthorize.3'));
-    labMcpLocked($sid,$role,function(&$g)use($secret){
-        if(empty($g['gate_hash']) || !hash_equals($g['gate_hash'],hash('sha256',$secret)) || ($g['expires_at'] ?? 0)<time())throw new RuntimeException(labT('mcp.McpAuthorize.4'));
+    labMcpLocked($sid,$role,function(&$g)use($hash,$field){
+        if(empty($g[$field]) || !hash_equals($g[$field],$hash) || ($g['expires_at'] ?? 0)<time())throw new RuntimeException(labT('mcp.McpAuthorize.4'));
         if(time()-strtotime($g['connected_at'] ?? '1970-01-01')>=10)$g['connected_at']=gmdate('c');
     });
-    $GLOBALS['lab_mcp_authorization']=['sid'=>$sid,'role'=>$role,'hash'=>hash('sha256',$secret)];
+    $GLOBALS['lab_mcp_authorization']=['sid'=>$sid,'role'=>$role,'hash'=>$hash,'field'=>$field];
     return [$s,$role];
 }
 function labMcpChat(array &$s,string $role,array $messages):string {
@@ -134,14 +196,18 @@ function labMcpReply(array $s,string $role,array $args):array {
     });
 }
 function labMcpDelete(array $s):void {
-    foreach(array_keys($s['mcp_actors'] ?? []) as $role)labMcpLocked($s['session_id'],$role,function(&$g){$g=[];});
-    foreach(array_keys($s['mcp_actors'] ?? []) as $role){$p=labMcpPath($s['session_id'],$role);if(is_file($p))unlink($p);}
+    if(empty($s['mcp_actors']))return;
+    labMcpInvitations(function(&$entries)use($s){
+        foreach($entries as $hash=>$entry)if($entry['session_id']===$s['session_id'])unset($entries[$hash]);
+        foreach(array_keys($s['mcp_actors'] ?? []) as $role)labMcpLocked($s['session_id'],$role,function(&$g){$g=[];});
+        foreach(array_keys($s['mcp_actors'] ?? []) as $role){$p=labMcpPath($s['session_id'],$role);if(is_file($p))unlink($p);}
+    },true);
 }
 function labMcpStatus(array $s):array {
     $out=[];
     foreach(array_keys($s['mcp_actors'] ?? []) as $role){
         $p=labMcpPath($s['session_id'],$role);$g=is_file($p)?labRead($p):[];
-        $out[$role]=['active'=>!empty($g['gate_hash']) && ($g['expires_at'] ?? 0)>time(),'expires_at'=>$g['expires_at'] ?? null,
+        $out[$role]=['active'=>(!empty($g['gate_hash']) || !empty($g['join_hash'])) && ($g['expires_at'] ?? 0)>time(),'invitation'=>!empty($g['join_hash']),'expires_at'=>$g['expires_at'] ?? null,
             'connected_at'=>$g['connected_at'] ?? null,'task_state'=>empty($g['task'])?'not_requested':(!empty($g['task']['consumed'])?'processed':(isset($g['task']['response'])?'reply_received':'waiting_agent'))];
     }
     return $out;

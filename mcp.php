@@ -13,8 +13,8 @@ try{
     if($origin!=='' && rtrim($origin,'/')!==rtrim($base,'/'))mcpSend(['error'=>labT('mcp.mcpSend.1')],403);
     $token=trim($_GET['gate'] ?? '');
     if(preg_match('/^Bearer (.+)$/D',$_SERVER['HTTP_AUTHORIZATION'] ?? '',$bearer))$token=$bearer[1];
-    [$s,$role]=labMcpAuthorize($token);
-    labUseSessionLocale($s);
+    $legacy=$token!=='';
+    if($legacy){[$s,$role]=labMcpAuthorize($token);labUseSessionLocale($s);}
     if($_SERVER['REQUEST_METHOD']!=='POST'){header('Allow: POST');mcpSend(['error'=>labT('mcp.mcpSend.2')],405);}
     if(!str_contains($_SERVER['CONTENT_TYPE'] ?? '','application/json'))mcpSend(['error'=>labT('mcp.mcpSend.3')],415);
     $raw=file_get_contents('php://input',false,null,0,65537);if(strlen($raw)>65536)mcpSend(['error'=>labT('mcp.mcpSend.4')],413);
@@ -27,20 +27,32 @@ try{
     if($method==='initialize'){
         $version=$params['protocolVersion'] ?? '2025-11-25';
         if(!in_array($version,['2025-03-26','2025-06-18','2025-11-25'],true))$version='2025-11-25';
-        $result=['protocolVersion'=>$version,'capabilities'=>['tools'=>new stdClass()],'serverInfo'=>['name'=>'PrisonLab','version'=>'1.0.0'],
-            'instructions'=>labPrompt('mcp.initialize', ['role' => $role === 'prisoner' ? labT('roles.prisoner') : labT('roles.interrogator')])];
+        $result=['protocolVersion'=>$version,'capabilities'=>['tools'=>new stdClass()],'serverInfo'=>['name'=>'PrisonLab','version'=>'1.1.0'],
+            'instructions'=>$legacy?labPrompt('mcp.initialize', ['role' => $role === 'prisoner' ? labT('roles.prisoner') : labT('roles.interrogator')]):labPrompt('mcp.shared_initialize')];
     }elseif($method==='ping')$result=new stdClass();
-    elseif($method==='tools/list')$result=['tools'=>[
-        ['name'=>'prisonlab_wait','description'=>labPrompt('mcp.mcpSend.13'),'inputSchema'=>['type'=>'object','properties'=>['wait_seconds'=>['type'=>'integer','minimum'=>0,'maximum'=>15]],'additionalProperties'=>false]],
-        ['name'=>'prisonlab_reply','description'=>labPrompt('mcp.mcpSend.14'),'inputSchema'=>['type'=>'object','properties'=>['task_id'=>['type'=>'string'],'output'=>['type'=>'object','properties'=>['question'=>['type'=>'string'],'reply'=>['type'=>'string'],'expression'=>['type'=>'string'],'state_id'=>['type'=>'string'],'inner_thought'=>['type'=>'string']],'additionalProperties'=>false]],'required'=>['task_id','output'],'additionalProperties'=>false]]
-    ]];
+    elseif($method==='tools/list'){
+        $code=$legacy?[]:['code'=>['type'=>'string','minLength'=>27,'maxLength'=>27,'description'=>labT('mcp.invitation.argument')]];
+        $tools=[
+            ['name'=>'prisonlab_wait','description'=>labPrompt($legacy?'mcp.mcpSend.13':'mcp.shared_wait'),'inputSchema'=>['type'=>'object','properties'=>$code+['wait_seconds'=>['type'=>'integer','minimum'=>0,'maximum'=>15]],'required'=>array_keys($code),'additionalProperties'=>false]],
+            ['name'=>'prisonlab_reply','description'=>labPrompt($legacy?'mcp.mcpSend.14':'mcp.shared_reply'),'inputSchema'=>['type'=>'object','properties'=>$code+['task_id'=>['type'=>'string'],'output'=>['type'=>'object','properties'=>['question'=>['type'=>'string'],'reply'=>['type'=>'string'],'expression'=>['type'=>'string'],'state_id'=>['type'=>'string'],'inner_thought'=>['type'=>'string']],'additionalProperties'=>false]],'required'=>array_merge(array_keys($code),['task_id','output']),'additionalProperties'=>false]]
+        ];
+        if(!$legacy)array_unshift($tools,['name'=>'prisonlab_join','description'=>labPrompt('mcp.shared_join'),'inputSchema'=>['type'=>'object','properties'=>$code,'required'=>['code'],'additionalProperties'=>false]]);
+        $result=['tools'=>$tools];
+    }
     elseif($method==='tools/call'){
         $args=$params['arguments'] ?? [];if(!is_array($args))throw new InvalidArgumentException(labT('mcp.mcpSend.15'));
         try{
-            if(($params['name'] ?? '')==='prisonlab_wait'){
+            if(!$legacy){
+                $joinCode=$args['code'] ?? null;
+                if(!is_string($joinCode))throw new RuntimeException(labT('mcp.invitation.invalid'));
+                [$s,$role]=labMcpAuthorizeCode($joinCode);labUseSessionLocale($s);
+            }
+            if(($params['name'] ?? '')==='prisonlab_join' && !$legacy){
+                $data=['status'=>'joined','session_id'=>$s['session_id'],'role'=>$role,'locale'=>labLocale(),'instruction'=>labPrompt('mcp.joined')];
+            }elseif(($params['name'] ?? '')==='prisonlab_wait'){
                 $wait=$args['wait_seconds'] ?? 15;if(!is_int($wait) || $wait<0 || $wait>15)throw new RuntimeException(labT('mcp.mcpSend.16'));
                 $deadline=microtime(true)+$wait;
-                do{[$s,$role]=labMcpAuthorize($token);$data=labMcpTask($s,$role);if($data['status']!=='waiting' || microtime(true)>=$deadline)break;usleep(250000);}while(true);
+                do{[$s,$role]=$legacy?labMcpAuthorize($token):labMcpAuthorizeCode($joinCode);$data=labMcpTask($s,$role);if($data['status']!=='waiting' || microtime(true)>=$deadline)break;usleep(250000);}while(true);
             }elseif(($params['name'] ?? '')==='prisonlab_reply')$data=labMcpReply($s,$role,$args);
             else throw new RuntimeException(labT('mcp.mcpSend.17'));
             $result=['content'=>[['type'=>'text','text'=>labJson($data)]],'isError'=>false];

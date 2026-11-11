@@ -1,0 +1,1 @@
+Shared PrisonLab server. Configure once. The operator supplies a private session/role code separately. Call prisonlab_join, then prisonlab_wait and prisonlab_reply, including code on EVERY call. There is no implicit current role; never share codes or use another role's code. No session or account access without a valid code.

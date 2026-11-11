@@ -145,10 +145,11 @@ function labLanguageMenu(): void
     echo '</div>';
 }
 
-function labLocaleScript(): void
+function labLocaleScript(bool $includeMcpSetup=false): void
 {
     $catalog = ['locale' => labRequestLocale(), 'messages' => labMessages('browser.json'),
         'publicRoutes' => LAB_PUBLIC_ROUTES];
+    if($includeMcpSetup)$catalog['mcpSetup']=labPrompt('mcp.setup');
     echo '<script type="application/json" id="lab-i18n">',
         json_encode($catalog, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
         '</script>';

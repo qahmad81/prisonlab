@@ -232,7 +232,7 @@ try {
         if($owns){$probe=fopen($path.'.lock','c');if($probe){$processing=!flock($probe,LOCK_EX|LOCK_NB);if(!$processing)flock($probe,LOCK_UN);fclose($probe);}}
         respond(['ok'=>true,'processing'=>$processing,'session'=>publicSession($s,$owner)]);
     }
-    if (!in_array($action,['mcp_gate','send_message','ai_vs_ai_step','reverse_question','reverse_answer','retry_confession','evaluate_session','publish_session','submit_review','compact_now','delete_session'],true))
+    if (!in_array($action,['mcp_gate','mcp_invitation','send_message','ai_vs_ai_step','reverse_question','reverse_answer','retry_confession','evaluate_session','publish_session','submit_review','compact_now','delete_session'],true))
         respond(['ok'=>false,'error'=>labT('api.summary.26')],404);
     $lock = fopen($path . '.lock', 'c');
     if (!$lock || !flock($lock, LOCK_EX | LOCK_NB)) {
@@ -243,6 +243,13 @@ try {
     try {
         $s = labRead($path);
         if (!hash_equals($s['owner_id'] ?? '', $owner)) respond(['ok'=>false,'error'=>labT('api.summary.29')],403);
+        if($action==='mcp_invitation'){
+            $role=(string)($body['role'] ?? '');
+            $invitation=labMcpInvitation($s,$role,!empty($body['revoke']));
+            labUseSessionLocale($s);
+            respond(['ok'=>true,'code'=>$invitation['code'],'expires_at'=>$invitation['expires_at'],
+                'handoff'=>$invitation['code']===null?null:labMcpJoinHandoff($s['mcp_actors'][$role],$role,$invitation['code'])]);
+        }
         if($action==='mcp_gate'){
             $role=(string)($body['role'] ?? '');
             $gate=labMcpGate($s,$role,!empty($body['revoke']));

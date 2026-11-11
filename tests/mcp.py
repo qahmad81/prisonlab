@@ -115,6 +115,55 @@ def run(storage):
     assert 'mcp_status' not in pub and tokens['prisoner'].split('.')[-1] not in json.dumps(pub)
     assert owner.post('delete_session',session_id=sid,confirm=sid)[0]==200
     assert rpc(tokens['prisoner'],'ping')[0]==401 and not list((storage/'mcp').glob(sid+'*.json'))
+    # Shared server discovery is public; every role operation needs an explicit code.
+    def shared(method,params=None):return rpc('',method,params)
+    public_init=shared('initialize')[1]['result'];assert 'session_id' not in json.dumps(public_init)
+    shared_tools=shared('tools/list')[1]['result']['tools']
+    assert {t['name'] for t in shared_tools}=={'prisonlab_join','prisonlab_wait','prisonlab_reply'}
+    assert all('code' in t['inputSchema']['required'] for t in shared_tools)
+    def call(code,name='prisonlab_join',**args):
+        return shared('tools/call',{'name':name,'arguments':dict(code=code,**args)})[1]['result']
+    assert call('invalid')['isError']
+    a=start('ai',actors);b=start('human',{'prisoner':actors['prisoner']})
+    def invitation(session,role):
+        status,data=owner.post('mcp_invitation',session_id=session['session_id'],role=role)
+        assert status==200 and len(data['code'])==27
+        assert data['code'] in data['handoff'] and '/mcp.php' not in data['handoff']
+        return data['code']
+    assert other.post('mcp_invitation',session_id=a['session_id'],role='prisoner')[0]==403
+    codes={r:invitation(a,r) for r in actors};bc=invitation(b,'prisoner')
+    import hashlib
+    registry=json.loads((storage/'mcp-invitations.json').read_text())
+    assert all(hashlib.sha256(c.encode()).hexdigest() in registry for c in [*codes.values(),bc])
+    assert all(c not in (storage/'mcp-invitations.json').read_text() for c in codes.values())
+    for r,c in codes.items():
+        joined=json.loads(call(c)['content'][0]['text']);assert joined['role']==r and joined['session_id']==a['session_id'] and joined['locale']=='ar'
+    assert json.loads(call(bc)['content'][0]['text'])['session_id']==b['session_id']
+    assert shared('tools/call',{'name':'prisonlab_wait','arguments':{'wait_seconds':0}})[1]['result']['isError'],'No implicit role after join'
+    arid=uuid.uuid4().hex;assert step(a,rid=arid)[1]['mcp_wait']
+    it=json.loads(call(codes['interrogator'],'prisonlab_wait',wait_seconds=0)['content'][0]['text'])
+    assert it['status']=='task'
+    assert call(codes['prisoner'],'prisonlab_reply',task_id=it['task']['id'],output={'reply':'wrong role'})['isError']
+    assert not call(codes['interrogator'],'prisonlab_reply',task_id=it['task']['id'],output={'question':'كيف تفسر التناقض؟','inner_thought':'SHARED_PRIVATE_SENTINEL'})['isError']
+    assert step(a,rid=arid)[1]['mcp_wait']
+    pt=json.loads(call(codes['prisoner'],'prisonlab_wait',wait_seconds=0)['content'][0]['text'])
+    assert pt['status']=='task' and 'SHARED_PRIVATE_SENTINEL' not in json.dumps(pt)
+    old=codes['prisoner'];codes['prisoner']=invitation(a,'prisoner');assert call(old)['isError']
+    assert json.loads(call(codes['prisoner'],'prisonlab_wait',wait_seconds=0)['content'][0]['text'])['task']['id']==pt['task']['id']
+    assert not call(codes['prisoner'],'prisonlab_reply',task_id=pt['task']['id'],output={'reply':'وجود الملف لا يثبت تسريبه.'})['isError']
+    assert step(a,rid=arid)[1]['session']['turns_count']==1
+    old=codes['interrogator'];legacy=gate(a,'interrogator');assert call(old)['isError']
+    codes['interrogator']=invitation(a,'interrogator');assert rpc(legacy,'ping')[0]==401
+    assert owner.post('mcp_invitation',session_id=a['session_id'],role='interrogator',revoke=True)[0]==200
+    assert call(codes['interrogator'])['isError']
+    # Expiry is enforced by both registry and mailbox.
+    path=storage/'mcp-invitations.json';registry=json.loads(path.read_text());h=hashlib.sha256(bc.encode()).hexdigest();registry[h]['expires_at']=1;path.write_text(json.dumps(registry))
+    assert call(bc)['isError']
+    for session in [a,b]:
+        assert owner.post('delete_session',session_id=session['session_id'],confirm=session['session_id'])[0]==200
+        assert not list((storage/'mcp').glob(session['session_id']+'*.json'))
+    assert not any(v['session_id'] in [a['session_id'],b['session_id']] for v in (json.loads(path.read_text()) or {}).values())
+    assert call(codes['prisoner'])['isError']
     # Human investigator / MCP prisoner.
     s=start('human',{'prisoner':actors['prisoner']});tokens={'prisoner':gate(s,'prisoner')};rid=uuid.uuid4().hex
     assert owner.post('mcp_gate',session_id=s['session_id'],role='prisoner',revoke=True)[0]==200
