@@ -33,7 +33,7 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
 <main class="privacy-wrap">
     <nav class="privacy-nav" aria-label="<?= labE('privacy.html.2') ?>">
         <div class="brand-title-row"><span class="privacy-brand"><img src="/assets/branding/prisonlab-128.png" width="44" height="44" alt="" style="vertical-align:middle;border-radius:10px;margin-inline-end:8px">PrisonLab</span><?php labLanguageMenu(); ?></div>
-        <div><a href="<?= labPageHref('home') ?>"><?= labE('privacy.html.3') ?></a> · <a href="<?= labPageHref('public') ?>"><?= labE('privacy.html.4') ?></a></div>
+        <div><a href="<?= labPageHref('home') ?>"><?= labE('privacy.html.3') ?></a> · <a href="<?= labPageHref('public') ?>"><?= labE('privacy.html.4') ?></a> · <a class="repo-link" href="https://github.com/qahmad81/prisonlab" target="_blank" rel="noopener noreferrer" aria-label="<?= labE('repository.link') ?>" title="<?= labE('repository.link') ?>"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-14-2 18"/></svg><span dir="ltr">GitHub</span></a></div>
     </nav>
     <h1><?= labE('privacy.html.5') ?></h1>
     <p class="privacy-meta"><?= labE('privacy.html.6') ?></p>

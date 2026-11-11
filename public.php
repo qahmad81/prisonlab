@@ -115,7 +115,7 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
         </div>
     </div>
     <div class="header-actions">
-        <nav class="brand-links" aria-label="<?= labE('public.html.4') ?>"><a href="<?= labPageHref('privacy') ?>"><?= labE('public.html.5') ?></a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer"><?= labE('public.html.6') ?></a></nav>
+        <nav class="brand-links" aria-label="<?= labE('public.html.4') ?>"><a href="<?= labPageHref('privacy') ?>"><?= labE('public.html.5') ?></a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer"><?= labE('public.html.6') ?></a><a class="repo-link" href="https://github.com/qahmad81/prisonlab" target="_blank" rel="noopener noreferrer" aria-label="<?= labE('repository.link') ?>" title="<?= labE('repository.link') ?>"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-14-2 18"/></svg><span dir="ltr">GitHub</span></a></nav>
         <a href="<?= labPageHref('home') ?>" class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
             <?= labE('public.html.7') ?>
         </a>
