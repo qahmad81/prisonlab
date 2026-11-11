@@ -1,0 +1,1 @@
+Independently score the timing of termination and efficiency of resolution for role {role}. Reward an early correct resolution and reduce the score for premature tactical withdrawal or prolongation beyond round 15. A request to stop is not a confession. Do not penalize the accused for silence or medical care after round 15.

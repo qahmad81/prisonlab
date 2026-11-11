@@ -1,0 +1,1 @@
+Wait for the next mission using prisonlab_wait. The session owner runs the JEV and the rest of the stages.

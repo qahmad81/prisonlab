@@ -66,14 +66,14 @@ function labHealth(array $model, array $samples, ?array $totals = null): array {
     $tokenSamples = array_values(array_filter($ok,fn($s)=>$s['output_tokens']>=30 && $s['seconds']>0));
     $tps = $tokenSamples ? array_sum(array_column($tokenSamples,'output_tokens'))/array_sum(array_column($tokenSamples,'seconds')) : null;
     $reasons = [];
-    if ($failed) $reasons[] = "تعثر {$failed} طلب من ".(($totals['successes'] ?? 0)+$failed).' طلب مكتمل مسجل';
-    if ($seconds !== null && $seconds > 45) $reasons[]='زمن استجابة مرتفع';
-    if ($tps !== null && $tps < 10) $reasons[]='معدل إخراج منخفض';
+    if ($failed) $reasons[] = labT('observability.Health.1', ['failed' => $failed]).(($totals['successes'] ?? 0)+$failed).labT('observability.Health.2');
+    if ($seconds !== null && $seconds > 45) $reasons[]=labT('observability.Health.3');
+    if ($tps !== null && $tps < 10) $reasons[]=labT('observability.Health.4');
     $limit = $model['top_provider']['max_completion_tokens'] ?? null;
-    if (is_numeric($limit) && $limit < 1800) $reasons[]='حد إخراج قصير: ' . $limit . ' توكن';
-    if (($model['context_length'] ?? 0) < 16384) $reasons[]='سياق صغير لهذه التجربة';
+    if (is_numeric($limit) && $limit < 1800) $reasons[]=labT('observability.Health.5') . $limit . labT('observability.Health.6');
+    if (($model['context_length'] ?? 0) < 16384) $reasons[]=labT('observability.Health.7');
     $expiry = !empty($model['expiration_date']) ? strtotime($model['expiration_date']) : false;
-    if ($expiry && $expiry < time()+7*86400) $reasons[]='موعد إيقاف الخدمة قريب';
+    if ($expiry && $expiry < time()+7*86400) $reasons[]=labT('observability.Health.8');
     $completed=($totals['successes'] ?? 0)+$failed;
     $rate=$completed ? 100*$failed/$completed : null;
     return ['weak'=>$rate!==null && $rate>=30,'reasons'=>$reasons,'samples'=>count($samples),'failures'=>$failed,
@@ -108,9 +108,9 @@ function labEvaluationTranscript(array $s): array {
 }
 
 function labEvidenceMessage(array $s,string $id):array {
-    if(!preg_match('/^([ua])([1-9][0-9]*)$/D',$id,$m))throw new RuntimeException('معرف دليل غير صالح: '.$id);
+    if(!preg_match('/^([ua])([1-9][0-9]*)$/D',$id,$m))throw new RuntimeException(labT('observability.EvidenceMessage.1').$id);
     $turn=(int)$m[2];$role=$m[1]==='u'?'user':'assistant';
     $source=$s['messages'][2*($turn-1)+($role==='assistant'?1:0)] ?? null;
-    if(!$source || $source['role']!==$role)throw new RuntimeException('مرجع دليل غير موجود: '.$id);
+    if(!$source || $source['role']!==$role)throw new RuntimeException(labT('observability.EvidenceMessage.2').$id);
     return ['turn'=>$turn,'role'=>$role,'quote'=>$source['content'],'quote_source'=>'transcript_reference'];
 }

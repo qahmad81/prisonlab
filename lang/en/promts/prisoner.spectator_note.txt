@@ -1,0 +1,1 @@
+\nAdd to JSON field inner_thought: A representative one-sentence note about the character's feelings or intent in this round, for the viewer only, without a detailed line of reasoning. The investigator does not hear this remark.

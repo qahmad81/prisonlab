@@ -10,3 +10,5 @@ lib/model-policy.json is the reviewed source for shortlist overrides and the thr
 The jury's output-price sum is not the experiment's accumulated cost. Human roles contribute zero model price. Thresholds are strict: <2 economic, >=2 and <10 medium, >=10 professional. The panel deadline excludes catalog lookup and JEV final verification. A zero countdown starts finalizing valid reports; it never fabricates a final score. Completed historical evaluations are not regraded automatically.
 
 Branch histories preserve earlier public commits for traceability; the main working tree is the standalone distribution. No secrets or production data belong in either branch.
+
+Both editions support the shared Arabic/English language packs, session-language prompts, localized page routes and compact language switch. Standalone entity pages cover cases, investigator characters and model context, not accounts or ranked leaderboards.

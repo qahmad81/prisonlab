@@ -5,7 +5,7 @@ const chrome=process.env.CHROME_PATH || path.join(os.homedir(),'AppData/Local/ms
 try{
  const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>sessionStorage.setItem('user_openrouter_api_key','sk-or-test'));
- const base='http://127.0.0.1:8492';await page.goto(base);await page.waitForFunction(()=>App.models.length>0);
+ const base='http://127.0.0.1:8492';await page.goto(base+'/ar/home');await page.waitForFunction(()=>App.models.length>0);
  await page.locator('#mode-btn-ai').click();
  async function configure(role,name,effort){
    await page.locator(role==='prisoner'?'#selected-model-card':'#selected-interrogator-card').click();

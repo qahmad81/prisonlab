@@ -1,0 +1,1 @@
+The prisoner's human simulation of the psychological state imposed by JEV each round. Compare sense_directive, sense_metrics, and jev_target_state with tone, behavior, and strategy. Do not reward the state name or numbers alone.

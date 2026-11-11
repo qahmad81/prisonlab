@@ -33,9 +33,9 @@ const App = {
 
     async fetchData(url,options={},timeoutMs=30000) {
         const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
-        try{const response=await fetch(url,{...options,signal:controller.signal});const data=await response.json();
-            if(!data.ok)throw new Error(data.error || 'تعذر تحميل البيانات؛ أعد المحاولة.');return data;
-        }catch(e){if(e.name==='AbortError')throw new Error('انتهت مهلة الاتصال بالخادم. أعد تحميل الصفحة أو حاول مجددًا.');throw e;}
+        try{const response=await fetch(LabI18n.api(url),{...options,signal:controller.signal});const data=await response.json();
+            if(!data.ok)throw new Error(data.error || LabI18n.t("app.fetchData.1"));return data;
+        }catch(e){if(e.name==='AbortError')throw new Error(LabI18n.t("standalone.app.fetchData.2"));throw e;}
         finally{clearTimeout(timer);}
     },
 
@@ -98,6 +98,10 @@ const App = {
         this.renderSelectedModelSummary();
         this.setInterrogationMode(this.interrogationMode);
         this.renderLogsList();
+        const linkedCase=new URL(location.href).searchParams.get('case_file');
+        if(linkedCase && this.cases.some(c=>c.filename===linkedCase)){
+            this.selectedCaseFilename=linkedCase;this.renderSelectedCaseSummary();
+        }
         this.bindEvents();
         this.updateControls();
         this.renderAccount();if(this.userApiKey)this.refreshKeyBalance();
@@ -119,7 +123,7 @@ const App = {
         });
 
         const modelDialog=document.getElementById('model-modal'),modelGrid=document.getElementById('modal-models-grid');
-        modelGrid.tabIndex=0;modelGrid.setAttribute('aria-label','قائمة النماذج القابلة للتمرير');
+        modelGrid.tabIndex=0;modelGrid.setAttribute('aria-label',LabI18n.t("app.bindEvents.1"));
         modelDialog.addEventListener('wheel',e=>{
             if(!modelDialog.classList.contains('active') || e.ctrlKey || !e.deltaY)return;
             let target=e.target.closest('.model-modal-toolbar,.modal-models-grid') || modelGrid;
@@ -207,7 +211,7 @@ const App = {
         });
 
         if (filtered.length === 0) {
-            container.innerHTML = '<div style="color:var(--text-muted);padding:20px;text-align:center;grid-column:1/-1;">لا توجد قضايا مطابقة للبحث.</div>';
+            container.innerHTML = `<div style="color:var(--text-muted);padding:20px;text-align:center;grid-column:1/-1;">${LabI18n.html("app.renderCaseCards.1")}</div>`;
             return;
         }
 
@@ -218,14 +222,14 @@ const App = {
             card.dataset.filename = c.filename;
 
             const stateId = c.initial_state || 'calm';
-            const imgPath = `assets/images/${c.character_slug || c.gender}/${stateId}.jpg`;
+            const imgPath = `/assets/images/${c.character_slug || c.gender}/${stateId}.jpg`;
 
             card.innerHTML = `
-                <img src="${imgPath}" class="case-card-avatar" alt="${this.escapeHtml(c.character_name)}" onerror="this.src='assets/images/char_1/calm.jpg'">
+                <img src="${imgPath}" class="case-card-avatar" alt="${this.escapeHtml(c.character_name)}" onerror="this.src='/assets/images/char_1/calm.jpg'">
                 <div class="case-card-info">
                     <div class="case-card-name">${this.escapeHtml(c.character_name)}</div>
                     <div class="case-card-title">${this.escapeHtml(c.title)}</div>
-                    <span class="case-card-state">تبدأ بـ: ${this.escapeHtml(c.initial_state_ar || stateId)}</span>
+                    <span class="case-card-state">${LabI18n.html("app.renderCaseCards.2")} ${this.escapeHtml(c.initial_state_ar || stateId)}</span>
                 </div>
             `;
             card.addEventListener('click', () => this.selectModalCase(c.filename));
@@ -238,16 +242,16 @@ const App = {
         if (!c) return;
 
         const stateId = c.initial_state || 'calm';
-        const stateAr = c.initial_state_ar || 'هادئ';
-        const imgPath = `assets/images/${c.character_slug || c.gender}/${stateId}.jpg`;
+        const stateAr = c.initial_state_ar || LabI18n.t("session-view.emotionDescription.2");
+        const imgPath = `/assets/images/${c.character_slug || c.gender}/${stateId}.jpg`;
 
         const portraitImg = document.getElementById('modal-detail-portrait');
         portraitImg.src = imgPath;
-        portraitImg.onerror = () => { portraitImg.src = 'assets/images/char_1/calm.jpg'; };
+        portraitImg.onerror = () => { portraitImg.src = '/assets/images/char_1/calm.jpg'; };
 
         document.getElementById('modal-detail-name').textContent = c.character_name || c.title;
-        document.getElementById('modal-detail-sub').textContent = c.accusation ? `التهمة: ${c.accusation}` : c.title;
-        document.getElementById('modal-detail-state-pill').textContent = `الحالة الابتدائية المحددة: ${stateAr} (${stateId})`;
+        document.getElementById('modal-detail-sub').textContent = c.accusation ? LabI18n.t("app.renderCasePreviewDetail.2", {"accusation": c.accusation}) : c.title;
+        document.getElementById('modal-detail-state-pill').textContent = LabI18n.t("app.renderCasePreviewDetail.3", {"stateAr": stateAr, "stateId": stateId});
         document.getElementById('modal-detail-content').textContent = c.content;
     },
 
@@ -277,7 +281,7 @@ const App = {
     openModelModal(target = 'prisoner') {
         this.modelTarget = target;
         document.getElementById('connection-toast').hidden=true;
-        document.getElementById('model-modal-description').textContent=target==='interrogator'?'اختبار الموديل في دور المحقق · درجات ومراجعات هذا الدور':'اختبار الموديل في دور المتهم · درجات ومراجعات هذا الدور';
+        document.getElementById('model-modal-description').textContent=target==='interrogator'?LabI18n.t("app.openModelModal.1"):LabI18n.t("app.openModelModal.2");
         this.currentModelTab='focus_economic';
         document.querySelectorAll('.model-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab==='focus_economic'));
         this.modelSearchQuery = '';
@@ -308,7 +312,7 @@ const App = {
         for(const tab of ['focus_economic','focus_medium','focus_high','economic','professional','all','free'])document.getElementById('tab-count-'+tab).textContent=this.models.filter(m=>inTab(m,tab)).length;
         const source=document.getElementById('ranking-source');source.replaceChildren();
         const asOf=this.discoveryMeta?.ranking_meta?.as_of;
-        source.append(asOf ? `استخدام آخر 7 أيام · ${new Date(asOf).toLocaleDateString('ar')} · المصدر: ` : 'ترتيب الحداثة حسب تاريخ الإصدار؛ بيانات الاستخدام غير متاحة · ');
+        source.append(asOf ? LabI18n.t("app.renderModalModels.1", {"value1": new Date(asOf).toLocaleDateString(LabI18n.locale)}) : LabI18n.t("app.renderModalModels.2"));
         const link=document.createElement('a');link.href='https://openrouter.ai/rankings';link.textContent='OpenRouter';link.target='_blank';link.rel='noopener';source.append(link);
         if(asOf)source.append(' · CC BY 4.0');
 
@@ -328,7 +332,7 @@ const App = {
         }).sort((a,b)=>this.modelOrder(b)-this.modelOrder(a) || a.name.localeCompare(b.name));
 
         if (filtered.length === 0) {
-            container.innerHTML = '<div style="color:var(--text-muted);padding:30px;text-align:center;grid-column:1/-1;">لا توجد نماذج مطابقة لمعايير البحث.</div>';
+            container.innerHTML = `<div style="color:var(--text-muted);padding:30px;text-align:center;grid-column:1/-1;">${LabI18n.html("app.renderModalModels.3")}</div>`;
             return;
         }
 
@@ -353,16 +357,16 @@ const App = {
             let badgeHtml = '';
             if (isLocked) {
                 if (this.userApiKey) {
-                    badgeHtml = '<span class="model-card-badge badge-userkey">✓ مفتاحك مفعل</span>';
+                    badgeHtml = `<span class="model-card-badge badge-userkey">${LabI18n.html("app.renderModalModels.4")}</span>`;
                 } else {
-                    badgeHtml = '<span class="model-card-badge badge-locked">🔒 متقدم (&gt; $1.00)</span>';
+                    badgeHtml = `<span class="model-card-badge badge-locked">${LabI18n.html("app.renderModalModels.5")}</span>`;
                 }
             } else {
-                badgeHtml = `<span class="model-card-badge badge-unlocked">${category(m)==='free'?'مجاني':'مدفوع اقتصادي'}</span>`;
+                badgeHtml = `<span class="model-card-badge badge-unlocked">${category(m)==='free'?LabI18n.t("app.renderModalModels.6"):LabI18n.t("app.renderModalModels.7")}</span>`;
             }
 
-            if (category(m)==='free' && !this.env.free_models_available) badgeHtml='<span class="model-card-badge badge-locked">تمويل المجاني غير متاح</span>';
-            const descText = m.description_ar || `${m.name} نموذج ذكاء اصطناعي عبر منصة OpenRouter.`;
+            if (category(m)==='free' && !this.env.free_models_available) badgeHtml=`<span class="model-card-badge badge-locked">${LabI18n.html("app.renderModalModels.10")}</span>`;
+            const descText = m.description_ar || LabI18n.t("app.renderModalModels.11", {"name": m.name});
 
             card.innerHTML = `
                 <div class="model-card-icon">
@@ -377,11 +381,11 @@ const App = {
                         ${this.escapeHtml(descText)}
                     </div>
                     <div class="model-card-footer">
-                        <span class="model-card-price">$${pIn} In / $${pOut} Out / مليون</span>
+                        <span class="model-card-price">$${pIn} In / $${pOut} ${LabI18n.html("app.renderModalModels.17")}</span>
                         <span class="reasoning-badge">${LabView.escape(LabView.reasoningLabel(this.reasoningPreview(this.modelTarget,m)))}</span><span class="model-card-context">${m.context_formatted || '128K'}</span>
                     </div>
-                    <div class="model-discovery-meta">${m.created ? new Date(m.created*1000).toLocaleDateString('ar') : 'تاريخ غير متوفر'}${m.usage_rank ? ` · الاستخدام #${m.usage_rank}` : ''}</div>
-                    ${m.curated_family?`<div class="curated-family">${this.escapeHtml(m.curated_family)} · إصدار رسمي مختار</div>`:''}
+                    <div class="model-discovery-meta">${m.created ? new Date(m.created*1000).toLocaleDateString(LabI18n.locale) : LabI18n.t("app.renderModalModels.14")}${m.usage_rank ? LabI18n.t("app.renderModalModels.15", {"usage_rank": m.usage_rank}) : ''}</div>
+                    ${m.curated_family?`<div class="curated-family">${this.escapeHtml(m.curated_family)} ${LabI18n.html("app.renderModalModels.16")}</div>`:''}
                     ${this.modelPerformanceHTML(m)}
                     <div class="model-health">${this.modelHealthText(m)}</div>
                 </div>
@@ -409,31 +413,31 @@ const App = {
     },
     modelPerformanceHTML(m) {
         const p=m.performance?.[this.modelTarget];
-        if(!p)return '<div class="model-performance">لا توجد درجات لهذا الدور بعد · ابدأ اختبارًا</div>';
-        return `<div class="model-performance"><strong>${this.modelTarget==='interrogator'?'أداء المحقق':'أداء المتهم'}: ${p.judge_average==null?'لم يُحكّم':p.judge_average+'/100'}</strong> · ${p.assessments} اختبار<br>المستخدمون: ${p.user_average==null?'لا مراجعات':p.user_average+'/5'} · ${p.user_reviews} مراجعة${p.limited_sample?'<br>عينة محدودة':''}${Object.entries(p.badges || {}).map(([type,n])=>`<span class="incident-badge">${LabView.incidentLabels[type] || this.escapeHtml(type)} ×${n}</span>`).join('')}${p.quality_band==='orange' || p.quality_band==='yellow'?'<small>لون تنبيه بسبب درجات الأداء؛ قياسات الاتصال منفصلة أدناه.</small>':''}${p.contexts?.length?`<details class="model-user-reviews"><summary>سياق الاختبارات</summary>${p.contexts.map(c=>`<p>مستوى ${c.level ?? 'غير محفوظ'} · معيار ${this.escapeHtml(c.rubric_version || 'قديم')} · ${c.count} اختبار · ${c.average}/100</p>`).join('')}</details>`:''}${p.recent_reviews?.length?`<details class="model-user-reviews"><summary>مراجعات المستخدمين</summary>${p.recent_reviews.map(r=>`<p><strong>${r.rating}/5</strong> ${this.escapeHtml(r.text)}</p>`).join('')}</details>`:''}</div>`;
+        if(!p)return `<div class="model-performance">${LabI18n.html("app.modelPerformanceHTML.1")}</div>`;
+        return `<div class="model-performance"><strong>${this.modelTarget==='interrogator'?LabI18n.t("session-view.evaluation.13"):LabI18n.t("app.modelPerformanceHTML.3")}: ${p.judge_average==null?LabI18n.t("app.modelPerformanceHTML.4"):p.judge_average+'/100'}</strong> · ${p.assessments} ${LabI18n.html("app.modelPerformanceHTML.15")}<br>${LabI18n.html("app.modelPerformanceHTML.16")} ${p.user_average==null?LabI18n.t("app.modelPerformanceHTML.5"):p.user_average+'/5'} · ${p.user_reviews} ${LabI18n.html("app.modelPerformanceHTML.17")}${p.limited_sample?`<br>${LabI18n.html("app.modelPerformanceHTML.6")}`:''}${Object.entries(p.badges || {}).map(([type,n])=>`<span class="incident-badge">${LabView.incidentLabels[type] || this.escapeHtml(type)} ×${n}</span>`).join('')}${p.quality_band==='orange' || p.quality_band==='yellow'?`<small>${LabI18n.html("app.modelPerformanceHTML.7")}</small>`:''}${p.contexts?.length?`<details class="model-user-reviews"><summary>${LabI18n.html("app.modelPerformanceHTML.13")}</summary>${p.contexts.map(c=>`<p>${LabI18n.html("app.modelPerformanceHTML.10")} ${c.level ?? LabI18n.t("app.modelPerformanceHTML.8")} ${LabI18n.html("session-view.evaluation.10")} ${this.escapeHtml(c.rubric_version || LabI18n.t("session-view.evaluation.5"))} · ${c.count} ${LabI18n.html("app.modelPerformanceHTML.12")} ${c.average}/100</p>`).join('')}</details>`:''}${p.recent_reviews?.length?`<details class="model-user-reviews"><summary>${LabI18n.html("app.modelPerformanceHTML.14")}</summary>${p.recent_reviews.map(r=>`<p><strong>${r.rating}/5</strong> ${this.escapeHtml(r.text)}</p>`).join('')}</details>`:''}</div>`;
     },
     modelHealthText(m) {
         const h=m.health || {}, parts=[];
-        parts.push(`الاستدعاءات ${h.requests ?? 0} · نجح ${h.successes ?? 0} · فشل ${h.failures ?? 0}`);
-        if(h.failure_rate!=null)parts.push(`نسبة الفشل ${h.failure_rate}%`);
-        if(h.cancelled)parts.push(`أُلغي بعد اكتمال النصاب ${h.cancelled}`);
-        if(h.invalid_responses)parts.push(`من الفشل: ${h.invalid_responses} رد غير صالح`);
-        if(h.failure_rate!=null && h.sample_confidence==='limited')parts.push('عينة محدودة؛ ليست ضمانًا للاعتمادية');
+        parts.push(LabI18n.t("app.modelHealthText.1", {"value1": h.requests ?? 0, "value2": h.successes ?? 0, "value3": h.failures ?? 0}));
+        if(h.failure_rate!=null)parts.push(LabI18n.t("app.modelHealthText.2", {"failure_rate": h.failure_rate}));
+        if(h.cancelled)parts.push(LabI18n.t("app.modelHealthText.3", {"cancelled": h.cancelled}));
+        if(h.invalid_responses)parts.push(LabI18n.t("app.modelHealthText.4", {"invalid_responses": h.invalid_responses}));
+        if(h.failure_rate!=null && h.sample_confidence==='limited')parts.push(LabI18n.t("app.modelHealthText.5"));
         if(h.weak)parts.push('⚠ '+(h.reasons || []).map(x=>LabView.escape(x)).join(' · '));
-        if(h.first_byte_ms!=null)parts.push(`أول بايت ${h.first_byte_ms}ms`);
-        if(h.avg_seconds!=null)parts.push(`متوسط الطلب ${h.avg_seconds}ث`);
-        if(h.tokens_per_second!=null)parts.push(`${h.tokens_per_second} توكن/ث إجمالي`);
-        if(h.failure_rate==null)parts.push('لم يُقَس اتصال مكتمل بعد');
+        if(h.first_byte_ms!=null)parts.push(LabI18n.t("app.modelHealthText.6", {"first_byte_ms": h.first_byte_ms}));
+        if(h.avg_seconds!=null)parts.push(LabI18n.t("app.modelHealthText.7", {"avg_seconds": h.avg_seconds}));
+        if(h.tokens_per_second!=null)parts.push(LabI18n.t("app.modelHealthText.8", {"tokens_per_second": h.tokens_per_second}));
+        if(h.failure_rate==null)parts.push(LabI18n.t("app.modelHealthText.9"));
         return parts.join(' · ');
     },
 
     selectModalModel(modelId) {
         const m = this.models.find(item => item.id === modelId);
         if (!m) return;
-        if (Number(m.pricing?.prompt_per_1m)===0 && Number(m.pricing?.completion_per_1m)===0 && !this.env.free_models_available) {alert('تمويل النماذج المجانية غير متاح حاليًا.');return;}
+        if (Number(m.pricing?.prompt_per_1m)===0 && Number(m.pricing?.completion_per_1m)===0 && !this.env.free_models_available) {alert(LabI18n.t("standalone.app.selectModalModel.1"));return;}
 
         if (m.is_locked && !this.userApiKey) {
-            alert('عذراً لا تتوفر لدينا ميزانية لفتح هذه الموديولات، أرجو أن تستخدم مفتاحك في زر (استخدام مفتاحي) في الأعلى لتختبر هذا الموديول على نفقتك الخاصة.. ملاحظة: المفاتيح الخاصة تحفظ أثناء الزيارة فقط على متصفحك ولا يتم تخزين أي مفاتيح للزوار هنا.');
+            alert(LabI18n.t("standalone.app.selectModalModel.2"));
             this.closeModelModal();
             this.openKeyModal();
             return;
@@ -462,14 +466,14 @@ const App = {
     async saveUserKey() {
         const val = document.getElementById('custom-api-key-input').value.trim();
         if (val && !val.startsWith('sk-or-')) {
-            alert('يرجى التأكد من إدخال مفتاح OpenRouter صالح (يبدأ عادة بـ sk-or-v1-).');
+            alert(LabI18n.t("app.saveUserKey.1"));
             return;
         }
         const old=this.userApiKey;this.userApiKey = val;
-        if(val){try{this.keyBalance=(await this.api('key_balance')).balance;}catch(e){this.userApiKey=old;return this.notify('تعذر التحقق من المفتاح: '+e.message,true);}}
+        if(val){try{this.keyBalance=(await this.api('key_balance')).balance;}catch(e){this.userApiKey=old;return this.notify(LabI18n.t("app.saveUserKey.3")+e.message,true);}}
         if (val) {
             sessionStorage.setItem('user_openrouter_api_key', val);
-            this.notify('تم التحقق من مفتاحك. التجارب الجديدة ستكون على نفقتك؛ لا يوجد حد يومي للتجارب.');
+            this.notify(LabI18n.t("standalone.app.saveUserKey.3"));
         } else {
             this.keyBalance=null;sessionStorage.removeItem('user_openrouter_api_key');
         }
@@ -487,17 +491,17 @@ const App = {
         this.updateKeyButtonState();
         this.closeKeyModal();
         this.renderSelectedModelSummary();
-        this.renderAccount();this.renderInterrogatorSummary();this.renderModalModels();this.notify('أُزيل المفتاح. التجارب الجديدة تستخدم مفتاح المشغّل؛ التجارب الشخصية السابقة تحتاج مفتاحها نفسه لمتابعتها.');
+        this.renderAccount();this.renderInterrogatorSummary();this.renderModalModels();this.notify(LabI18n.t("standalone.app.clearUserKey.1"));
     },
 
     updateKeyButtonState() {
         const btn = document.getElementById('open-key-modal-btn');
         if (this.userApiKey) {
             const amount=this.keyBalance?.available_to_spend;
-            btn.textContent='🔑 مفتاحي مفعل ✓'+(amount!=null?' '+Number(amount).toFixed(2)+'$':' · الرصيد غير متاح');
+            btn.textContent=LabI18n.t("app.updateKeyButtonState.2")+(amount!=null?' '+Number(amount).toFixed(2)+'$':LabI18n.t("app.updateKeyButtonState.3"));
             btn.classList.add('has-key');
         } else {
-            btn.innerHTML = '🔑 استخدام مفتاحي';
+            btn.innerHTML = LabI18n.t("app.updateKeyButtonState.4");
             btn.classList.remove('has-key');
         }
     },
@@ -511,12 +515,12 @@ const App = {
         const stateObj = this.states.find(s => s.id === stateId) || this.states[0];
         const validId = stateObj ? stateObj.id : 'calm';
         const img = document.getElementById('prisoner-portrait');
-        img.src = `assets/images/${slug}/${validId}.jpg`;
-        img.onerror = () => { img.src = `assets/images/char_1/${validId}.jpg`; };
+        img.src = `/assets/images/${slug}/${validId}.jpg`;
+        img.onerror = () => { img.src = `/assets/images/char_1/${validId}.jpg`; };
 
         const pill = document.getElementById('current-state-pill');
         if (customStateText) {
-            pill.textContent = `${customStateText} (حالة مخصصة)`;
+            pill.textContent = LabI18n.t("app.updatePortrait.1", {"customStateText": customStateText});
             pill.style.background = '#9333ea';
         } else if (stateObj) {
             pill.textContent = `${stateObj.name_ar} (${stateObj.name_en})`;
@@ -545,7 +549,7 @@ const App = {
         setBar('breaking', metrics.breaking_point || 0);
 
         const target=this.states.find(s=>s.id===targetState);
-        document.getElementById('sense-directive-text').textContent=target ? `الحالة التي يفرضها JEV: ${target.name_ar}. هذه مؤشرات مستقلة وليست نسبًا يجب أن مجموعها 100%. ارتفاع الخوف أو الإنهاك لا يثبت وقوع اعتراف.` : 'تظهر قراءة JEV المستقلة مع كل رد. ارتفاع الانهيار لا يعني الاعتراف.';
+        document.getElementById('sense-directive-text').textContent=target ? LabI18n.t("app.updateSenseMeters.1", {"name_ar": target.name_ar}) : LabI18n.t("app.updateSenseMeters.2");
     },
 
     // ==========================================
@@ -558,31 +562,31 @@ const App = {
         const body=JSON.stringify({action,...payload});
         const busyDeadline=Date.now()+1320000;
         const firstAttempt=retryContext.priorFailure?1:0;
-        if(firstAttempt) {this.notify('تعذر فحص الإنهاء أو الاعتراف بعد حفظ الرد. المحاولة الثانية بعد 10 ثوانٍ.',true);await this.retryWait(10000);}
+        if(firstAttempt) {this.notify(LabI18n.t("app.api.1"),true);await this.retryWait(10000);}
         for(let attempt=firstAttempt;attempt<3;attempt++) {
             try {
                 let res;
-                try {res=await fetch('api.php',{method:'POST',signal:AbortSignal.timeout(1320000),headers:{'Content-Type':'application/json','X-CSRF-Token':this.csrfToken,...(this.userApiKey?{'X-User-OpenRouter-Key':this.userApiKey}:{})},body});}
-                catch(e) {throw Object.assign(new Error('تعذر الاتصال بالخادم.'),{retryable:true});}
+                try {res=await fetch(LabI18n.api(),{method:'POST',signal:AbortSignal.timeout(1320000),headers:{'Content-Type':'application/json','X-CSRF-Token':this.csrfToken,...(this.userApiKey?{'X-User-OpenRouter-Key':this.userApiKey}:{})},body});}
+                catch(e) {throw Object.assign(new Error(LabI18n.t("app.api.2")),{retryable:true});}
                 let data;
-                try {data=await res.json();}catch {throw Object.assign(new Error('تعذر قراءة استجابة الخادم.'),{retryable:res.status>=500});}
+                try {data=await res.json();}catch {throw Object.assign(new Error(LabI18n.t("app.api.3")),{retryable:res.status>=500});}
                 if(res.status===409 && data.busy && canRetry && payload.session_id) {
-                    this.notify('الخادم ما زال يُكمل الطلب السابق؛ ننتظره دون تكرار الاستدعاء المدفوع.');
+                    this.notify(LabI18n.t("app.api.4"));
                     let progress;
                     do {
-                        if(Date.now()>busyDeadline)throw new Error('ما زال الطلب قيد التنفيذ. المراحل محفوظة؛ أعد فتح الجلسة لاحقًا.');
+                        if(Date.now()>busyDeadline)throw new Error(LabI18n.t("app.api.5"));
                         await this.retryWait(3000);
                         progress=await this.fetchData('api.php?action=load_session&session_id='+encodeURIComponent(payload.session_id));
                     }while(progress.processing);
                     // Replay the identical ID only after release; server idempotence returns saved work.
                     attempt--;continue;
                 }
-                if(!data.ok)throw Object.assign(new Error(data.error || 'تعذر تنفيذ الطلب'),{retryable:!!data.retryable || [502,503,504].includes(res.status)});
+                if(!data.ok)throw Object.assign(new Error(data.error || LabI18n.t("app.api.6")),{retryable:!!data.retryable || [502,503,504].includes(res.status)});
                 if(data.mcp_wait && typeof MCPUI!=='undefined'){
                     MCPUI.waiting=true;this.currentSession=data.session;this.renderActiveSession();
-                    this.notify('بانتظار وكيل MCP. افتح بوابات الجلسة وانسخ رابط الدور لوكيلك؛ المراحل المكتملة محفوظة.');
+                    this.notify(LabI18n.t("app.api.7"));
                     await this.retryWait(2000);
-                    if(MCPUI.pauseRequested){MCPUI.waiting=false;MCPUI.pauseRequested=false;throw new Error('أُوقف انتظار MCP. يمكنك إكمال التحقيق من المرحلة المحفوظة.');}
+                    if(MCPUI.pauseRequested){MCPUI.waiting=false;MCPUI.pauseRequested=false;throw new Error(LabI18n.t("app.api.8"));}
                     attempt--;continue;
                 }
                 if(typeof MCPUI!=='undefined')MCPUI.waiting=false;
@@ -593,9 +597,9 @@ const App = {
                 if(this.userApiKey && data.session && ['send_message','ai_vs_ai_step','reverse_question','reverse_answer','evaluate_session','compact_now'].includes(action))void this.refreshKeyBalance();
                 return data;
             } catch(e) {
-                if(!canRetry || !e.retryable || attempt===2) {if(canRetry && e.retryable && attempt===2)e.message='فشلت محاولات الاتصال الثلاث. '+e.message;throw e;}
+                if(!canRetry || !e.retryable || attempt===2) {if(canRetry && e.retryable && attempt===2)e.message=LabI18n.t("app.api.9")+e.message;throw e;}
                 const delay=(attempt+1)*10000;
-                this.notify(`${e.message} إعادة المحاولة ${attempt+2} من 3 بعد ${delay/1000} ثانية؛ المراحل المكتملة محفوظة.`,true);
+                this.notify(LabI18n.t("app.api.10", {"message": e.message, "value2": attempt+2, "value3": delay/1000}),true);
                 await this.retryWait(delay);
             }
         }
@@ -617,9 +621,9 @@ const App = {
         const button=document.getElementById(role+'-reasoning-btn');
         if(!button)return;
         const adjustable=!!m?.reasoning_capabilities?.efforts?.length;
-        button.textContent=LabView.reasoningLabel(this.reasoningPreview(role,m))+(adjustable?' · تعديل ↗':'');
+        button.textContent=LabView.reasoningLabel(this.reasoningPreview(role,m))+(adjustable?LabI18n.t("mcp.renderSelection.3"):'');
         button.disabled=!m || !adjustable;
-        button.title='إعداد التجربة التالية؛ لا يغيّر الجلسة الحالية';
+        button.title=LabI18n.t("app.renderReasoningControl.2");
     },
     openReasoningModal(role) {
         if(typeof MCPUI!=='undefined' && MCPUI.selections[role])return MCPUI.configure(role);
@@ -630,7 +634,7 @@ const App = {
         document.getElementById('reasoning-model-name').textContent=m.name;
         for(const choice of ['auto',...efforts]) {
             const b=document.createElement('button');b.type='button';b.className='reasoning-option';b.dataset.effort=choice;
-            b.textContent=choice==='auto'?'تلقائي · حسب مستوى الشخصية':LabView.reasoningNames[choice];
+            b.textContent=choice==='auto'?LabI18n.t("app.openReasoningModal.1"):LabView.reasoningNames[choice];
             b.setAttribute('aria-pressed',String(this.reasoningSelection(role)===choice));
             b.addEventListener('click',()=>{this.reasoningSelections[role][id]=choice;this.startRequestId=null;this.renderSelectedModelSummary();this.renderInterrogatorSummary();this.closeReasoningModal();});box.appendChild(b);
         }
@@ -661,13 +665,13 @@ const App = {
         document.getElementById('interrogator-human-card').hidden=!humanInvestigator;
         document.getElementById('reverse-role-brief').hidden=!humanPrisoner;
         for(const [role,isHuman] of [['prisoner',humanPrisoner],['interrogator',humanInvestigator]]) {
-            document.getElementById(role+'-representation-label').textContent=isHuman?'أنت · مشارك بشري':'ذكاء اصطناعي';
-            document.getElementById(role+'-performer-type').textContent=isHuman?'المشارك البشري':'نموذج ذكاء اصطناعي';
+            document.getElementById(role+'-representation-label').textContent=isHuman?LabI18n.t("app.setInterrogationMode.1"):LabI18n.t("app.setInterrogationMode.2");
+            document.getElementById(role+'-performer-type').textContent=isHuman?LabI18n.t("app.setInterrogationMode.3"):LabI18n.t("app.setInterrogationMode.4");
             this.renderHumanPerformer(document.getElementById(role+'-human-card'));
         }
         this.renderSelectedModelSummary();
         this.renderInterrogatorSummary();
-        document.getElementById('swap-roles-btn').title=mode==='ai'?'تبديل نموذجَي الذكاء الاصطناعي بين الدورين':'تبديل دورك ونقل نموذج الذكاء الاصطناعي إلى الدور المقابل';
+        document.getElementById('swap-roles-btn').title=mode==='ai'?LabI18n.t("app.setInterrogationMode.5"):LabI18n.t("app.setInterrogationMode.6");
     },
     swapRoles() {
         if(this.busy || this.generating)return;
@@ -678,7 +682,7 @@ const App = {
         this.updateControls();
     },
     renderHumanPerformer(container) {
-        container.innerHTML='<span class="participant-avatar participant-placeholder" aria-hidden="true">👤</span><span class="participant-info"><strong>أنت · المشارك البشري</strong><small>نسخة مستقلة · السجلات مرتبطة بهذا المتصفح</small></span>';
+        container.innerHTML=`<span class="participant-avatar participant-placeholder" aria-hidden="true">👤</span><span class="participant-info"><strong>${LabI18n.html("app.renderHumanPerformer.1")}</strong><small>${LabI18n.html("standalone.app.renderHumanPerformer.2")}</small></span>`;
     },
     renderInterrogatorSummary() {
         const m=this.models.find(m=>m.id===this.selectedInterrogatorId);
@@ -690,8 +694,8 @@ const App = {
         const box=document.getElementById('investigator-profile-grid');box.replaceChildren();
         for(const p of this.investigators) {
             const card=document.createElement('article');card.className='investigator-card';
-            card.innerHTML=`${LabView.investigatorAvatar(p,'profile-portrait')}<div class="investigator-file"><span class="investigator-rank">${String(p.number).padStart(2,'0')} · المستوى ${p.level}/10 · ${this.escapeHtml(p.level_ar)}</span><h3 dir="ltr">${this.escapeHtml(p.name)}</h3><p>${p.age} عامًا · ${p.years_experience} سنة خبرة</p><strong>${this.escapeHtml(p.specialty)}</strong><p>${this.escapeHtml(p.bio)}</p><p>${this.escapeHtml(p.style)}</p><div class="investigator-skills">${p.skills.map(s=>`<span>${this.escapeHtml(s)}</span>`).join('')}</div><details><summary>حدود المستوى وتعليمات الشخصية</summary><p>${this.escapeHtml(p.limits)}</p><p>${this.escapeHtml(p.instructions)}</p><small>التفكير المطلوب: ${this.escapeHtml(({none:'معدوم إن أمكن',low:'قليل',medium:'متوسط',high:'مرتفع',highest:'أعلى مستوى متاح'})[p.thinking])} · حسب دعم النموذج.</small></details><button type="button" class="btn btn-secondary" data-investigator-id="${p.id}">${p.id===this.selectedInvestigatorPersona?'✓ المحدد حاليًا':'اختيار المحقق'}</button></div>`;
-            const faces=document.createElement('details');faces.innerHTML='<summary>معاينة التعابير الستة</summary><div class="investigator-expressions">'+Object.entries(LabView.investigatorExpressions).map(([id,name])=>`<figure>${LabView.investigatorAvatar(p,'',id)}<figcaption>${name}</figcaption></figure>`).join('')+'</div>';card.querySelector('.investigator-file').insertBefore(faces,card.querySelector('button'));
+            card.innerHTML=`${LabView.investigatorAvatar(p,'profile-portrait')}<div class="investigator-file"><span class="investigator-rank">${String(p.number).padStart(2,'0')} ${LabI18n.html("app.openInvestigatorModal.8")} ${p.level}/10 · ${this.escapeHtml(p.level_ar)}</span><h3 dir="ltr">${this.escapeHtml(p.name)}</h3><p>${p.age} ${LabI18n.html("app.openInvestigatorModal.9")} ${p.years_experience} ${LabI18n.html("app.openInvestigatorModal.10")}</p><strong>${this.escapeHtml(p.specialty)}</strong><p>${this.escapeHtml(p.bio)}</p><p>${this.escapeHtml(p.style)}</p><div class="investigator-skills">${p.skills.map(s=>`<span>${this.escapeHtml(s)}</span>`).join('')}</div><details><summary>${LabI18n.html("app.openInvestigatorModal.11")}</summary><p>${this.escapeHtml(p.limits)}</p><p>${this.escapeHtml(p.instructions)}</p><small>${LabI18n.html("app.openInvestigatorModal.12")} ${this.escapeHtml(({none:LabI18n.t("app.openInvestigatorModal.1"),low:LabI18n.t("session-view.ui.25"),medium:LabI18n.t("session-view.ui.26"),high:LabI18n.t("session-view.ui.27"),highest:LabI18n.t("app.openInvestigatorModal.5")})[p.thinking])} ${LabI18n.html("app.openInvestigatorModal.13")}</small></details><button type="button" class="btn btn-secondary" data-investigator-id="${p.id}">${p.id===this.selectedInvestigatorPersona?LabI18n.t("app.openInvestigatorModal.6"):LabI18n.t("app.openInvestigatorModal.7")}</button></div>`;
+            const faces=document.createElement('details');faces.innerHTML=`<summary>${LabI18n.html("app.openInvestigatorModal.14")}</summary><div class="investigator-expressions">`+Object.entries(LabView.investigatorExpressions).map(([id,name])=>`<figure>${LabView.investigatorAvatar(p,'',id)}<figcaption>${name}</figcaption></figure>`).join('')+'</div>';card.querySelector('.investigator-file').insertBefore(faces,card.querySelector('button'));
             card.querySelector('button').addEventListener('click',()=>{this.selectedInvestigatorPersona=p.id;this.renderInterrogatorSummary();document.getElementById('investigator-profile-modal').classList.remove('active');});
             box.appendChild(card);
         }
@@ -699,9 +703,9 @@ const App = {
     },
     async requestReverseQuestion() {
         if(this.busy || !this.currentSession || this.currentSession.interrogator_type!=='reverse' || this.currentSession.is_ended || this.currentSession.read_only)return;
-        this.busy=true;this.updateControls();this.notify('المحقق يراجع ملف القضية ويجهز سؤاله…');
-        try {this.currentSession=(await this.api('reverse_question',{session_id:this.currentSession.session_id})).session;this.renderActiveSession();this.notify('دورك: أجب بصفتك المتهم في القضية.');}
-        catch(e){this.notify(e.message+' يمكنك إعادة طلب السؤال من الزر أسفل الحوار.',true);}
+        this.busy=true;this.updateControls();this.notify(LabI18n.t("app.requestReverseQuestion.1"));
+        try {this.currentSession=(await this.api('reverse_question',{session_id:this.currentSession.session_id})).session;this.renderActiveSession();this.notify(LabI18n.t("app.requestReverseQuestion.2"));}
+        catch(e){this.notify(e.message+LabI18n.t("app.requestReverseQuestion.3"),true);}
         finally{this.busy=false;this.renderActiveSession();}
         if(this.currentSession?.is_ended && this.currentSession.evaluation_status==='pending')await this.endAndEvaluateSession();
     },
@@ -717,7 +721,7 @@ const App = {
             this.generation++; this.currentSession=data.session; this.stopRequested=false;this.aiPaused=false;
             if(typeof MCPUI!=='undefined')await MCPUI.started(data.session);
             this.startRequestId=null;this.renderAccount();
-            this.renderActiveSession(); await this.reloadLogsOnly(); this.notify('بدأت الجلسة. حد الاستجواب 30 ردًا للسجين.');
+            this.renderActiveSession(); await this.reloadLogsOnly(); this.notify(LabI18n.t("app.startNewSession.1"));
         } catch(e) {this.notify(e.message,true);}
         finally {this.busy=false;this.updateControls();}
         if(this.currentSession?.interrogator_type==='ai' && !this.currentSession.is_ended && !this.generating) this.generateAiRounds();
@@ -728,9 +732,9 @@ const App = {
         if(d.ok) {this.logs=d.logs;this.publishedLogs=d.published_logs;this.csrfToken=d.csrf_token;this.models=d.models;this.participantProfile=d.participant_profile;this.renderAccount();this.renderLogsList();}
     },
     async loadSession(id) {
-        if(this.busy || this.generating) return this.notify('انتظر انتهاء الجولة أو أنهِ التشغيل قبل فتح سجل آخر.',true);
+        if(this.busy || this.generating) return this.notify(LabI18n.t("app.loadSession.1"),true);
         try {
-            const d=await (await fetch('api.php?action=load_session&session_id='+encodeURIComponent(id))).json();
+            const d=await (await fetch(LabI18n.api('api.php?action=load_session&session_id='+encodeURIComponent(id)))).json();
             if(!d.ok) throw Error(d.error);
             this.currentSession=d.session;this.generation++;this.currentCharacterSlug=d.session.character_slug;
             if(typeof MCPUI!=='undefined')MCPUI.selections=structuredClone(d.session.mcp_actors || {});
@@ -742,7 +746,7 @@ const App = {
             this.setInterrogationMode(d.session.interrogator_type);
             if (d.session.pending_question && d.session.interrogator_type === 'human') document.getElementById('user-input').value = d.session.pending_question;
             this.renderSelectedCaseSummary();this.renderSelectedModelSummary();this.renderActiveSession();this.closeArchiveModal();
-            this.notify(d.session.read_only?'عرض جلسة منشورة للقراءة فقط.':'تم تحميل الجلسة.');
+            this.notify(d.session.read_only?LabI18n.t("app.loadSession.2"):LabI18n.t("app.loadSession.3"));
         } catch(e) {this.notify(e.message,true);}
     },
     updateControls() {
@@ -750,15 +754,15 @@ const App = {
         document.getElementById('start-session-btn').disabled=this.busy || this.generating;
         document.getElementById('swap-roles-btn').disabled=this.busy || this.generating;
         const logout=document.getElementById('logout-btn');if(logout)logout.disabled=this.busy || this.generating;
-        document.getElementById('start-session-btn').textContent='بدء تجربة جديدة';
+        document.getElementById('start-session-btn').textContent=LabI18n.t("app.updateControls.1");
         document.getElementById('human-input-bar').style.display=ai?'none':'';
         document.getElementById('human-tactics-bar').style.display=ai || reverse?'none':'';
         document.getElementById('ai-vs-ai-controls').style.display=ai?'':'none';
         const waiting=reverse && !s?.awaiting_question?.sense;
         document.getElementById('send-btn').disabled=this.busy || !!ended || !!ro || !!waiting;
         document.getElementById('user-input').disabled=this.busy || !!ended || !!ro || !!waiting;
-        document.getElementById('send-btn').textContent=reverse?'إرسال إجابتي ⬅':'إرسال وممارسة الضغط ⬅';
-        document.getElementById('user-input').placeholder=reverse?'أجب عن سؤال المحقق بصفتك المتهم في القضية…':'اكتب كلامك للسجين هنا…';
+        document.getElementById('send-btn').textContent=reverse?LabI18n.t("app.updateControls.3"):LabI18n.t("app.updateControls.4");
+        document.getElementById('user-input').placeholder=reverse?LabI18n.t("app.updateControls.5"):LabI18n.t("app.updateControls.6");
         document.getElementById('reverse-resume-btn').hidden=!reverse || !!ended || !!ro || !!s?.awaiting_question?.sense;
         document.getElementById('reverse-resume-btn').disabled=this.busy;
         document.getElementById('compact-btn').disabled=!s || this.busy || this.generating || !!ended || !!ro;
@@ -767,50 +771,50 @@ const App = {
         const end=document.getElementById('end-session-btn');
         end.disabled=!s || this.busy || !!ro || s.evaluation_status==='complete';
         const endTest=document.getElementById('end-test-btn');endTest.disabled=end.disabled;endTest.hidden=!!s?.evaluation;
-        endTest.textContent=this.generating?'إيقاف التوليد بعد الجولة الحالية وطلب التحكيم ⏹':'إنهاء الاختبار وطلب التحكيم والعلامة ⏹';
-        end.textContent=this.generating?'⏹ إيقاف بعد الجولة الحالية والتقييم':ended?'إعادة محاولة التقييم':'⏹ إنهاء الجلسة والتقييم';
+        endTest.textContent=this.generating?LabI18n.t("app.updateControls.7"):LabI18n.t("app.updateControls.8");
+        end.textContent=this.generating?LabI18n.t("app.updateControls.9"):ended?LabI18n.t("app.updateControls.10"):LabI18n.t("app.updateControls.11");
         if(ai) {
             document.getElementById('resume-investigation-btn').hidden=!this.aiPaused || this.generating || this.busy || !!ended || !!ro;
-            document.getElementById('ai-turn-counter').textContent=`الجولات المحفوظة ${s.turns_count} / 30${this.generating?' · جارٍ إنشاء الجولة التالية…':''}`;
+            document.getElementById('ai-turn-counter').textContent=LabI18n.t("app.updateControls.13", {"turns_count": s.turns_count, "value2": this.generating?LabI18n.t("app.updateControls.12"):''});
         }
     },
     renderActiveSession() {
         const s=this.currentSession;if(!s)return;
         const fundingLabel=document.getElementById('session-funding-label');
-        if(fundingLabel){fundingLabel.hidden=false;fundingLabel.textContent='تمويل هذه التجربة: '+LabCards.funding(s).name+(s.free_funding_mode==='mixed'?' · الدور المجاني: حساب النماذج المجانية':'');}
+        if(fundingLabel){fundingLabel.hidden=false;fundingLabel.textContent=LabI18n.t("app.renderActiveSession.1")+LabCards.funding(s).name+(s.free_funding_mode==='mixed'?LabI18n.t("standalone.app.renderActiveSession.2"):'');}
         const chatBox=document.getElementById('chat-messages');
         const followBottom=chatBox.scrollHeight-chatBox.scrollTop-chatBox.clientHeight<100;
         const previousScroll=chatBox.scrollTop;
         const visible=s.messages;
         const last=visible.filter(m=>m.role==='assistant').at(-1);
-        document.getElementById('active-session-id').textContent=`الجولات ${s.turns_count} / 30`;
+        document.getElementById('active-session-id').textContent=LabI18n.t("app.renderActiveSession.3", {"turns_count": s.turns_count});
         this.updatePortrait(s.character_slug,last?.visual_state || s.initial_state,'');
         document.getElementById('chat-messages').replaceChildren();
-        const levels=document.createElement('div');levels.className='session-levels';levels.innerHTML=LabView.levels(s)+(s.closure_policy?'<span>الإنهاء متاح للطرفين · الهدف 5–15 جولة · يراجع JEV الطلب وتقيّم اللجنة توقيته.</span>':'');document.getElementById('chat-messages').appendChild(levels);
+        const levels=document.createElement('div');levels.className='session-levels';levels.innerHTML=LabView.levels(s)+(s.closure_policy?`<span>${LabI18n.html("app.renderActiveSession.4")}</span>`:'');document.getElementById('chat-messages').appendChild(levels);
         if(!s.is_ended)document.getElementById('chat-messages').appendChild(LabCommunity.result(s));
         for(const m of visible)this.appendMessageDOM(m);
         if(s.interrogator_type==='reverse' && s.awaiting_question && !s.is_ended) {
             this.appendMessageDOM({role:'user',content:s.awaiting_question.text,interrogator_expression:s.awaiting_question.expression,turn:s.awaiting_question.turn,timestamp:s.awaiting_question.timestamp});
             const sense=s.awaiting_question.sense;
             if(sense) {
-                const p=document.createElement('p');p.className='reverse-prompt';p.textContent='توجيه تمثيل الدور من JEV (لا يسمعه المحقق): '+sense.directive;
+                const p=document.createElement('p');p.className='reverse-prompt';p.textContent=LabI18n.t("app.renderActiveSession.5")+sense.directive;
                 document.getElementById('chat-messages').appendChild(p);
             }
         }
         if(!visible.length && !s.awaiting_question) {
-            const p=document.createElement('p');p.className='session-empty';p.textContent=s.interrogator_type==='ai'?'المحقق يدرس القضية. سيظهر الحوار هنا تلقائياً عند اكتمال كل جولة.':'تم فتح غرفة التحقيق. ابدأ بسؤال محدد من القضية.';
+            const p=document.createElement('p');p.className='session-empty';p.textContent=s.interrogator_type==='ai'?LabI18n.t("app.renderActiveSession.6"):LabI18n.t("app.renderActiveSession.7");
             document.getElementById('chat-messages').appendChild(p);
         }
         if(last?.sense_metrics)this.updateSenseMeters(last.sense_metrics,last.sense_directive,last.jev_target_state);
-        else {this.updateSenseMeters({fear:0,anger:0,trust:0,collapse:0,breaking_point:0},'تظهر قراءة JEV مع كل رد معروض.');}
-        if(s.interrogator_type==='reverse')document.getElementById('sense-directive-text').textContent='توجيه JEV لتمثيل الشخصية في المحاكاة، وليس قياسًا لمشاعرك أو كشفًا للكذب.';
+        else {this.updateSenseMeters({fear:0,anger:0,trust:0,collapse:0,breaking_point:0},LabI18n.t("app.renderActiveSession.8"));}
+        if(s.interrogator_type==='reverse')document.getElementById('sense-directive-text').textContent=LabI18n.t("app.renderActiveSession.9");
         if(s.is_ended) {
             const card=LabView.evaluation(s);
             if(!s.read_only && s.evaluation_status==='complete') {
                 // Publication controls, provisional ranking and privacy confirmation are shown together above.
             }
             if(!s.read_only && s.evaluation_status!=='complete') {
-                const b=document.createElement('button');b.className='btn btn-secondary';b.textContent=this.busy?'اللجنة تراجع الحوار…':'إكمال التقييم';b.disabled=this.busy;
+                const b=document.createElement('button');b.className='btn btn-secondary';b.textContent=this.busy?LabI18n.t("app.renderActiveSession.10"):LabI18n.t("app.renderActiveSession.11");b.disabled=this.busy;
                 b.addEventListener('click',()=>this.endAndEvaluateSession());card.appendChild(b);
             }
             document.getElementById('chat-messages').appendChild(card);
@@ -820,7 +824,7 @@ const App = {
         document.getElementById('usage-summary').textContent=LabView.usage(s);
         const memory=document.getElementById('memory-notes'),visibleTurn=s.turns_count;
         const notes=Object.values(s.memory_notes || {}).filter(n=>n.audience==='spoken' && n.turn<=visibleTurn);
-        memory.hidden=!notes.length;memory.innerHTML=`<summary>ملاحظات التحقيق المحفوظة (${notes.length})</summary>${notes.map(n=>`<p>الجولة ${n.turn}: ${LabView.text(n.note)}</p>`).join('')}`;
+        memory.hidden=!notes.length;memory.innerHTML=`<summary>${LabI18n.html("app.renderActiveSession.13")}${notes.length})</summary>${notes.map(n=>`<p>${LabI18n.html("session-view.message.1")} ${n.turn}: ${LabView.text(n.note)}</p>`).join('')}`;
         const box=document.getElementById('chat-messages');box.scrollTop=followBottom?box.scrollHeight:previousScroll;this.updateControls();
     },
     appendMessageDOM(m) {document.getElementById('chat-messages').appendChild(LabView.message(m,this.currentSession));},
@@ -848,12 +852,12 @@ const App = {
         const input=document.getElementById('user-input'),text=input.value.trim();if(!text)return;
         if(!this.currentSession)await this.startNewSession();
         if(!this.currentSession || this.currentSession.interrogator_type==='ai' || this.currentSession.is_ended || this.currentSession.read_only)return;
-        this.busy=true;this.updateControls();this.notify('يحلل JEV الضغط النفسي ثم يرد السجين…');
+        this.busy=true;this.updateControls();this.notify(LabI18n.t("app.sendMessage.1"));
         try {
             if(this.currentSession.confession_error)await this.checkConfession();
             if(!this.currentSession.is_ended)await this.takeRound(text);
             input.value='';
-            this.notify('حُفظت الجولة.');this.renderActiveSession();await this.reloadLogsOnly();
+            this.notify(LabI18n.t("app.sendMessage.2"));this.renderActiveSession();await this.reloadLogsOnly();
         } catch(e) {this.notify(e.message,true);}
         finally {this.busy=false;this.updateControls();}
         if(this.currentSession.is_ended && this.currentSession.evaluation_status==='pending')await this.endAndEvaluateSession();
@@ -866,50 +870,50 @@ const App = {
             if(this.currentSession.confession_error)await this.checkConfession();
             while(!this.stopRequested && !this.currentSession.is_ended) {
                 await this.takeRound();this.renderActiveSession();await this.reloadLogsOnly();
-                this.notify('حُفظت الجولة وظهر الحوار تلقائياً. جارٍ إكمال المحاكاة…');
+                this.notify(LabI18n.t("app.generateAiRounds.1"));
             }
-        } catch(e) {this.aiPaused=true;this.notify('توقف التوليد: '+e.message+' اضغط «إكمال التحقيق» لإعادة المحاولة من المرحلة المحفوظة.',true);await this.reloadLogsOnly().catch(()=>{});}
+        } catch(e) {this.aiPaused=true;this.notify(LabI18n.t("app.generateAiRounds.2")+e.message+LabI18n.t("app.generateAiRounds.3"),true);await this.reloadLogsOnly().catch(()=>{});}
         finally {this.generating=false;this.updateControls();}
         if(this.currentSession.is_ended || this.stopRequested) await this.endAndEvaluateSession();
     },
     resumeInvestigation() {
         if(this.busy || this.generating || !this.currentSession || this.currentSession.read_only)return;
         if(this.currentSession.is_ended)return this.endAndEvaluateSession();
-        this.notify('جارٍ إكمال التحقيق من آخر مرحلة محفوظة…');this.generateAiRounds();
+        this.notify(LabI18n.t("app.resumeInvestigation.1"));this.generateAiRounds();
     },
     watchJury(sessionId) {
         const box=document.getElementById('jury-live-status');let done=false,inFlight=false,wait=null,progress={};
         box.hidden=false;
         const draw=()=>{
             if(done)return;
-            if(!wait){box.textContent='جارٍ تجهيز اللجنة والتحقق من أسعارها…';return;}
+            if(!wait){box.textContent=LabI18n.t("app.watchJury.1");return;}
             const remaining=Math.max(0,Math.ceil((wait.deadline_at*1000-Date.now())/1000));
             const received=Object.values(progress).filter(p=>p.status==='complete').length;
             box.replaceChildren();
-            const title=document.createElement('strong');title.textContent=`تحكيم ${wait.tier==='economic'?'اقتصادي':wait.tier==='medium'?'متوسط':'احترافي'} · ${received}/3 تقارير`;
-            const timer=document.createElement('bdi');timer.className='jury-countdown';timer.dataset.remaining=remaining;timer.textContent=remaining+' ث';
-            const detail=document.createElement('span');detail.textContent=wait.phase==='finished' || remaining===0?'يحسم JEV التقارير الصالحة ويجهز النتيجة…':'عند انتهاء المهلة تُعتمد التقارير الصالحة ولو كان تقريرًا واحدًا؛ تكتمل اللجنة مبكرًا إذا وصلت الثلاثة.';
+            const title=document.createElement('strong');title.textContent=LabI18n.t("app.watchJury.4", {"value1": wait.tier==='economic'?LabI18n.t("app.watchJury.2"):wait.tier==='medium'?LabI18n.t("session-view.ui.26"):LabI18n.t("lab-cards.setupModel.3"), "received": received});
+            const timer=document.createElement('bdi');timer.className='jury-countdown';timer.dataset.remaining=remaining;timer.textContent=remaining+LabI18n.t("app.watchJury.5");
+            const detail=document.createElement('span');detail.textContent=wait.phase==='finished' || remaining===0?LabI18n.t("app.watchJury.6"):LabI18n.t("app.watchJury.7");
             box.append(title,timer,detail);
         };
         const poll=async()=>{
             if(done || inFlight)return;inFlight=true;
             try{const d=await this.fetchData('api.php?action=load_session&session_id='+encodeURIComponent(sessionId),{},5000);
                 if(!done){wait=d.session.jury_wait || null;progress=d.session.judge_progress || {};draw();}}
-            catch(e){if(!done && !wait)box.textContent='جارٍ التحكيم؛ تعذر تحديث العداد مؤقتًا. النتيجة ستظهر عند اكتمال الطلب.';}
+            catch(e){if(!done && !wait)box.textContent=LabI18n.t("app.watchJury.8");}
             finally{inFlight=false;}
         };
         draw();poll();const ticker=setInterval(draw,250),poller=setInterval(poll,1500);
         return ()=>{done=true;clearInterval(ticker);clearInterval(poller);box.hidden=true;box.replaceChildren();};
     },
     async endAndEvaluateSession() {
-        if(this.generating) {this.stopRequested=true;this.notify('سيتوقف التوليد بعد حفظ الجولة الحالية، ثم تبدأ اللجنة.');return;}
+        if(this.generating) {this.stopRequested=true;this.notify(LabI18n.t("app.endAndEvaluateSession.1"));return;}
         if(this.busy || !this.currentSession || this.currentSession.read_only)return;
-        if(!this.currentSession.turns_count)return this.notify('أكمل جولة واحدة على الأقل قبل التقييم.',true);
-        this.busy=true;this.updateControls();this.notify('تجهيز لجنة من ثلاثة حكام حسب فئة النماذج، ثم يحسم JEV التقارير الصالحة.');
+        if(!this.currentSession.turns_count)return this.notify(LabI18n.t("app.endAndEvaluateSession.2"),true);
+        this.busy=true;this.updateControls();this.notify(LabI18n.t("app.endAndEvaluateSession.3"));
         const stopJury=this.watchJury(this.currentSession.session_id);
         try {
             const d=await this.api('evaluate_session',{session_id:this.currentSession.session_id});this.currentSession=d.session;
-            this.notify(d.session.evaluation_status==='complete'?'اكتمل التقييم وحُفظ مع الجلسة.':d.session.evaluation_error || 'تعذر التقييم؛ يمكنك إعادة المحاولة.',d.session.evaluation_status!=='complete');
+            this.notify(d.session.evaluation_status==='complete'?LabI18n.t("app.endAndEvaluateSession.4"):d.session.evaluation_error || LabI18n.t("app.endAndEvaluateSession.5"),d.session.evaluation_status!=='complete');
             await this.reloadLogsOnly();
         } catch(e){this.notify(e.message,true);}
         finally{stopJury();this.busy=false;this.renderActiveSession();}
@@ -917,18 +921,18 @@ const App = {
     async compactNow() {
         if(this.busy || this.generating || !this.currentSession)return;
         this.busy=true;this.updateControls();
-        try{this.currentSession=(await this.api('compact_now',{session_id:this.currentSession.session_id})).session;this.notify('تم تحديث ذاكرة السياق مع الاحتفاظ بالحوار الكامل.');}
+        try{this.currentSession=(await this.api('compact_now',{session_id:this.currentSession.session_id})).session;this.notify(LabI18n.t("app.compactNow.1"));}
         catch(e){this.notify(e.message,true);}finally{this.busy=false;this.renderActiveSession();}
     },
     async submitModelReview(role,rating,text) {
         const data=await this.api('submit_review',{session_id:this.currentSession.session_id,role,rating,text});
-        this.currentSession=data.session;await this.reloadLogsOnly();this.renderActiveSession();this.notify('حُفظت مراجعتك في سجل الموديل لهذا الدور.');
+        this.currentSession=data.session;await this.reloadLogsOnly();this.renderActiveSession();this.notify(LabI18n.t("app.submitModelReview.1"));
     },
     async publishSession() {
         if(this.busy || !this.currentSession)return;
-        if(!confirm('نشر هذه المحادثة ونتائجها ومراجعاتك واسمك وصورتك للزوار؟ يمكنك حذفها من المختبر لاحقًا.'))return;
+        if(!confirm(LabI18n.t("app.publishSession.1")))return;
         this.busy=true;this.updateControls();
-        try{this.currentSession=(await this.api('publish_session',{session_id:this.currentSession.session_id})).session;await this.reloadLogsOnly();this.notify('نُشرت الجلسة ويمكن مشاركتها من الصفحة العامة.');}
+        try{this.currentSession=(await this.api('publish_session',{session_id:this.currentSession.session_id})).session;await this.reloadLogsOnly();this.notify(LabI18n.t("app.publishSession.2"));}
         catch(e){this.notify(e.message,true);}finally{this.busy=false;this.renderActiveSession();}
     },
     renderLogsList() {
@@ -937,7 +941,7 @@ const App = {
         if(document.getElementById('archive-modal').classList.contains('active'))this.renderArchive();
     },
     openArchiveModal(mode) {
-        this.archiveMode=mode;document.getElementById('archive-modal-title').textContent=mode==='public'?'سجلات التحقيق المنشورة':'سجلات التحقيق في الجلسة';
+        this.archiveMode=mode;document.getElementById('archive-modal-title').textContent=mode==='public'?LabI18n.t("app.openArchiveModal.1"):LabI18n.t("app.openArchiveModal.2");
         document.getElementById('archive-modal-search').value='';document.getElementById('archive-modal').classList.add('active');this.renderArchive();
     },
     closeArchiveModal(){document.getElementById('archive-modal').classList.remove('active');},
@@ -945,7 +949,7 @@ const App = {
         const box=document.getElementById('archive-modal-grid');box.replaceChildren();
         const q=document.getElementById('archive-modal-search').value.trim().toLowerCase();
         const logs=(this.archiveMode==='public'?this.publishedLogs:this.logs).filter(s=>[s.case_title,s.model,s.interrogator_model].join(' ').toLowerCase().includes(q));
-        if(!logs.length){box.textContent='لا توجد جلسات مطابقة.';return;}
+        if(!logs.length){box.textContent=LabI18n.t("app.renderArchive.1");return;}
         for(const s of logs){
             const compact=LabCards.card(s,{open:id=>this.loadSession(id)});box.appendChild(compact);
 
@@ -953,28 +957,28 @@ const App = {
     },
     renderAccount() {
         const controls=document.getElementById('account-controls'),notice=document.getElementById('account-notice');controls.replaceChildren();notice.replaceChildren();
-        controls.textContent='النسخة المستقلة';
-        const p=document.createElement('p');p.textContent='بلا تسجيل دخول وبلا حد يومي للتجارب. سجلاتك الخاصة مرتبطة بهذا المتصفح؛ النشر اختياري.';notice.appendChild(p);
+        controls.textContent=LabI18n.t("standalone.app.renderAccount.1");
+        const p=document.createElement('p');p.textContent=LabI18n.t("standalone.app.renderAccount.2");notice.appendChild(p);
         if(this.userApiKey){const balance=document.createElement('p');balance.id='personal-key-balance';
-            const b=this.keyBalance;balance.textContent=b?(b.available_to_spend!=null?`المتاح للإنفاق بهذا المفتاح: ${Number(b.available_to_spend).toFixed(2)}$${b.key_limit!=null?' · سقف المفتاح '+Number(b.key_limit).toFixed(2)+'$':''}`:'الرصيد غير متاح لهذا المفتاح؛ تحقق من حدوده لدى OpenRouter.'):'جارٍ التحقق من رصيد مفتاحك…';notice.appendChild(balance);
-            const refresh=document.createElement('button');refresh.className='text-button';refresh.textContent='تحديث الرصيد';refresh.addEventListener('click',()=>this.refreshKeyBalance());notice.appendChild(refresh);
+            const b=this.keyBalance;balance.textContent=b?(b.available_to_spend!=null?LabI18n.t("app.renderAccount.9", {"value1": Number(b.available_to_spend).toFixed(2), "value2": b.key_limit!=null?LabI18n.t("app.renderAccount.8")+Number(b.key_limit).toFixed(2)+'$':''}):LabI18n.t("app.renderAccount.10")):LabI18n.t("app.renderAccount.11");notice.appendChild(balance);
+            const refresh=document.createElement('button');refresh.className='text-button';refresh.textContent=LabI18n.t("app.renderAccount.12");refresh.addEventListener('click',()=>this.refreshKeyBalance());notice.appendChild(refresh);
         }
     },
     async refreshKeyBalance() {
         if(!this.userApiKey)return;
         const checkedKey=this.userApiKey;
         try{const balance=(await this.api('key_balance')).balance;if(this.userApiKey!==checkedKey)return;this.keyBalance=balance;this.updateKeyButtonState();this.renderAccount();}
-        catch(e){const el=document.getElementById('personal-key-balance');if(el)el.textContent='تعذر تحديث الرصيد: '+e.message;}
+        catch(e){const el=document.getElementById('personal-key-balance');if(el)el.textContent=LabI18n.t("app.refreshKeyBalance.1")+e.message;}
     },
     async deleteSession(id) {
-        if(this.busy || this.generating)return this.notify('انتظر حفظ الجولة قبل الحذف.',true);
-        if(!confirm('حذف المحادثة نهائيًا من أرشيف هذا المتصفح والمعرض، مع تقييماتك المرتبطة بها؟ لا يمكن التراجع عن الحذف.'))return;
+        if(this.busy || this.generating)return this.notify(LabI18n.t("app.deleteSession.1"),true);
+        if(!confirm(LabI18n.t("standalone.app.deleteSession.2")))return;
         this.busy=true;this.updateControls();
         try{await this.api('delete_session',{session_id:id,confirm:id});
             if(this.currentSession?.session_id===id){this.currentSession=null;this.generation++;document.getElementById('chat-messages').replaceChildren();document.getElementById('user-input').value='';document.getElementById('usage-summary').textContent='';document.getElementById('session-funding-label').hidden=true;}
-            await this.reloadLogsOnly();this.notify('حُذفت المحادثة ومراجعاتها من المختبر نهائيًا.');
+            await this.reloadLogsOnly();this.notify(LabI18n.t("standalone.app.deleteSession.3"));
         }catch(e){this.notify(e.message,true);}finally{this.busy=false;this.updateControls();}
     },
     escapeHtml(str) {return LabView.text(str);}
 };
-window.addEventListener('DOMContentLoaded', () => App.init().catch(e=>App.notify('تعذر تحميل التطبيق: '+e.message,true)));
+window.addEventListener('DOMContentLoaded', () => App.init().catch(e=>App.notify(LabI18n.t("app.ui.1")+e.message,true)));

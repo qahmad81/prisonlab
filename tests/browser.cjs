@@ -19,7 +19,46 @@ if(!chrome && process.platform==='win32') {
         page.on('dialog',dialog=>dialog.accept());
         const errors=[];page.on('pageerror',e=>errors.push(e.message));
         const base=process.env.TEST_BASE_URL || 'http://127.0.0.1:8492';
-        await page.goto(base);await page.waitForFunction(()=>App.models.length>0);
+
+        await page.goto(base);
+        assert.equal(new URL(page.url()).pathname,'/en/home');
+        await page.waitForFunction(()=>typeof App!=='undefined' && App.models.length>0);
+        assert.equal(await page.locator('.top-bar a[href*="auth.php"], .top-bar a[href*="/privacy"], .top-bar a[href*="/public"], .top-bar a[href*="#contact"], #open-sponsors-btn').count(),0);
+        assert.equal(await page.locator('#account-controls').isVisible(),false);
+        const file='char_10_leo_vance.md',path='/public/case_file/char_10_leo_vance';
+        await page.goto(base+'/en'+path);
+        await page.waitForSelector('#public-context-heading h2');
+        assert((await page.locator('#public-context-heading').innerText()).includes('Leo Vance'));
+        await Promise.all([page.waitForURL(base+'/ar'+path),page.getByRole('link',{name:'العربية',exact:true}).click()]);
+        assert.equal(await page.locator('html').getAttribute('dir'),'rtl');
+        await Promise.all([page.waitForURL(base+'/en'+path),page.getByRole('link',{name:'English',exact:true}).click()]);
+        await page.waitForSelector('#public-context-heading a');
+        await Promise.all([page.waitForURL('**/en/home?case_file=char_10_leo_vance.md'),page.locator('#public-context-heading a').click()]);
+        await page.waitForFunction(()=>typeof App!=='undefined' && App.models.length>0);
+        assert.equal(await page.evaluate(()=>App.selectedCaseFilename),file);
+        for(const width of [320,390,768,1440]){
+            await page.setViewportSize({width,height:1024});
+            assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+        }
+        const english=await page.evaluate(async()=>{
+            const {session}=await App.api('start_session',{model:'google/gemini-2.5-flash-lite',interrogator_type:'human',case_file:'char_10_leo_vance.md',request_id:crypto.randomUUID()});
+            const data=await App.api('send_message',{session_id:session.session_id,expected_turns:0,request_id:crypto.randomUUID(),message:'Who had access to the exam database?'});
+            const grade=await App.api('evaluate_session',{session_id:session.session_id});
+            await App.api('delete_session',{session_id:session.session_id,confirm:session.session_id});
+            const external=(await App.api('start_session',{model:'google/gemini-2.5-flash-lite',interrogator_type:'human',case_file:'char_10_leo_vance.md',request_id:crypto.randomUUID(),mcp_actors:{prisoner:{name:'Local Harness',effort:'high'}}})).session;
+            const r=await fetch('/api.php?lang=ar',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':App.csrfToken},body:JSON.stringify({action:'mcp_gate',session_id:external.session_id,role:'prisoner'})});
+            const gate=await r.json();
+            await App.api('delete_session',{session_id:external.session_id,confirm:external.session_id});
+            return {session:data.session,status:grade.session.evaluation_status,handoff:gate.handoff,gateOk:gate.ok};
+        });
+        assert.equal(english.session.locale,'en');
+        assert.match(english.session.messages[1].content,/That allegation/);
+        assert.equal(english.status,'complete');
+        assert(english.gateOk && english.handoff.includes('prisonlab_wait') && english.handoff.includes('English'));
+        assert(!/[\u0600-\u06ff]/.test(english.handoff));
+        await page.setViewportSize({width:1560,height:1024});
+
+        await page.goto(base+'/ar/home');await page.waitForFunction(()=>App.models.length>0);
         assert.equal(await page.evaluate(()=>App.models.find(m=>m.id===App.selectedModelId)?.curated_tier),'focus_economic');
         assert.equal(await page.locator('#states-gallery').isVisible(),false);
         // Each actor offers only its declared efforts; selections travel with swapped models.
@@ -111,21 +150,23 @@ if(!chrome && process.platform==='win32') {
         await page.locator('#swap-roles-btn').click();await page.locator('#swap-roles-btn').click();
         assert.deepEqual(await page.evaluate(()=>[App.currentSession.session_id,App.currentSession.model,App.currentSession.interrogator_model,App.currentSession.interrogator_type]),fixedSession,'Setup swap must not mutate the saved experiment');
 
+        const apiPath=url=>url.pathname==='/api.php';
+        const loadSessionPath=url=>apiPath(url) && url.searchParams.get('action')==='load_session';
         // A busy server waits for the original worker, then replays exactly the same idempotency ID.
         let busyOnce=true,pollCount=0;const replayIds=[];
-        await page.route('**/api.php',async route=>{
+        await page.route(apiPath,async route=>{
             const req=route.request();if(req.method()!=='POST')return route.continue();
             const body=req.postDataJSON();if(body.action!=='send_message')return route.continue();
             replayIds.push(body.request_id);
             if(busyOnce){busyOnce=false;return route.fulfill({status:409,contentType:'application/json',body:JSON.stringify({ok:false,busy:true,error:'Busy fixture'})});}
             return route.continue();
         });
-        await page.route('**/api.php?action=load_session&session_id=*',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({ok:true,processing:++pollCount===1})}));
+        await page.route(loadSessionPath,route=>route.fulfill({contentType:'application/json',body:JSON.stringify({ok:true,processing:++pollCount===1})}));
         await page.locator('#user-input').fill('ما الدليل الذي تستند إليه في إنكارك؟');
         await page.locator('#send-btn').click();
         await page.waitForFunction(()=>App.currentSession.turns_count===1 && !App.busy);
         assert.equal(pollCount,2);assert.equal(replayIds.length,2);assert.equal(replayIds[0],replayIds[1]);
-        await page.unroute('**/api.php');await page.unroute('**/api.php?action=load_session&session_id=*');
+        await page.unroute(apiPath);await page.unroute(loadSessionPath);
         assert((await page.locator('.msg-assistant .reasoning-badge').innerText()).includes('إعداد المزود'));
         assert.equal(await page.locator('.msg-assistant .mini-metric').count(),4);
         assert.equal(await page.locator('.msg-face-portrait').count(),1);
@@ -167,7 +208,7 @@ if(!chrome && process.platform==='win32') {
         await page.locator('.btn-archive-local').click();assert.equal(await page.locator('#archive-modal-grid .archive-card').count(),1);
         await page.locator('#archive-modal .modal-close-btn').click();
         const pub=await browser.newPage();pub.on('pageerror',e=>errors.push(e.message));
-        await pub.goto(base+'/public.php?session_id='+sid);
+        await pub.goto(base+'/public.php?lang=ar&session_id='+sid);
         await pub.waitForSelector('#session-reader-modal.active');
         assert.equal(await pub.locator('.duel-scores > div').count(),2);
         assert.equal(await pub.locator('.msg-face-portrait').count(),1);
@@ -181,7 +222,7 @@ if(!chrome && process.platform==='win32') {
         await page.locator('.model-card').first().click();
         let failed=0;const attempts=[];let releaseAi;const pauseAfterFirst=new Promise(resolve=>{releaseAi=resolve;});
         await page.evaluate(()=>{window.__retryWaits=[];App.retryWait=async ms=>{window.__retryWaits.push(ms);};});
-        await page.route('**/api.php',async route=>{
+        await page.route(apiPath,async route=>{
             const d=route.request().postDataJSON();
             if(d?.action==='ai_vs_ai_step' && failed<3) {
                 failed++;attempts.push(d.request_id);
@@ -249,7 +290,7 @@ if(!chrome && process.platform==='win32') {
         await page.setViewportSize({width:1560,height:1024});
         await page.evaluate(()=>window.scrollTo(0,0));
         await page.screenshot({path:'test-results/reverse-round.png',fullPage:true});
-        await page.route('**/api.php',async route=>{
+        await page.route(apiPath,async route=>{
             const data=route.request().postDataJSON();
             if(data?.action==='evaluate_session' && data.session_id===reverseId)return route.continue({headers:{...route.request().headers(),'X-Test-Incidents':'1'}});
             return route.fallback();
@@ -262,15 +303,15 @@ if(!chrome && process.platform==='win32') {
         assert.equal(await page.locator('.msg-user').count(),1,'Unanswered question must not enter evaluated transcript');
         await page.getByRole('button',{name:'نشر التجربة',exact:true}).click();
         await page.waitForFunction(()=>App.currentSession.is_published && !App.busy);
-        await pub.goto(base+'/public.php?session_id='+reverseId);
+        await pub.goto(base+'/public.php?lang=ar&session_id='+reverseId);
         await pub.waitForSelector('#session-reader-modal.active');
         assert((await pub.locator('.msg-assistant .msg-meta').textContent()).includes('أنت'));
         assert.equal(await pub.locator('.msg-thought').count(),0);
         // Semantic investigator closure ends reverse mode without an extra human answer.
-        await page.unroute('**/api.php');
+        await page.unroute(apiPath);
         await page.locator('#start-session-btn').click();
         await page.waitForFunction(()=>App.currentSession.interrogator_type==='reverse' && App.currentSession.awaiting_question?.sense && !App.busy);
-        await page.route('**/api.php',async route=>{
+        await page.route(apiPath,async route=>{
             const data=route.request().postDataJSON();
             if(data?.action==='reverse_question')return route.continue({headers:{...route.request().headers(),'X-Test-Investigator-Stop':'1'}});
             return route.fallback();

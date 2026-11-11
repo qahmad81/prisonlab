@@ -22,7 +22,7 @@ def start(client, key='', model='google/gemini-2.5-flash-lite', mode='human', in
 with tempfile.TemporaryDirectory(prefix='prisonlab-standalone-') as tmp:
     with open(Path(tmp) / 'server.log', 'w') as log:
         server = subprocess.Popen(['php', '-d', 'auto_prepend_file=' + str(ROOT / 'tests/mock-provider.php'),
-                                   '-S', '127.0.0.1:8496', 'router.php'], cwd=ROOT,
+                                   '-S', '127.0.0.1:8496', 'tests/router.php'], cwd=ROOT,
                                   env={**os.environ, 'LAB_DATA_DIR': tmp}, stdout=log, stderr=log,
                                   creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
         try:
@@ -37,6 +37,16 @@ with tempfile.TemporaryDirectory(prefix='prisonlab-standalone-') as tmp:
             b.init()
             assert data['edition'] == 'standalone' and data['participant_profile']['provider'] == 'local'
             assert 'quota' not in data and 'auth_ready' not in data
+            for lang, direction in [('en','ltr'),('ar','rtl')]:
+                for page in ['home','public/case_file/char_10_leo_vance','public/investigator/ethan_cole','privacy']:
+                    with a.opener.open(integration.BASE+'/'+lang+'/'+page) as response:
+                        html=response.read().decode('utf-8')
+                    assert f'<html lang="{lang}" dir="{direction}">' in html
+                code, catalog=a.get('/api.php?action=init_data&lang='+lang)
+                assert code==200 and len(catalog['cases'])==16 and len(catalog['investigators'])==10
+            for path in ['/lang/ar/messages.json','/lang/en/promts/prisoner.role.txt','/en/public/profile/unknown']:
+                assert a.get(path)[0]==404,path
+
             assert a.get('/auth.php?action=login')[0] == 404
             assert a.get('/api.php?action=leaderboard')[0] == 405
             assert a.get('/api.php?action=public_profile')[0] == 405

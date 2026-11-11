@@ -4,7 +4,6 @@
   "models": [
     {
       "provider_slug": "aion-labs",
-      "description_ar": "نموذج AionLabs: Aion 3.5 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "aion-labs/aion-3.5",
@@ -57,7 +56,6 @@
     },
     {
       "provider_slug": "aion-labs",
-      "description_ar": "نموذج AionLabs: Aion 3.5 Mini خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "aion-labs/aion-3.5-mini",
@@ -110,7 +108,6 @@
     },
     {
       "provider_slug": "aion-labs",
-      "description_ar": "نموذج AionLabs: Aion-2.0 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "aion-labs/aion-2.0",
@@ -156,7 +153,6 @@
     },
     {
       "provider_slug": "aion-labs",
-      "description_ar": "نموذج AionLabs: Aion-3.0 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "aion-labs/aion-3.0",
@@ -202,7 +198,6 @@
     },
     {
       "provider_slug": "aion-labs",
-      "description_ar": "نموذج AionLabs: Aion-3.0-Mini خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "aion-labs/aion-3.0-mini",
@@ -248,7 +243,6 @@
     },
     {
       "provider_slug": "aion-labs",
-      "description_ar": "نموذج AionLabs: Aion-RP 1.0 (8B) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "aion-labs/aion-rp-llama-3.1-8b",
@@ -286,7 +280,6 @@
     },
     {
       "provider_slug": "amazon",
-      "description_ar": "نموذج Amazon: Nova 2 Lite خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "amazon/nova-2-lite-v1",
@@ -336,7 +329,6 @@
     },
     {
       "provider_slug": "amazon",
-      "description_ar": "نموذج Amazon: Nova Lite 1.0 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "amazon/nova-lite-v1",
@@ -378,7 +370,6 @@
     },
     {
       "provider_slug": "amazon",
-      "description_ar": "نموذج Amazon: Nova Micro 1.0 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "amazon/nova-micro-v1",
@@ -419,7 +410,6 @@
     },
     {
       "provider_slug": "amazon",
-      "description_ar": "نموذج Amazon: Nova Premier 1.0 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "amazon/nova-premier-v1",
@@ -461,7 +451,6 @@
     },
     {
       "provider_slug": "amazon",
-      "description_ar": "نموذج Amazon: Nova Pro 1.0 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "amazon/nova-pro-v1",
@@ -503,7 +492,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Fable 5 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-fable-5",
@@ -562,7 +550,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Fable 5 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-fable-5:batch",
@@ -620,7 +607,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Fable 5.1 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 59,
       "usage_tokens_7d": 58617530483,
       "id": "anthropic/claude-fable-5.1",
@@ -679,7 +665,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Fable 5.1 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-fable-5.1:batch",
@@ -737,7 +722,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Fable Latest ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~anthropic/claude-fable-latest",
@@ -796,7 +780,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Haiku 4.5 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-haiku-4.5",
@@ -848,7 +831,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Haiku 4.5 (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-haiku-4.5:batch",
@@ -899,7 +881,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Haiku 5.5 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": 18,
       "usage_tokens_7d": 1957325967341,
       "id": "anthropic/claude-haiku-5.5",
@@ -959,7 +940,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Haiku 5.5 (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-haiku-5.5:batch",
@@ -1018,7 +998,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Haiku Latest خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~anthropic/claude-haiku-latest",
@@ -1078,7 +1057,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 4.1 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-opus-4.1",
@@ -1127,7 +1105,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 4.1 (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-opus-4.1:batch",
@@ -1176,7 +1153,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 4.5 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-opus-4.5",
@@ -1228,7 +1204,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 4.5 (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-opus-4.5:batch",
@@ -1278,7 +1253,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 4.6 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-opus-4.6",
@@ -1342,7 +1316,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 4.6 (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-opus-4.6:batch",
@@ -1404,7 +1377,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 4.7 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-opus-4.7",
@@ -1465,7 +1437,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 4.7 (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-opus-4.7:batch",
@@ -1525,7 +1496,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 4.8 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-opus-4.8",
@@ -1586,7 +1556,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 4.8 (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-opus-4.8:batch",
@@ -1646,7 +1615,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 5 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 34,
       "usage_tokens_7d": 802259908903,
       "id": "anthropic/claude-opus-5",
@@ -1707,7 +1675,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 5 (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-opus-5:batch",
@@ -1767,7 +1734,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 5.5 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 6,
       "usage_tokens_7d": 6802877090910,
       "id": "anthropic/claude-opus-5.5",
@@ -1826,7 +1792,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus 5.5 (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-opus-5.5:batch",
@@ -1884,7 +1849,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Opus Latest متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~anthropic/claude-opus-latest",
@@ -1943,7 +1907,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Sonnet 4.5 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-sonnet-4.5",
@@ -1995,7 +1958,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Sonnet 4.5 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-sonnet-4.5:batch",
@@ -2046,7 +2008,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Sonnet 4.6 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-sonnet-4.6",
@@ -2108,7 +2069,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Sonnet 4.6 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-sonnet-4.6:batch",
@@ -2168,7 +2128,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Sonnet 5 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 43,
       "usage_tokens_7d": 546568643477,
       "id": "anthropic/claude-sonnet-5",
@@ -2229,7 +2188,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Sonnet 5 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-sonnet-5:batch",
@@ -2289,7 +2247,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Sonnet 5.5 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 17,
       "usage_tokens_7d": 2473958375821,
       "id": "anthropic/claude-sonnet-5.5",
@@ -2348,7 +2305,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Sonnet 5.5 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthropic/claude-sonnet-5.5:batch",
@@ -2406,7 +2362,6 @@
     },
     {
       "provider_slug": "anthropic",
-      "description_ar": "نموذج Anthropic: Claude Sonnet Latest ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~anthropic/claude-sonnet-latest",
@@ -2465,7 +2420,6 @@
     },
     {
       "provider_slug": "arcee-ai",
-      "description_ar": "نموذج Arcee AI: Trinity Large Thinking متخصص في التفكير المنطقي العميق وحل السيناريوهات المعقدة (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "arcee-ai/trinity-large-thinking",
@@ -2512,7 +2466,6 @@
     },
     {
       "provider_slug": "bytedance-seed",
-      "description_ar": "نموذج ByteDance Seed: Seed 1.6 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "bytedance-seed/seed-1.6",
@@ -2563,7 +2516,6 @@
     },
     {
       "provider_slug": "bytedance-seed",
-      "description_ar": "نموذج ByteDance Seed: Seed 1.6 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "bytedance-seed/seed-1.6-flash",
@@ -2614,7 +2566,6 @@
     },
     {
       "provider_slug": "bytedance-seed",
-      "description_ar": "نموذج ByteDance Seed: Seed 2.1 Turbo ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "bytedance-seed/seed-2-1-turbo",
@@ -2665,7 +2616,6 @@
     },
     {
       "provider_slug": "bytedance-seed",
-      "description_ar": "نموذج ByteDance Seed: Seed-2.0-Code ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "bytedance-seed/seed-2.0-code",
@@ -2724,7 +2674,6 @@
     },
     {
       "provider_slug": "bytedance-seed",
-      "description_ar": "نموذج ByteDance Seed: Seed-2.0-Lite خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "bytedance-seed/seed-2.0-lite",
@@ -2784,7 +2733,6 @@
     },
     {
       "provider_slug": "bytedance-seed",
-      "description_ar": "نموذج ByteDance Seed: Seed-2.0-Mini خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "bytedance-seed/seed-2.0-mini",
@@ -2844,7 +2792,6 @@
     },
     {
       "provider_slug": "bytedance",
-      "description_ar": "نموذج ByteDance: UI-TARS 7B  ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "bytedance/ui-tars-1.5-7b",
@@ -2893,7 +2840,6 @@
     },
     {
       "provider_slug": "cohere",
-      "description_ar": "نموذج Cohere: Command A ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "cohere/command-a",
@@ -2938,7 +2884,6 @@
     },
     {
       "provider_slug": "cohere",
-      "description_ar": "نموذج Cohere: Command A+ ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "cohere/command-a-plus",
@@ -2990,7 +2935,6 @@
     },
     {
       "provider_slug": "cohere",
-      "description_ar": "نموذج Cohere: Command R (08-2024) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "cohere/command-r-08-2024",
@@ -3037,7 +2981,6 @@
     },
     {
       "provider_slug": "cohere",
-      "description_ar": "نموذج Cohere: Command R+ (08-2024) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "cohere/command-r-plus-08-2024",
@@ -3084,7 +3027,6 @@
     },
     {
       "provider_slug": "cohere",
-      "description_ar": "نموذج Cohere: Command R7B (12-2024) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "cohere/command-r7b-12-2024",
@@ -3129,7 +3071,6 @@
     },
     {
       "provider_slug": "cohere",
-      "description_ar": "نموذج Cohere: North Mini Code (free) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "cohere/north-mini-code:free",
@@ -3179,7 +3120,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek Flash Latest خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~deepseek/deepseek-flash-latest",
@@ -3248,7 +3188,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek Pro Latest متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~deepseek/deepseek-pro-latest",
@@ -3313,7 +3252,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V3 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "deepseek/deepseek-chat",
@@ -3363,7 +3301,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V3 0324 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "deepseek/deepseek-chat-v3-0324",
@@ -3410,7 +3347,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V3.1 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "deepseek/deepseek-chat-v3.1",
@@ -3467,7 +3403,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V3.1 Terminus ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "deepseek/deepseek-v3.1-terminus",
@@ -3516,7 +3451,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V3.2 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 62,
       "usage_tokens_7d": 42892831243,
       "id": "deepseek/deepseek-v3.2",
@@ -3574,7 +3508,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V3.2 Exp ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "deepseek/deepseek-v3.2-exp",
@@ -3623,7 +3556,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V4 Flash 0423 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": 16,
       "usage_tokens_7d": 2774951600290,
       "id": "deepseek/deepseek-v4-flash",
@@ -3689,7 +3621,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V4 Flash 0731 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 11,
       "usage_tokens_7d": 4712133832328,
       "id": "deepseek/deepseek-v4-flash-0731",
@@ -3757,7 +3688,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V4 Flash Latest خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~deepseek/deepseek-v4-flash-latest",
@@ -3825,7 +3755,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V4 Flash Vision Exp خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "deepseek/deepseek-v4-flash-vision-exp",
@@ -3892,7 +3821,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V4 Pro 0423 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 38,
       "usage_tokens_7d": 645980413051,
       "id": "deepseek/deepseek-v4-pro",
@@ -3957,7 +3885,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V4 Pro 0813 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": 31,
       "usage_tokens_7d": 937986035116,
       "id": "deepseek/deepseek-v4-pro-0813",
@@ -4022,7 +3949,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V4.1 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": 1,
       "usage_tokens_7d": 27330542152138,
       "id": "deepseek/deepseek-v4.1-flash",
@@ -4091,7 +4017,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V4.1 Flash (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "deepseek/deepseek-v4.1-flash:batch",
@@ -4158,7 +4083,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: DeepSeek V4.1 Flash 1017 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": 3,
       "usage_tokens_7d": 11487998885873,
       "id": "deepseek/deepseek-v4.1-flash-1017",
@@ -4227,7 +4151,6 @@
     },
     {
       "provider_slug": "deepseek",
-      "description_ar": "نموذج DeepSeek: R1 0528 متخصص في التفكير المنطقي العميق وحل السيناريوهات المعقدة (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "deepseek/deepseek-r1-0528",
@@ -4284,7 +4207,6 @@
     },
     {
       "provider_slug": "dots-studio",
-      "description_ar": "نموذج Dots Studio: Dots3-Note Preview (free) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "dots-studio/dots-3-note-preview:free",
@@ -4332,7 +4254,6 @@
     },
     {
       "provider_slug": "elorian",
-      "description_ar": "نموذج Elorian: Glimpse ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "elorian/glimpse",
@@ -4390,7 +4311,6 @@
     },
     {
       "provider_slug": "fireworks",
-      "description_ar": "نموذج Fireworks: Ember-1 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "fireworks/ember-1",
@@ -4455,7 +4375,6 @@
     },
     {
       "provider_slug": "openrouter",
-      "description_ar": "نموذج Free Models Router ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openrouter/free",
@@ -4511,7 +4430,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 2.5 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 54,
       "usage_tokens_7d": 117137125651,
       "id": "google/gemini-2.5-flash",
@@ -4564,7 +4482,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 2.5 Flash Lite خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 41,
       "usage_tokens_7d": 611511256387,
       "id": "google/gemini-2.5-flash-lite",
@@ -4617,7 +4534,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 2.5 Pro خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-2.5-pro",
@@ -4669,7 +4585,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 2.5 Pro Preview 06-05 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-2.5-pro-preview",
@@ -4721,7 +4636,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3 Flash Preview خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 35,
       "usage_tokens_7d": 733253880026,
       "id": "google/gemini-3-flash-preview",
@@ -4783,7 +4697,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3 Flash Preview (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3-flash-preview:batch",
@@ -4845,7 +4758,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.1 Flash Lite خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": 46,
       "usage_tokens_7d": 479030582851,
       "id": "google/gemini-3.1-flash-lite",
@@ -4908,7 +4820,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.1 Flash Lite (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3.1-flash-lite:batch",
@@ -4971,7 +4882,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.1 Flash Lite Preview خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3.1-flash-lite-preview",
@@ -5033,7 +4943,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.1 Pro Preview خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3.1-pro-preview",
@@ -5093,7 +5002,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.1 Pro Preview (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3.1-pro-preview:batch",
@@ -5153,7 +5061,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.1 Pro Preview Custom Tools خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3.1-pro-preview-customtools",
@@ -5212,7 +5119,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.5 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3.5-flash",
@@ -5274,7 +5180,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.5 Flash (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3.5-flash:batch",
@@ -5336,7 +5241,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.5 Flash Lite خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3.5-flash-lite",
@@ -5398,7 +5302,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.5 Flash Lite (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3.5-flash-lite:batch",
@@ -5458,7 +5361,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.6 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3.6-flash",
@@ -5520,7 +5422,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.6 Flash (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3.6-flash:batch",
@@ -5580,7 +5481,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.7 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 49,
       "usage_tokens_7d": 326915135419,
       "id": "google/gemini-3.7-flash",
@@ -5641,7 +5541,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.7 Flash (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3.7-flash:batch",
@@ -5700,7 +5599,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.8 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 23,
       "usage_tokens_7d": 1656135963058,
       "id": "google/gemini-3.8-flash",
@@ -5761,7 +5659,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 3.8 Flash (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-3.8-flash:batch",
@@ -5820,7 +5717,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 4 Argon خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 29,
       "usage_tokens_7d": 998370665144,
       "id": "google/gemini-4-argon",
@@ -5880,7 +5776,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini 4 Argon (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-4-argon:batch",
@@ -5940,7 +5835,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini Flash Latest خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~google/gemini-flash-latest",
@@ -6001,7 +5895,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemini Pro Latest خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~google/gemini-pro-latest",
@@ -6061,7 +5954,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemma 2 27B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemma-2-27b-it",
@@ -6106,7 +5998,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemma 3 12B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemma-3-12b-it",
@@ -6157,7 +6048,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemma 3 27B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemma-3-27b-it",
@@ -6210,7 +6100,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemma 3 4B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemma-3-4b-it",
@@ -6261,7 +6150,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemma 4 26B A4B  ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 52,
       "usage_tokens_7d": 263121604172,
       "id": "google/gemma-4-26b-a4b-it",
@@ -6322,7 +6210,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemma 4 26B A4B  (free) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemma-4-26b-a4b-it:free",
@@ -6372,7 +6259,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemma 4 31B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 42,
       "usage_tokens_7d": 551319213830,
       "id": "google/gemma-4-31b-it",
@@ -6433,7 +6319,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Gemma 4 31B (free) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemma-4-31b-it:free",
@@ -6483,7 +6368,6 @@
     },
     {
       "provider_slug": "google",
-      "description_ar": "نموذج Google: Nano Banana 2.1 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "google/gemini-nano-banana-2.1",
@@ -6541,7 +6425,6 @@
     },
     {
       "provider_slug": "ibm-granite",
-      "description_ar": "نموذج IBM: Granite 4.0 Micro ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "ibm-granite/granite-4.0-h-micro",
@@ -6591,7 +6474,6 @@
     },
     {
       "provider_slug": "ibm-granite",
-      "description_ar": "نموذج IBM: Granite 4.2 8B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "ibm-granite/granite-4.2-8b",
@@ -6656,7 +6538,6 @@
     },
     {
       "provider_slug": "inception",
-      "description_ar": "نموذج Inception: Mercury 2 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "inception/mercury-2",
@@ -6712,7 +6593,6 @@
     },
     {
       "provider_slug": "inception",
-      "description_ar": "نموذج Inception: Mercury 2.5 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "inception/mercury-2.5",
@@ -6820,7 +6700,6 @@
     },
     {
       "provider_slug": "inclusionai",
-      "description_ar": "نموذج inclusionAI: Ling 3.0 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "inclusionai/ling-3.0-flash",
@@ -6877,7 +6756,6 @@
     },
     {
       "provider_slug": "inclusionai",
-      "description_ar": "نموذج inclusionAI: Ling 3.0 Flash VL خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "inclusionai/ling-3.0-flash-vl",
@@ -6935,7 +6813,6 @@
     },
     {
       "provider_slug": "inclusionai",
-      "description_ar": "نموذج inclusionAI: Ling 3.1 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "inclusionai/ling-3.1-flash",
@@ -6993,7 +6870,6 @@
     },
     {
       "provider_slug": "inference-net",
-      "description_ar": "نموذج Inference.net: Schematron V2 Small ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "inference-net/schematron-v2-small",
@@ -7041,7 +6917,6 @@
     },
     {
       "provider_slug": "inference-net",
-      "description_ar": "نموذج Inference.net: Schematron V2 Turbo ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "inference-net/schematron-v2-turbo",
@@ -7142,7 +7017,6 @@
     },
     {
       "provider_slug": "liquid",
-      "description_ar": "نموذج LiquidAI: LFM2.5-2.6B (free) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "liquid/lfm-2.5-2.6b:free",
@@ -7198,7 +7072,6 @@
     },
     {
       "provider_slug": "liquid",
-      "description_ar": "نموذج LiquidAI: LFM2.5-24B-A2B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "liquid/lfm-2.5-24b-a2b",
@@ -7254,7 +7127,6 @@
     },
     {
       "provider_slug": "anthracite-org",
-      "description_ar": "نموذج Magnum v4 72B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "anthracite-org/magnum-v4-72b",
@@ -7305,7 +7177,6 @@
     },
     {
       "provider_slug": "mancer",
-      "description_ar": "نموذج Mancer: Weaver (alpha) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mancer/weaver",
@@ -7355,7 +7226,6 @@
     },
     {
       "provider_slug": "meituan",
-      "description_ar": "نموذج Meituan: LongCat 2.0 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meituan/longcat-2.0",
@@ -7410,7 +7280,6 @@
     },
     {
       "provider_slug": "meta-llama",
-      "description_ar": "نموذج Meta: Llama 3.1 70B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta-llama/llama-3.1-70b-instruct",
@@ -7460,7 +7329,6 @@
     },
     {
       "provider_slug": "meta-llama",
-      "description_ar": "نموذج Meta: Llama 3.1 8B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta-llama/llama-3.1-8b-instruct",
@@ -7512,7 +7380,6 @@
     },
     {
       "provider_slug": "meta-llama",
-      "description_ar": "نموذج Meta: Llama 3.2 1B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta-llama/llama-3.2-1b-instruct",
@@ -7558,7 +7425,6 @@
     },
     {
       "provider_slug": "meta-llama",
-      "description_ar": "نموذج Meta: Llama 3.2 3B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta-llama/llama-3.2-3b-instruct",
@@ -7607,7 +7473,6 @@
     },
     {
       "provider_slug": "meta-llama",
-      "description_ar": "نموذج Meta: Llama 3.3 70B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta-llama/llama-3.3-70b-instruct",
@@ -7659,7 +7524,6 @@
     },
     {
       "provider_slug": "meta-llama",
-      "description_ar": "نموذج Meta: Llama 4 Maverick ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta-llama/llama-4-maverick",
@@ -7711,7 +7575,6 @@
     },
     {
       "provider_slug": "meta-llama",
-      "description_ar": "نموذج Meta: Llama 4 Scout ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta-llama/llama-4-scout",
@@ -7762,7 +7625,6 @@
     },
     {
       "provider_slug": "meta-llama",
-      "description_ar": "نموذج Meta: Llama Guard 4 12B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta-llama/llama-guard-4-12b",
@@ -7809,7 +7671,6 @@
     },
     {
       "provider_slug": "meta",
-      "description_ar": "نموذج Meta: Muse Glimmer 30B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta/muse-glimmer-30b",
@@ -7873,7 +7734,6 @@
     },
     {
       "provider_slug": "meta",
-      "description_ar": "نموذج Meta: Muse Spark 1.1 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta/muse-spark-1.1",
@@ -7934,7 +7794,6 @@
     },
     {
       "provider_slug": "meta",
-      "description_ar": "نموذج Meta: Muse Spark 1.2 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta/muse-spark-1.2",
@@ -7995,7 +7854,6 @@
     },
     {
       "provider_slug": "meta",
-      "description_ar": "نموذج Meta: Muse Spark 1.2 Contributor ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta/muse-spark-1.2-contributor",
@@ -8056,7 +7914,6 @@
     },
     {
       "provider_slug": "meta",
-      "description_ar": "نموذج Meta: Muse Spark 1.3 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta/muse-spark-1.3",
@@ -8118,7 +7975,6 @@
     },
     {
       "provider_slug": "meta",
-      "description_ar": "نموذج Meta: Muse Spark 1.3 Contributor ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 13,
       "usage_tokens_7d": 3259679762071,
       "id": "meta/muse-spark-1.3-contributor",
@@ -8180,7 +8036,6 @@
     },
     {
       "provider_slug": "meta",
-      "description_ar": "نموذج Meta: Muse Spark Open ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta/muse-spark-open",
@@ -8249,7 +8104,6 @@
     },
     {
       "provider_slug": "meta",
-      "description_ar": "نموذج Meta: Muse Wonder ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "meta/muse-wonder",
@@ -8312,7 +8166,6 @@
     },
     {
       "provider_slug": "microsoft",
-      "description_ar": "نموذج Microsoft: Phi 4 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "microsoft/phi-4",
@@ -8360,7 +8213,6 @@
     },
     {
       "provider_slug": "minimax",
-      "description_ar": "نموذج MiniMax: MiniMax M1 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "minimax/minimax-m1",
@@ -8411,7 +8263,6 @@
     },
     {
       "provider_slug": "minimax",
-      "description_ar": "نموذج MiniMax: MiniMax M2 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "minimax/minimax-m2",
@@ -8456,7 +8307,6 @@
     },
     {
       "provider_slug": "minimax",
-      "description_ar": "نموذج MiniMax: MiniMax M2-her خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "minimax/minimax-m2-her",
@@ -8494,7 +8344,6 @@
     },
     {
       "provider_slug": "minimax",
-      "description_ar": "نموذج MiniMax: MiniMax M2.1 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "minimax/minimax-m2.1",
@@ -8540,7 +8389,6 @@
     },
     {
       "provider_slug": "minimax",
-      "description_ar": "نموذج MiniMax: MiniMax M2.5 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "minimax/minimax-m2.5",
@@ -8597,7 +8445,6 @@
     },
     {
       "provider_slug": "minimax",
-      "description_ar": "نموذج MiniMax: MiniMax M2.7 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "minimax/minimax-m2.7",
@@ -8651,7 +8498,6 @@
     },
     {
       "provider_slug": "minimax",
-      "description_ar": "نموذج MiniMax: MiniMax M3 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": 24,
       "usage_tokens_7d": 1377952422539,
       "id": "minimax/minimax-m3",
@@ -8774,7 +8620,6 @@
     },
     {
       "provider_slug": "minimax",
-      "description_ar": "نموذج MiniMax: MiniMax-01 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "minimax/minimax-01",
@@ -8813,7 +8658,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral Large ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-large",
@@ -8860,7 +8704,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral Large 2407 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-large-2407",
@@ -8907,7 +8750,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Codestral 2508 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/codestral-2508",
@@ -8955,7 +8797,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Codestral 2508 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/codestral-2508:batch",
@@ -9004,7 +8845,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Devstral 2 2512 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/devstral-2512",
@@ -9051,7 +8891,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Ministral 3 14B 2512 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/ministral-14b-2512",
@@ -9098,7 +8937,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Ministral 3 3B 2512 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/ministral-3b-2512",
@@ -9145,7 +8983,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Ministral 3 8B 2512 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/ministral-8b-2512",
@@ -9192,7 +9029,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Ministral 3 8B 2512 (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/ministral-8b-2512:batch",
@@ -9240,7 +9076,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Large 3 2512 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-large-2512",
@@ -9288,7 +9123,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Large 3 2512 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-large-2512:batch",
@@ -9337,7 +9171,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Large 4 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-large-4-0",
@@ -9398,7 +9231,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Medium 3 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-medium-3",
@@ -9446,7 +9278,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Medium 3.1 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-medium-3.1",
@@ -9494,7 +9325,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Medium 3.1 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-medium-3.1:batch",
@@ -9543,7 +9373,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Medium 3.5 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-medium-3-5",
@@ -9602,7 +9431,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Medium 3.5 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-medium-3-5:batch",
@@ -9661,7 +9489,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Nemo ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 61,
       "usage_tokens_7d": 45038480611,
       "id": "mistralai/mistral-nemo",
@@ -9713,7 +9540,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Small 3 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-small-24b-instruct-2501",
@@ -9761,7 +9587,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Small 3.1 24B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-small-3.1-24b-instruct",
@@ -9813,7 +9638,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Small 3.2 24B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-small-3.2-24b-instruct",
@@ -9866,7 +9690,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Small 4 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-small-2603",
@@ -9925,7 +9748,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mistral Small 4 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-small-2603:batch",
@@ -9985,7 +9807,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Mixtral 8x22B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mixtral-8x22b-instruct",
@@ -10032,7 +9853,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Saba ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/mistral-saba",
@@ -10079,7 +9899,6 @@
     },
     {
       "provider_slug": "mistralai",
-      "description_ar": "نموذج Mistral: Voxtral Small 24B 2507 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "mistralai/voxtral-small-24b-2507",
@@ -10127,7 +9946,6 @@
     },
     {
       "provider_slug": "moondream",
-      "description_ar": "نموذج Moondream: Moondream 3 Preview ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "moondream/moondream3-preview",
@@ -10173,7 +9991,6 @@
     },
     {
       "provider_slug": "moondream",
-      "description_ar": "نموذج Moondream: Moondream 3.1 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "moondream/moondream3.1-9b-a2b",
@@ -10219,7 +10036,6 @@
     },
     {
       "provider_slug": "moonshotai",
-      "description_ar": "نموذج MoonshotAI: Kimi K2 0711 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "moonshotai/kimi-k2",
@@ -10265,7 +10081,6 @@
     },
     {
       "provider_slug": "moonshotai",
-      "description_ar": "نموذج MoonshotAI: Kimi K2 0905 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "moonshotai/kimi-k2-0905",
@@ -10313,7 +10128,6 @@
     },
     {
       "provider_slug": "moonshotai",
-      "description_ar": "نموذج MoonshotAI: Kimi K2 Thinking متخصص في التفكير المنطقي العميق وحل السيناريوهات المعقدة (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "moonshotai/kimi-k2-thinking",
@@ -10367,7 +10181,6 @@
     },
     {
       "provider_slug": "moonshotai",
-      "description_ar": "نموذج MoonshotAI: Kimi K2.5 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "moonshotai/kimi-k2.5",
@@ -10426,7 +10239,6 @@
     },
     {
       "provider_slug": "moonshotai",
-      "description_ar": "نموذج MoonshotAI: Kimi K2.6 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "moonshotai/kimi-k2.6",
@@ -10486,7 +10298,6 @@
     },
     {
       "provider_slug": "moonshotai",
-      "description_ar": "نموذج MoonshotAI: Kimi K2.7 Code ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "moonshotai/kimi-k2.7-code",
@@ -10546,7 +10357,6 @@
     },
     {
       "provider_slug": "moonshotai",
-      "description_ar": "نموذج Kimi K3 للمحادثة والاستدلال والسياقات الطويلة من Moonshot AI.",
       "usage_rank": 20,
       "usage_tokens_7d": 1825053894200,
       "id": "moonshotai/kimi-k3",
@@ -10616,7 +10426,6 @@
     },
     {
       "provider_slug": "moonshotai",
-      "description_ar": "نموذج MoonshotAI: Kimi K3 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "moonshotai/kimi-k3:batch",
@@ -10681,7 +10490,6 @@
       }
     },
     {
-      "description_ar": "نموذج Kimi K3.1 Pro المتقدم للاستدلال والمهام المعقدة، بسياق يصل إلى مليون توكن.",
       "id": "moonshotai/kimi-k3.1-pro",
       "created": 1792778188,
       "canonical_slug": "moonshotai/kimi-k3.1-pro-20261023",
@@ -10740,7 +10548,6 @@
     },
     {
       "provider_slug": "moonshotai",
-      "description_ar": "نموذج MoonshotAI: Kimi Latest ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~moonshotai/kimi-latest",
@@ -10810,7 +10617,6 @@
     },
     {
       "provider_slug": "morph",
-      "description_ar": "نموذج Morph: Morph V3 Fast ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "morph/morph-v3-fast",
@@ -10852,7 +10658,6 @@
     },
     {
       "provider_slug": "morph",
-      "description_ar": "نموذج Morph: Morph V3 Large ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "morph/morph-v3-large",
@@ -10894,7 +10699,6 @@
     },
     {
       "provider_slug": "gryphe",
-      "description_ar": "نموذج MythoMax 13B متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "gryphe/mythomax-l2-13b",
@@ -10945,7 +10749,6 @@
     },
     {
       "provider_slug": "nex-agi",
-      "description_ar": "نموذج Nex AGI: Nex-N2.5-Mini خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nex-agi/nex-n2.5-mini",
@@ -11000,7 +10803,6 @@
     },
     {
       "provider_slug": "nex-agi",
-      "description_ar": "نموذج Nex AGI: Nex-N2.5-Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nex-agi/nex-n2.5-pro",
@@ -11057,7 +10859,6 @@
     },
     {
       "provider_slug": "nousresearch",
-      "description_ar": "نموذج Nous: Hermes 3 405B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nousresearch/hermes-3-llama-3.1-405b",
@@ -11105,7 +10906,6 @@
     },
     {
       "provider_slug": "nousresearch",
-      "description_ar": "نموذج Nous: Hermes 3 70B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nousresearch/hermes-3-llama-3.1-70b",
@@ -11152,7 +10952,6 @@
     },
     {
       "provider_slug": "nousresearch",
-      "description_ar": "نموذج Nous: Hermes 4 405B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nousresearch/hermes-4-405b",
@@ -11203,7 +11002,6 @@
     },
     {
       "provider_slug": "nvidia",
-      "description_ar": "نموذج NVIDIA: Nemotron 3 Nano 30B A3B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nvidia/nemotron-3-nano-30b-a3b",
@@ -11259,7 +11057,6 @@
     },
     {
       "provider_slug": "nvidia",
-      "description_ar": "نموذج NVIDIA: Nemotron 3 Nano Omni (free) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
@@ -11310,7 +11107,6 @@
     },
     {
       "provider_slug": "nvidia",
-      "description_ar": "نموذج NVIDIA: Nemotron 3 Super ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nvidia/nemotron-3-super-120b-a12b",
@@ -11376,7 +11172,6 @@
     },
     {
       "provider_slug": "nvidia",
-      "description_ar": "نموذج NVIDIA: Nemotron 3 Super (free) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nvidia/nemotron-3-super-120b-a12b:free",
@@ -11434,7 +11229,6 @@
     },
     {
       "provider_slug": "nvidia",
-      "description_ar": "نموذج NVIDIA: Nemotron 3 Ultra ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nvidia/nemotron-3-ultra-550b-a55b",
@@ -11498,7 +11292,6 @@
     },
     {
       "provider_slug": "nvidia",
-      "description_ar": "نموذج NVIDIA: Nemotron 3 Ultra (free) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
@@ -11553,7 +11346,6 @@
     },
     {
       "provider_slug": "nvidia",
-      "description_ar": "نموذج NVIDIA: Nemotron 3.5 Content Safety ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nvidia/nemotron-3.5-content-safety",
@@ -11606,7 +11398,6 @@
     },
     {
       "provider_slug": "nvidia",
-      "description_ar": "نموذج NVIDIA: Nemotron 3.5 Content Safety (free) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nvidia/nemotron-3.5-content-safety:free",
@@ -11652,7 +11443,6 @@
     },
     {
       "provider_slug": "nvidia",
-      "description_ar": "نموذج NVIDIA: Nemotron 3.5 Lightning ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nvidia/nemotron-3.5-lightning",
@@ -11709,7 +11499,6 @@
     },
     {
       "provider_slug": "nvidia",
-      "description_ar": "نموذج NVIDIA: Nemotron 3.5 Lightning (free) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nvidia/nemotron-3.5-lightning:free",
@@ -11755,7 +11544,6 @@
     },
     {
       "provider_slug": "nvidia",
-      "description_ar": "نموذج NVIDIA: Nemotron 3.5 Super VL ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nvidia/nemotron-3.5-super-vl",
@@ -11814,7 +11602,6 @@
     },
     {
       "provider_slug": "nvidia",
-      "description_ar": "نموذج NVIDIA: Nemotron 3.5 Super VL (free) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "nvidia/nemotron-3.5-super-vl:free",
@@ -11864,7 +11651,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT Astra Latest ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~openai/gpt-astra-latest",
@@ -11924,7 +11710,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT Audio ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-audio",
@@ -11975,7 +11760,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT Audio Mini خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-audio-mini",
@@ -12026,7 +11810,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT Chat Latest ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-chat-latest",
@@ -12069,7 +11852,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT Luna Latest ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~openai/gpt-luna-latest",
@@ -12130,7 +11912,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT Mini Latest خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~openai/gpt-mini-latest",
@@ -12190,7 +11971,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT Sol Latest ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~openai/gpt-sol-latest",
@@ -12250,7 +12030,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT Terra Latest ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~openai/gpt-terra-latest",
@@ -12311,7 +12090,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-3.5 Turbo ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-3.5-turbo",
@@ -12361,7 +12139,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-3.5 Turbo (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-3.5-turbo:batch",
@@ -12411,7 +12188,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-3.5 Turbo (older v0613) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-3.5-turbo-0613",
@@ -12460,7 +12236,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-3.5 Turbo 16k ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-3.5-turbo-16k",
@@ -12509,7 +12284,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-3.5 Turbo Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-3.5-turbo-instruct",
@@ -12557,7 +12331,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4",
@@ -12605,7 +12378,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4 Turbo ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4-turbo",
@@ -12656,7 +12428,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4 Turbo (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4-turbo:batch",
@@ -12706,7 +12477,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4.1 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4.1",
@@ -12752,7 +12522,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4.1 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4.1:batch",
@@ -12797,7 +12566,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4.1 Mini خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4.1-mini",
@@ -12843,7 +12611,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4.1 Mini (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4.1-mini:batch",
@@ -12888,7 +12655,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4.1 Nano ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4.1-nano",
@@ -12933,7 +12699,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4.1 Nano (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4.1-nano:batch",
@@ -12978,7 +12743,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4o ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4o",
@@ -13032,7 +12796,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4o (2024-05-13) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4o-2024-05-13",
@@ -13084,7 +12847,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4o (2024-08-06) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4o-2024-08-06",
@@ -13138,7 +12900,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4o (2024-11-20) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4o-2024-11-20",
@@ -13191,7 +12952,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4o (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4o:batch",
@@ -13244,7 +13004,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4o-mini خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4o-mini",
@@ -13298,7 +13057,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4o-mini (2024-07-18) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4o-mini-2024-07-18",
@@ -13351,7 +13109,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-4o-mini (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-4o-mini:batch",
@@ -13404,7 +13161,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5",
@@ -13462,7 +13218,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5:batch",
@@ -13519,7 +13274,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5 Mini خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5-mini",
@@ -13577,7 +13331,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5 Mini (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5-mini:batch",
@@ -13634,7 +13387,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5 Nano ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5-nano",
@@ -13692,7 +13444,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5 Nano (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5-nano:batch",
@@ -13749,7 +13500,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5 Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5-pro",
@@ -13803,7 +13553,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5 Pro (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5-pro:batch",
@@ -13857,7 +13606,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.1 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.1",
@@ -13916,7 +13664,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.1 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.1:batch",
@@ -13974,7 +13721,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.1-Codex ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.1-codex",
@@ -14029,7 +13775,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.1-Codex-Max متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.1-codex-max",
@@ -14085,7 +13830,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.1-Codex-Mini خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.1-codex-mini",
@@ -14140,7 +13884,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.2 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.2",
@@ -14199,7 +13942,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.2 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.2:batch",
@@ -14257,7 +13999,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.2 Chat ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.2-chat",
@@ -14301,7 +14042,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.2 Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.2-pro",
@@ -14357,7 +14097,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.2 Pro (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.2-pro:batch",
@@ -14413,7 +14152,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.2-Codex ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.2-codex",
@@ -14469,7 +14207,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.3-Codex ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.3-codex",
@@ -14528,7 +14265,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.4 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.4",
@@ -14588,7 +14324,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.4 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.4:batch",
@@ -14647,7 +14382,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.4 Mini خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 57,
       "usage_tokens_7d": 61454896557,
       "id": "openai/gpt-5.4-mini",
@@ -14707,7 +14441,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.4 Mini (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.4-mini:batch",
@@ -14766,7 +14499,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.4 Nano ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.4-nano",
@@ -14826,7 +14558,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.4 Nano (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.4-nano:batch",
@@ -14885,7 +14616,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.4 Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.4-pro",
@@ -14942,7 +14672,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.4 Pro (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.4-pro:batch",
@@ -14998,7 +14727,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.5 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.5",
@@ -15058,7 +14786,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.5 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.5:batch",
@@ -15117,7 +14844,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.5 Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.5-pro",
@@ -15173,7 +14899,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.5 Pro (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.5-pro:batch",
@@ -15229,7 +14954,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.6 Luna ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 21,
       "usage_tokens_7d": 1686085118682,
       "id": "openai/gpt-5.6-luna",
@@ -15290,7 +15014,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.6 Luna (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.6-luna:batch",
@@ -15350,7 +15073,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.6 Luna Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.6-luna-pro",
@@ -15411,7 +15133,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.6 Luna Pro (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.6-luna-pro:batch",
@@ -15471,7 +15192,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.6 Sol ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 50,
       "usage_tokens_7d": 318571829850,
       "id": "openai/gpt-5.6-sol",
@@ -15532,7 +15252,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.6 Sol (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.6-sol:batch",
@@ -15592,7 +15311,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.6 Sol Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.6-sol-pro",
@@ -15653,7 +15371,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.6 Sol Pro (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.6-sol-pro:batch",
@@ -15713,7 +15430,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.6 Terra ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.6-terra",
@@ -15774,7 +15490,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.6 Terra (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.6-terra:batch",
@@ -15834,7 +15549,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.6 Terra Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.6-terra-pro",
@@ -15895,7 +15609,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-5.6 Terra Pro (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-5.6-terra-pro:batch",
@@ -15955,7 +15668,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6 Astra ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 53,
       "usage_tokens_7d": 202068618115,
       "id": "openai/gpt-6-astra",
@@ -16015,7 +15727,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6 Astra (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-6-astra:batch",
@@ -16074,7 +15785,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6 Astra Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-6-astra-pro",
@@ -16134,7 +15844,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6 Astra Pro (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-6-astra-pro:batch",
@@ -16193,7 +15902,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6 Luna ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 7,
       "usage_tokens_7d": 6210531237602,
       "id": "openai/gpt-6-luna",
@@ -16254,7 +15962,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6 Luna (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-6-luna:batch",
@@ -16314,7 +16021,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6 Luna Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 51,
       "usage_tokens_7d": 287427234172,
       "id": "openai/gpt-6-luna-pro",
@@ -16375,7 +16081,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6 Luna Pro (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-6-luna-pro:batch",
@@ -16435,7 +16140,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6 Sol ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 47,
       "usage_tokens_7d": 429418230145,
       "id": "openai/gpt-6-sol",
@@ -16496,7 +16200,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6 Sol (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-6-sol:batch",
@@ -16556,7 +16259,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6 Sol Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-6-sol-pro",
@@ -16617,7 +16319,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6 Sol Pro (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-6-sol-pro:batch",
@@ -16677,7 +16378,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6.1 Sol ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 19,
       "usage_tokens_7d": 1892019779941,
       "id": "openai/gpt-6.1-sol",
@@ -16737,7 +16437,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6.1 Sol (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-6.1-sol:batch",
@@ -16796,7 +16495,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6.1 Sol Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-6.1-sol-pro",
@@ -16856,7 +16554,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: GPT-6.1 Sol Pro (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-6.1-sol-pro:batch",
@@ -17139,7 +16836,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: gpt-oss-120b ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 44,
       "usage_tokens_7d": 543985321004,
       "id": "openai/gpt-oss-120b",
@@ -17204,7 +16900,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: gpt-oss-120b (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-oss-120b:batch",
@@ -17266,7 +16961,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: gpt-oss-20b ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-oss-20b",
@@ -17330,7 +17024,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: gpt-oss-20b (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/gpt-oss-20b:batch",
@@ -17392,7 +17085,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: o1 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/o1",
@@ -17441,7 +17133,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: o1-pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/o1-pro",
@@ -17488,7 +17179,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: o3 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/o3",
@@ -17536,7 +17226,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: o3 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/o3:batch",
@@ -17584,7 +17273,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: o3 Mini خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/o3-mini",
@@ -17632,7 +17320,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: o3 Mini (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/o3-mini:batch",
@@ -17679,7 +17366,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: o3 Mini High خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/o3-mini-high",
@@ -17732,7 +17418,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: o3 Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/o3-pro",
@@ -17780,7 +17465,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: o4 Mini خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/o4-mini",
@@ -17829,7 +17513,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: o4 Mini (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/o4-mini:batch",
@@ -17877,7 +17560,6 @@
     },
     {
       "provider_slug": "openai",
-      "description_ar": "نموذج OpenAI: o4 Mini High خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "openai/o4-mini-high",
@@ -17931,7 +17613,6 @@
     },
     {
       "provider_slug": "unbiased",
-      "description_ar": "نموذج Pareto 26.10 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "unbiased/pareto-26.10",
@@ -17972,7 +17653,6 @@
     },
     {
       "provider_slug": "unbiased",
-      "description_ar": "نموذج Pareto 26.9 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "unbiased/pareto-26.9",
@@ -18014,7 +17694,6 @@
     },
     {
       "provider_slug": "unbiased",
-      "description_ar": "نموذج Pareto Latest ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~unbiased/pareto-latest",
@@ -18055,7 +17734,6 @@
     },
     {
       "provider_slug": "particle-ai",
-      "description_ar": "نموذج Particle AI متخصص في البرمجة ومعدل من DeepSeek، ويدعم المحادثة النصية.",
       "id": "particle-ai/particle-1",
       "created": 1793207893,
       "canonical_slug": "particle-ai/particle-1-20261027",
@@ -18122,7 +17800,6 @@
     },
     {
       "provider_slug": "perceptron",
-      "description_ar": "نموذج Perceptron: Perceptron Mk1 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "perceptron/perceptron-mk1",
@@ -18171,7 +17848,6 @@
     },
     {
       "provider_slug": "perceptron",
-      "description_ar": "نموذج Perceptron: Perceptron Mk1.5 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "perceptron/perceptron-mk1.5",
@@ -18232,7 +17908,6 @@
     },
     {
       "provider_slug": "perplexity",
-      "description_ar": "نموذج Perplexity: Sonar ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "perplexity/sonar",
@@ -18275,7 +17950,6 @@
     },
     {
       "provider_slug": "perplexity",
-      "description_ar": "نموذج Perplexity: Sonar Deep Research ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "perplexity/sonar-deep-research",
@@ -18322,7 +17996,6 @@
     },
     {
       "provider_slug": "perplexity",
-      "description_ar": "نموذج Perplexity: Sonar Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "perplexity/sonar-pro",
@@ -18365,7 +18038,6 @@
     },
     {
       "provider_slug": "perplexity",
-      "description_ar": "نموذج Perplexity: Sonar Pro Search متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "perplexity/sonar-pro-search",
@@ -18414,7 +18086,6 @@
     },
     {
       "provider_slug": "perplexity",
-      "description_ar": "نموذج Perplexity: Sonar Reasoning Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "perplexity/sonar-reasoning-pro",
@@ -18462,7 +18133,6 @@
     },
     {
       "provider_slug": "poolside",
-      "description_ar": "نموذج Poolside: Laguna S 2.1 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "poolside/laguna-s-2.1",
@@ -18508,7 +18178,6 @@
     },
     {
       "provider_slug": "poolside",
-      "description_ar": "نموذج Poolside: Laguna S 2.1 (free) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "poolside/laguna-s-2.1:free",
@@ -18554,7 +18223,6 @@
     },
     {
       "provider_slug": "poolside",
-      "description_ar": "نموذج Poolside: Laguna XS 2.1 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "poolside/laguna-xs-2.1",
@@ -18600,7 +18268,6 @@
     },
     {
       "provider_slug": "poolside",
-      "description_ar": "نموذج Poolside: Laguna XS 2.1 (free) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "poolside/laguna-xs-2.1:free",
@@ -18646,7 +18313,6 @@
     },
     {
       "provider_slug": "prism-ml",
-      "description_ar": "نموذج PrismML: Ternary Bonsai 2 27B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "prism-ml/ternary-bonsai-2-27b",
@@ -18710,7 +18376,6 @@
     },
     {
       "provider_slug": "prism-ml",
-      "description_ar": "نموذج PrismML صغير للمحادثة والاستدلال، مبني على Qwen بأوزان ثلاثية.",
       "id": "prism-ml/ternary-bonsai-2-9b",
       "created": 1792130995,
       "canonical_slug": "prism-ml/ternary-bonsai-2-9b-20261015",
@@ -18765,7 +18430,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen2.5 72B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen-2.5-72b-instruct",
@@ -18815,7 +18479,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen2.5 Coder 32B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen-2.5-coder-32b-instruct",
@@ -18862,7 +18525,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen-Plus متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen-plus",
@@ -18911,7 +18573,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen2.5 7B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen-2.5-7b-instruct",
@@ -18960,7 +18621,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen2.5 VL 72B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen2.5-vl-72b-instruct",
@@ -19010,7 +18670,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 14B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-14b",
@@ -19067,7 +18726,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 235B A22B Instruct 2507 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-235b-a22b-2507",
@@ -19119,7 +18777,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 235B A22B Thinking 2507 متخصص في التفكير المنطقي العميق وحل السيناريوهات المعقدة (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-235b-a22b-thinking-2507",
@@ -19168,7 +18825,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 30B A3B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-30b-a3b",
@@ -19224,7 +18880,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 30B A3B Instruct 2507 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-30b-a3b-instruct-2507",
@@ -19275,7 +18930,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 32B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-32b",
@@ -19333,7 +18987,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 Coder 30B A3B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-coder-30b-a3b-instruct",
@@ -19378,7 +19031,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 Coder 480B A35B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-coder",
@@ -19428,7 +19080,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 Coder Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-coder-flash",
@@ -19476,7 +19127,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 Coder Next ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-coder-next",
@@ -19527,7 +19177,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 Next 80B A3B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-next-80b-a3b-instruct",
@@ -19579,7 +19228,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 Next 80B A3B Thinking متخصص في التفكير المنطقي العميق وحل السيناريوهات المعقدة (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-next-80b-a3b-thinking",
@@ -19635,7 +19283,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 VL 235B A22B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-vl-235b-a22b-instruct",
@@ -19688,7 +19335,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 VL 30B A3B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-vl-30b-a3b-instruct",
@@ -19741,7 +19387,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 VL 30B A3B Thinking متخصص في التفكير المنطقي العميق وحل السيناريوهات المعقدة (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-vl-30b-a3b-thinking",
@@ -19791,7 +19436,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3 VL 8B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3-vl-8b-instruct",
@@ -19843,7 +19487,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.5 397B A17B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.5-397b-a17b",
@@ -19902,7 +19545,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.5 Plus 2026-02-15 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.5-plus-02-15",
@@ -19958,7 +19600,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.5 Plus 2026-04-20 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.5-plus-20260420",
@@ -20014,7 +19655,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.5-122B-A10B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.5-122b-a10b",
@@ -20073,7 +19713,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.5-27B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.5-27b",
@@ -20132,7 +19771,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.5-35B-A3B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.5-35b-a3b",
@@ -20191,7 +19829,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.5-9B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.5-9b",
@@ -20251,7 +19888,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.5-Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.5-flash-02-23",
@@ -20305,7 +19941,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.6 27B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.6-27b",
@@ -20365,7 +20000,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.6 35B A3B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 33,
       "usage_tokens_7d": 821787287185,
       "id": "qwen/qwen3.6-35b-a3b",
@@ -20425,7 +20059,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.6 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.6-flash",
@@ -20481,7 +20114,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.6 Plus متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.6-plus",
@@ -20537,7 +20169,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.7 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 56,
       "usage_tokens_7d": 62423206787,
       "id": "qwen/qwen3.7-flash",
@@ -20591,7 +20222,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.7 Max متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.7-max",
@@ -20646,7 +20276,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.7 Plus متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.7-plus",
@@ -20702,7 +20331,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.7 Plus (batch) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.7-plus:batch",
@@ -20758,7 +20386,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.8 2.4T A95B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.8-2.4t-a95b",
@@ -20823,7 +20450,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.8 27B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 48,
       "usage_tokens_7d": 426352181504,
       "id": "qwen/qwen3.8-27b",
@@ -20892,7 +20518,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.8 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 39,
       "usage_tokens_7d": 638393663470,
       "id": "qwen/qwen3.8-flash",
@@ -20950,7 +20575,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.8 Max (0902) متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.8-max-0902",
@@ -21016,7 +20640,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.8 Max Prime متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.8-max-prime",
@@ -21082,7 +20705,6 @@
     },
     {
       "provider_slug": "qwen",
-      "description_ar": "نموذج Qwen: Qwen3.8 Omni Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "qwen/qwen3.8-omni-flash",
@@ -21186,7 +20808,6 @@
     },
     {
       "provider_slug": "reflection",
-      "description_ar": "نموذج Reflection: Beam 1.0 501B A23B ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "reflection/beam-1.0-501b-a23b",
@@ -21252,7 +20873,6 @@
     },
     {
       "provider_slug": "rekaai",
-      "description_ar": "نموذج Reka Edge ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "rekaai/reka-edge",
@@ -21305,7 +20925,6 @@
     },
     {
       "provider_slug": "rekaai",
-      "description_ar": "نموذج Reka Flash 3 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "rekaai/reka-flash-3",
@@ -21356,7 +20975,6 @@
     },
     {
       "provider_slug": "relace",
-      "description_ar": "نموذج Relace: Relace Apply 3 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "relace/relace-apply-3",
@@ -21394,7 +21012,6 @@
     },
     {
       "provider_slug": "relace",
-      "description_ar": "نموذج Relace: Relace Search ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "relace/relace-search",
@@ -21437,7 +21054,6 @@
     },
     {
       "provider_slug": "undi95",
-      "description_ar": "نموذج ReMM SLERP 13B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "undi95/remm-slerp-l2-13b",
@@ -21488,7 +21104,6 @@
     },
     {
       "provider_slug": "sakana",
-      "description_ar": "نموذج Sakana: Fugu Max متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "sakana/fugu-max",
@@ -21542,7 +21157,6 @@
     },
     {
       "provider_slug": "sakana",
-      "description_ar": "نموذج Sakana: Fugu Ultra ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "sakana/fugu-ultra",
@@ -21595,7 +21209,6 @@
     },
     {
       "provider_slug": "sakana",
-      "description_ar": "نموذج Sakana: Fugu Ultra v2 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "sakana/fugu-ultra-v2",
@@ -21649,7 +21262,6 @@
     },
     {
       "provider_slug": "sakana",
-      "description_ar": "نموذج Sakana: Sakana Namazu ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "sakana/sakana-namazu",
@@ -21702,7 +21314,6 @@
     },
     {
       "provider_slug": "sao10k",
-      "description_ar": "نموذج Sao10K: Llama 3 8B Lunaris ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "sao10k/l3-lunaris-8b",
@@ -21752,7 +21363,6 @@
     },
     {
       "provider_slug": "sao10k",
-      "description_ar": "نموذج Sao10K: Llama 3.1 Euryale 70B v2.2 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "sao10k/l3.1-euryale-70b",
@@ -21799,7 +21409,6 @@
     },
     {
       "provider_slug": "scaledown",
-      "description_ar": "نموذج ScaleDown: Extract ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "scaledown/extract",
@@ -21837,7 +21446,6 @@
     },
     {
       "provider_slug": "scaledown",
-      "description_ar": "نموذج ScaleDown: Summarize ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "scaledown/summarize",
@@ -21875,7 +21483,6 @@
     },
     {
       "provider_slug": "x-ai",
-      "description_ar": "نموذج SpaceXAI: Grok 4.20 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "x-ai/grok-4.20",
@@ -21928,7 +21535,6 @@
     },
     {
       "provider_slug": "x-ai",
-      "description_ar": "نموذج SpaceXAI: Grok 4.20 Multi-Agent ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "x-ai/grok-4.20-multi-agent",
@@ -21987,7 +21593,6 @@
     },
     {
       "provider_slug": "x-ai",
-      "description_ar": "نموذج SpaceXAI: Grok 4.3 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "x-ai/grok-4.3",
@@ -22048,7 +21653,6 @@
     },
     {
       "provider_slug": "x-ai",
-      "description_ar": "نموذج SpaceXAI: Grok 4.3 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "x-ai/grok-4.3:batch",
@@ -22109,7 +21713,6 @@
     },
     {
       "provider_slug": "x-ai",
-      "description_ar": "نموذج SpaceXAI: Grok 4.5 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "x-ai/grok-4.5",
@@ -22169,7 +21772,6 @@
     },
     {
       "provider_slug": "x-ai",
-      "description_ar": "نموذج SpaceXAI: Grok 4.6 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "x-ai/grok-4.6",
@@ -22232,7 +21834,6 @@
     },
     {
       "provider_slug": "x-ai",
-      "description_ar": "نموذج SpaceXAI: Grok 4.7 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 58,
       "usage_tokens_7d": 61436284930,
       "id": "x-ai/grok-4.7",
@@ -22293,7 +21894,6 @@
     },
     {
       "provider_slug": "x-ai",
-      "description_ar": "نموذج SpaceXAI: Grok Build 0.1 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "x-ai/grok-build-0.1",
@@ -22345,7 +21945,6 @@
     },
     {
       "provider_slug": "stepfun",
-      "description_ar": "نموذج StepFun: Step 3.5 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "stepfun/step-3.5-flash",
@@ -22392,7 +21991,6 @@
     },
     {
       "provider_slug": "stepfun",
-      "description_ar": "نموذج StepFun: Step 3.7 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "stepfun/step-3.7-flash",
@@ -22456,7 +22054,6 @@
     },
     {
       "provider_slug": "stepfun",
-      "description_ar": "نموذج StepFun: Step 5 Preview ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 8,
       "usage_tokens_7d": 5807919107029,
       "id": "stepfun/step-5-preview",
@@ -22521,7 +22118,6 @@
     },
     {
       "provider_slug": "tencent",
-      "description_ar": "نموذج Tencent: Hunyuan A13B Instruct ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "tencent/hunyuan-a13b-instruct",
@@ -22568,7 +22164,6 @@
     },
     {
       "provider_slug": "tencent",
-      "description_ar": "نموذج Tencent: Hy-MT2-1.8B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "tencent/hy-mt2-1.8b",
@@ -22607,7 +22202,6 @@
     },
     {
       "provider_slug": "tencent",
-      "description_ar": "نموذج Tencent: Hy-MT2-30B-A3B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "tencent/hy-mt2-30b-a3b",
@@ -22648,7 +22242,6 @@
     },
     {
       "provider_slug": "tencent",
-      "description_ar": "نموذج Tencent: Hy-MT2-7B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "tencent/hy-mt2-7b",
@@ -22689,7 +22282,6 @@
     },
     {
       "provider_slug": "tencent",
-      "description_ar": "نموذج Tencent: Hy3 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 14,
       "usage_tokens_7d": 3147908086832,
       "id": "tencent/hy3",
@@ -22753,7 +22345,6 @@
     },
     {
       "provider_slug": "tencent",
-      "description_ar": "نموذج Tencent: Hy3 preview ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "tencent/hy3-preview",
@@ -22807,7 +22398,6 @@
     },
     {
       "provider_slug": "tencent",
-      "description_ar": "نموذج Tencent: Hy4 preview ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 5,
       "usage_tokens_7d": 8157744160293,
       "id": "tencent/hy4-preview",
@@ -22874,7 +22464,6 @@
     },
     {
       "provider_slug": "thedrummer",
-      "description_ar": "نموذج TheDrummer: Cydonia 24B V4.1 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "thedrummer/cydonia-24b-v4.1",
@@ -22923,7 +22512,6 @@
     },
     {
       "provider_slug": "thedrummer",
-      "description_ar": "نموذج TheDrummer: Skyfall 36B V2 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "thedrummer/skyfall-36b-v2",
@@ -22972,7 +22560,6 @@
     },
     {
       "provider_slug": "thedrummer",
-      "description_ar": "نموذج TheDrummer: UnslopNemo 12B ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "thedrummer/unslopnemo-12b",
@@ -23020,7 +22607,6 @@
     },
     {
       "provider_slug": "thinkingmachines",
-      "description_ar": "نموذج Thinking Machines: Inkling متخصص في التفكير المنطقي العميق وحل السيناريوهات المعقدة (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "thinkingmachines/inkling",
@@ -23085,7 +22671,6 @@
     },
     {
       "provider_slug": "thinkingmachines",
-      "description_ar": "نموذج Thinking Machines: Inkling (free) متخصص في التفكير المنطقي العميق وحل السيناريوهات المعقدة (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "thinkingmachines/inkling:free",
@@ -23146,7 +22731,6 @@
     },
     {
       "provider_slug": "thinkingmachines",
-      "description_ar": "نموذج Thinking Machines: Inkling Small متخصص في التفكير المنطقي العميق وحل السيناريوهات المعقدة",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "thinkingmachines/inkling-small",
@@ -23212,7 +22796,6 @@
     },
     {
       "provider_slug": "thinkingmachines",
-      "description_ar": "نموذج Thinking Machines: Inkling Small (free) متخصص في التفكير المنطقي العميق وحل السيناريوهات المعقدة",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "thinkingmachines/inkling-small:free",
@@ -23273,7 +22856,6 @@
     },
     {
       "provider_slug": "upstage",
-      "description_ar": "نموذج Upstage: Solar Mini 4 خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": 26,
       "usage_tokens_7d": 1027553477670,
       "id": "upstage/solar-mini4",
@@ -23335,7 +22917,6 @@
     },
     {
       "provider_slug": "upstage",
-      "description_ar": "نموذج Upstage: Solar Pro 3 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "upstage/solar-pro-3",
@@ -23396,7 +22977,6 @@
     },
     {
       "provider_slug": "upstage",
-      "description_ar": "نموذج Upstage: Solar Pro 4 متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": 40,
       "usage_tokens_7d": 622777712935,
       "id": "upstage/solar-pro4",
@@ -23458,7 +23038,6 @@
     },
     {
       "provider_slug": "cognitivecomputations",
-      "description_ar": "نموذج Venice: Uncensored ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "cognitivecomputations/dolphin-mistral-24b-venice-edition",
@@ -23501,7 +23080,6 @@
     },
     {
       "provider_slug": "writer",
-      "description_ar": "نموذج Writer: Palmyra X5 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "writer/palmyra-x5",
@@ -23541,7 +23119,6 @@
     },
     {
       "provider_slug": "x-ai",
-      "description_ar": "نموذج xAI: Grok Latest ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~x-ai/grok-latest",
@@ -23602,7 +23179,6 @@
     },
     {
       "provider_slug": "xiaomi",
-      "description_ar": "نموذج Xiaomi: MiMo-V2.5 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": 45,
       "usage_tokens_7d": 509013564241,
       "id": "xiaomi/mimo-v2.5",
@@ -23657,7 +23233,6 @@
     },
     {
       "provider_slug": "xiaomi",
-      "description_ar": "نموذج Xiaomi: MiMo-V2.5-Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "xiaomi/mimo-v2.5-pro",
@@ -23707,7 +23282,6 @@
     },
     {
       "provider_slug": "xiaomi",
-      "description_ar": "نموذج Xiaomi: MiMo-V2.6-Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": 4,
       "usage_tokens_7d": 9045893348387,
       "id": "xiaomi/mimo-v2.6-flash",
@@ -23768,7 +23342,6 @@
     },
     {
       "provider_slug": "xiaomi",
-      "description_ar": "نموذج Xiaomi: MiMo-V2.6-Pro متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": 22,
       "usage_tokens_7d": 1657461104664,
       "id": "xiaomi/mimo-v2.6-pro",
@@ -23826,7 +23399,6 @@
     },
     {
       "provider_slug": "xiaomi",
-      "description_ar": "نموذج Xiaomi: MiMo-V2.6-Pro-UltraSpeed متقدم وعالي الذكاء، يمتلك قدرات استنتاج وتحليل نفسي وسياقي عميق",
       "usage_rank": 60,
       "usage_tokens_7d": 45808210444,
       "id": "xiaomi/mimo-v2.6-pro-ultraspeed",
@@ -23879,7 +23451,6 @@
     },
     {
       "provider_slug": "xingchen-agi",
-      "description_ar": "نموذج XingChen: Xing4.0 29B A4B (free) ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "xingchen-agi/xing4.0-29b-a4b:free",
@@ -23934,7 +23505,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 4.5 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-4.5",
@@ -23981,7 +23551,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 4.5 Air ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-4.5-air",
@@ -24032,7 +23601,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 4.5V ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-4.5v",
@@ -24085,7 +23653,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 4.6 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-4.6",
@@ -24140,7 +23707,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 4.6V ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-4.6v",
@@ -24194,7 +23760,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 4.7 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-4.7",
@@ -24251,7 +23816,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 4.7 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-4.7-flash",
@@ -24309,7 +23873,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 5 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-5",
@@ -24365,7 +23928,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 5 Turbo ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-5-turbo",
@@ -24413,7 +23975,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 5.1 ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-5.1",
@@ -24471,7 +24032,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 5.2 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 28,
       "usage_tokens_7d": 1013986979276,
       "id": "z-ai/glm-5.2",
@@ -24537,7 +24097,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 5.3 ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": 9,
       "usage_tokens_7d": 5319635893276,
       "id": "z-ai/glm-5.3",
@@ -24603,7 +24162,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 5.3 (batch) ذكي متوازن للمحادثات المتقدمة وفهم السياق (يدعم التفكير المنطقي وسلاسل الاستدلال المعقدة)",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-5.3:batch",
@@ -24666,7 +24224,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 5.3 Flash خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": 2,
       "usage_tokens_7d": 11593397685528,
       "id": "z-ai/glm-5.3-flash",
@@ -24734,7 +24291,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 5.3 Flash (batch) خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-5.3-flash:batch",
@@ -24801,7 +24357,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 5.3 FlashX خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-5.3-flashx",
@@ -24858,7 +24413,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 5.3 Prime ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-5.3-prime",
@@ -24919,7 +24473,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM 5V Turbo ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "z-ai/glm-5v-turbo",
@@ -24969,7 +24522,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM Flash Latest خفيف واقتصادي، مصمم للاستجابات السريعة والمحادثة الحية تحت الضغط",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~z-ai/glm-flash-latest",
@@ -25037,7 +24589,6 @@
     },
     {
       "provider_slug": "z-ai",
-      "description_ar": "نموذج Z.ai: GLM Latest ذكي متوازن للمحادثات المتقدمة وفهم السياق",
       "usage_rank": null,
       "usage_tokens_7d": 0,
       "id": "~z-ai/glm-latest",

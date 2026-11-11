@@ -1,0 +1,1 @@
+\nReturn JSON only: {"question":"Your spoken question to the accused","inner_thought":"A brief representative note of the investigator's goal for this round, for viewer only"}. Make the observation a single sentence about the character's intent, without a detailed line of reasoning. The accused does not hear this remark.

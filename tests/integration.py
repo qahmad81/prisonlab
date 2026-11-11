@@ -23,10 +23,10 @@ class Client:
             with self.opener.open(BASE+path) as r: return r.status,json.load(r)
         except urllib.error.HTTPError as e: return e.code,None
     def init(self):
-        status,d=self.get('/api.php?action=init_data');assert status==200 and d['ok'];self.csrf=d['csrf_token'];return d
+        status,d=self.get('/api.php?action=init_data&lang=ar');assert status==200 and d['ok'];self.csrf=d['csrf_token'];return d
     def post(self,action,headers=None,**data):
         if action=='start_session': data.setdefault('request_id',uuid.uuid4().hex)
-        req=urllib.request.Request(BASE+'/api.php',data=json.dumps(dict(action=action,**data)).encode(),headers={'Content-Type':'application/json','X-CSRF-Token':self.csrf,'X-User-OpenRouter-Key':'sk-or-test',**(headers or {})})
+        req=urllib.request.Request(BASE+'/api.php?lang=ar',data=json.dumps(dict(action=action,**data)).encode(),headers={'Content-Type':'application/json','X-CSRF-Token':self.csrf,'X-User-OpenRouter-Key':'sk-or-test',**(headers or {})})
         try:
             with self.opener.open(req) as r:return r.status,json.load(r)
         except urllib.error.HTTPError as e:return e.code,json.load(e)
@@ -320,7 +320,7 @@ if __name__=='__main__':
         storage=Path(tmp);env={**os.environ,'LAB_DATA_DIR':tmp,'LAB_TEST_LEGACY_IDENTITY':'1'}
         flags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0
         with (storage/'server.log').open('w') as log:
-            proc=subprocess.Popen(['php','-d','auto_prepend_file='+str(ROOT/'tests/mock-provider.php'),'-S',f'127.0.0.1:{PORT}','router.php'],cwd=ROOT,env=env,stdout=log,stderr=log,creationflags=flags)
+            proc=subprocess.Popen(['php','-d','auto_prepend_file='+str(ROOT/'tests/mock-provider.php'),'-S',f'127.0.0.1:{PORT}','tests/router.php'],cwd=ROOT,env=env,stdout=log,stderr=log,creationflags=flags)
             try:
                 for _ in range(50):
                     try:

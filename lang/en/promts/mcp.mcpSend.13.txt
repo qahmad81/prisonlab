@@ -1,0 +1,1 @@
+Wait up to 15 seconds for your next task. If the status is waiting, wait again. The first task contains the character and case; subsequent tasks contain only the other party's latest spoken message and your trusted directives.

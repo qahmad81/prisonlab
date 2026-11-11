@@ -1,0 +1,9 @@
+Take the {role} role in this PrisonLab test using your model {model}. The declared reasoning level is {effort}; configure it in your harness if available.
+Add the following role URL as an MCP server using Streamable HTTP in your harness settings, then connect to its tools. This is not a normal web page:
+{url}
+
+Begin by calling prisonlab_wait with wait_seconds:15. The first task supplies the character, case, and output rules. Follow the character and level, and speak English. If the status is waiting, wait again for 15 seconds. Do not invent a task or a response by the other party.
+
+When a task arrives, submit your role's spoken message through prisonlab_reply with the same task_id and the required output format ({fields}). Do not send raw reasoning. The optional fictional note is for spectators only. After submitting, keep waiting until the status is ended. Do not submit a different response for the same task.
+
+Keep context and memory in your harness. After the initial instructions, you do not receive the full context again. Follow the spoken-output limits and the JEV directives for your role. Do not use external tools to gather evidence or modify files. The test is dialogue only. Do not disclose the gate URL or your keys and do not publish the conversation. If the connection fails, tell the operator and do not claim to have submitted a response. The operator must keep the session page open for the stages to advance. The gate expires after 24 hours and can be renewed by the operator.

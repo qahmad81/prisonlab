@@ -65,7 +65,7 @@ def fetch_and_save_models(output_path="models.json"):
             continue
 
         chat_models.append({
-            **{k:v for k,v in previous_models.get(mid,{}).items() if k in ['provider_slug','description_ar','usage_rank','usage_tokens_7d']},
+            **{k:v for k,v in previous_models.get(mid,{}).items() if k in ['provider_slug','usage_rank','usage_tokens_7d']},
             "id": mid,
             "created": m.get("created"),
             "canonical_slug": m.get("canonical_slug",mid),

@@ -3,4 +3,7 @@ RewriteEngine On
 RewriteRule ^(?:index\.php|public\.php|privacy\.php|api\.php|mcp\.php|favicon\.(?:svg|ico))$ - [END]
 RewriteRule ^assets/(?:[a-zA-Z0-9_-]+/)*[a-zA-Z0-9_.-]+\.(?:js|css|jpg|jpeg|png|webp|svg)$ - [END]
 RewriteRule ^$ index.php [END]
+RewriteRule ^[a-z]{2,3}(?:-[a-z0-9]{2,8})*/home/?$ index.php [END]
+RewriteRule ^[a-z]{2,3}(?:-[a-z0-9]{2,8})*/privacy/?$ privacy.php [END]
+RewriteRule ^[a-z]{2,3}(?:-[a-z0-9]{2,8})*/public(?:/(?:case_file|session|investigator|model)/[a-zA-Z0-9_.~:-]+(?:/[a-zA-Z0-9_.~:-]+)?)?/?$ public.php [END]
 RewriteRule ^ - [F,END]

@@ -1,0 +1,1 @@
+Evaluate the severity of the prisoner's {label} now as an independent dimension. Grading: absent, mild, moderate, high, very severe. Rely on character and dialogue, not the investigator's request to impose a feeling.

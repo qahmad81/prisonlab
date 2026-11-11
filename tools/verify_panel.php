@@ -3,7 +3,7 @@
 require_once dirname(__DIR__).'/lib/lab.php';
 $root=dirname(__DIR__);$env=labEnv($root.'/.env');$key=$env['OPENROUTER_API_KEY'] ?? '';
 $storage=dirname($root).'/.ai_prison_game-data';$GLOBALS['lab_storage']=$storage;$GLOBALS['lab_verify_all_judges']=true;
-$catalog=labRead($root.'/models.json')['models'];$states=labRead($root.'/states.json')['states'];
+$catalog=labRead($root.'/models.json')['models'];$states=labLanguageJson('data/states.json')['states'];
 $dir=$storage.'/verification';if(!is_dir($dir))mkdir($dir,0700,true);
 $mode=$argv[1] ?? 'latest';
 function retryStage(callable $fn,string $name):void {
@@ -33,7 +33,7 @@ if($mode==='latest') {
         $path=$dir.'/conversation-'.($i+1).'-verified.json';
         if(is_file($path))$s=labRead($path);
         else {
-            $content=file_get_contents($root.'/cases/'.$file);preg_match('/^#\s+(.+)$/m',$content,$title);
+            $content=labCase($file)['content'];preg_match('/^#\s+(.+)$/m',$content,$title);
             preg_match('/^(char_\d+)_/',$file,$slug);preg_match('/الحالة النفسية الابتدائية:\*?\*?\s*([a-z_]+)/u',$content,$state);
             $s=['schema_version'=>2,'session_id'=>'verification_'.($i+1),'created_at'=>gmdate('c'),'updated_at'=>gmdate('c'),
                 'case_content'=>$content,'case_file'=>$file,'case_title'=>$title[1],'character_slug'=>$slug[1],'gender'=>$i===1?'female':'male',

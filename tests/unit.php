@@ -1,6 +1,13 @@
 <?php
 require_once dirname(__DIR__).'/lib/lab.php';
 function check(bool $condition,string $message):void {if(!$condition)throw new RuntimeException($message);}
+check(labRequestLocale()==='en','default standalone language must be English');
+labUseSessionLocale([]);
+check(labLocale()==='ar','legacy standalone sessions must remain Arabic');
+unset($GLOBALS['lab_session_locale']);
+$_GET['lang']='ar';
+check(labParsePagePath('/en/public/case_file/char_10_leo_vance')['params']['case_file']==='char_10_leo_vance.md','case routes must keep stable case IDs');
+check(labParsePagePath('/en/public/profile/secret')===null,'standalone must not expose account routes');
 check(labJuryStop(3,12)==='all_reports','three reports must finish immediately');
 
 // Distinct credentials and zero provider caps are enforced per actor, not per session.
@@ -47,7 +54,7 @@ check($mandatory['effort']==='low','mandatory reasoning was incorrectly disabled
 check(!labInvestigatorReasoning($profiles[9],[])['supported'],'unsupported reasoning falsely advertised');
 $s=['case_content'=>'IMMUTABLE CASE AND IDENTITY','interrogator_type'=>'human','interrogator_model'=>'','interrogator_character'=>$profiles[9],'model'=>'mock','context_offset'=>0,'messages'=>[], 'usage'=>[]];
 $s['prisoner_character']=labPrisonerCharacter('char_10_leo_vance.md');
-foreach(glob(dirname(__DIR__).'/cases/*.md') as $case) {
+foreach(glob(labLanguageDirectory().'/ar/data/cases/*.md') as $case) {
     $p=labPrisonerCharacter(basename($case));check($p['level']>=1 && $p['level']<=10,'case missing level');
 }
 check($s['prisoner_character']['thinking']==='none','easy prisoner thinking not disabled');

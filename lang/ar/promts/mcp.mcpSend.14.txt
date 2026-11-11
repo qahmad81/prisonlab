@@ -1,0 +1,1 @@
+أرسل ردًا عربيًا للمهمة. output: للمحقق question وexpression؛ للمتهم reply وstate_id. inner_thought ملاحظة تمثيلية اختيارية للمشاهد فقط وليست استدلالًا خامًا.

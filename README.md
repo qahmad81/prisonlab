@@ -1,6 +1,6 @@
 # Prisonlab — AI Under Pressure Lab
 
-An Arabic RTL laboratory for comparing AI models through character-based interrogation, psychological simulation, evidence-based judging and role-specific model reviews. It supports a human investigator, AI versus AI, and a human playing the accused.
+An Arabic and English laboratory for comparing AI models through character-based interrogation, psychological simulation, evidence-based judging and role-specific model reviews. It supports a human investigator, AI versus AI, and a human playing the accused.
 
 Open source under the [MIT license](LICENSE). Third-party assets retain their respective terms; see [notices](docs/THIRD_PARTY_NOTICES.md).
 
@@ -13,6 +13,17 @@ php -S 127.0.0.1:8488 router.php
 ```
 
 Alternatively run start.bat. Open http://127.0.0.1:8488/. Always use router.php: it applies a public allowlist. The PHP development server is not a production server. Apache requires mod_rewrite and AllowOverride; a fronting Nginx server needs equivalent protection or a minimal public directory. See [deployment](docs/DEPLOYMENT.md).
+
+## Languages and page routes
+
+English is the default for new visitors. The compact language switch preserves the current page and its filters. The standalone header contains the language switch, project repository and personal-key control.
+
+- Home pages use `/en/home` and `/ar/home`.
+- A case page uses `/en/public/case_file/char_10_leo_vance`.
+- Investigator and model pages use `/en/public/investigator/ethan_cole` and `/en/public/model/openai/gpt-6.1-sol`. They show case/persona/model context and published tests, without account profiles or ranked leaderboards.
+- Published transcripts use `/en/public/session/<session_id>`. Existing PHP links continue working.
+
+Each `lang/<locale>/` folder contains `locale.json`, server `messages.json`, `browser.json`, `promts/`, and `data/` for cases, personalities, states and model descriptions. To add a language, copy a pack, update its display name/direction and translate its values while preserving keys, IDs, numbers and placeholders. Missing resources fall back to Arabic. New sessions store their chosen language; sessions predating language support remain Arabic.
 
 ## Conversation lifecycle
 
@@ -114,7 +125,7 @@ python tools/panel_report.py
 
 live_smoke creates one round plus judging; resume_live continues only that fixture's saved evaluation. verify_panel latest reevaluates the latest completed session with backup; suite runs isolated additional cases; quorum probes partial participation. Never run live tools casually on production. Historical limited live results are in [panel reliability](docs/PANEL_RELIABILITY_REVIEW.md).
 
-Update the model catalog with python fetch_models.py (requires requests) and discovery/ranking metadata with python tools/enrich_models.py. Judge selection is labPanel(); scoring is labRubric()/labEvaluate() in lib/lab.php. Agent instructions are in [AGENTS.md](AGENTS.md). English historical reviews under docs/ retain their version context; Arabic cases, UI strings and runtime prompts deliberately remain Arabic.
+Update the model catalog with python fetch_models.py (requires requests) and discovery/ranking metadata with python tools/enrich_models.py. Judge selection is labPanel(); scoring is labRubric()/labEvaluate() in lib/lab.php. Agent instructions are in [AGENTS.md](AGENTS.md). English historical reviews under docs/ retain their version context; runtime UI text, case files and prompts live in the language packs.
 
 ## Editions and maintenance
 

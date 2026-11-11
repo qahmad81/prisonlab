@@ -1,0 +1,1 @@
+Submit an English response to the task. In output, use question and expression for the investigator or reply and state_id for the accused. inner_thought is an optional fictional spectator note, never raw reasoning.

@@ -1,0 +1,1 @@
+The previous attempt exceeded the production budget. Do not repeat the previous text; Answer with less than half the limit and close the JSON, and shorten or delete the optional note.

@@ -14,6 +14,7 @@ class Client:
         except urllib.error.HTTPError as e:r=e
         raw=r.read();return r.status,json.loads(raw) if 'application/json' in r.headers.get('Content-Type','') else raw.decode(),r.headers
     def login(self,alias='alice'):
+        self.request('/ar/home')
         self.csrf=self.request('/api.php?action=init_data')[1]['csrf_token']
         if (ROOT/'lib/accounts.php').exists():
             _,_,h=self.request('/auth.php?action=login');state=urllib.parse.parse_qs(urllib.parse.urlparse(h['Location']).query)['state'][0]
@@ -153,7 +154,7 @@ if __name__=='__main__':
     with tempfile.TemporaryDirectory(prefix='prisonlab-mcp-') as tmp:
         storage=Path(tmp);env={**os.environ,'LAB_DATA_DIR':tmp,'LAB_TEST_LEGACY_IDENTITY':'0'}
         with (storage/'server.log').open('w') as log:
-            p=subprocess.Popen(['php','-d','auto_prepend_file='+str(ROOT/'tests/mock-provider.php'),'-S','127.0.0.1:8494','router.php'],cwd=ROOT,env=env,stdout=log,stderr=log,creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
+            p=subprocess.Popen(['php','-d','auto_prepend_file='+str(ROOT/'tests/mock-provider.php'),'-S','127.0.0.1:8494','tests/router.php'],cwd=ROOT,env=env,stdout=log,stderr=log,creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
             try:
                 for _ in range(70):
                     try:

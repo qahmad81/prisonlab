@@ -1,0 +1,1 @@
+Preparation of stated mindset for this role: {effort}. This setup is actually managed in the Harness; Don't pretend to change settings you don't control. Do not use external tools to investigate or change files, and practice the role only verbally within the laboratory.

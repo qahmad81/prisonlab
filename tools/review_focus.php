@@ -15,7 +15,7 @@ if($apply && ($session['interrogator_type']!=='reverse' || $session['is_ended'] 
 labSessionLevels($session,$catalog);
 $reply=labInterrogator($session,$env['OPENROUTER_API_KEY'] ?? '');
 if($apply) {
-    $states=labRead($root.'/states.json');
+    $states=labLanguageJson('data/states.json');
     if(isset($states['states']))$states=$states['states'];
     $sense=labSense($session,$reply['text'],$states,$env['OPENROUTER_API_KEY'] ?? '');
     $backups=$GLOBALS['lab_storage'].'/backups';if(!is_dir($backups))mkdir($backups,0700,true);

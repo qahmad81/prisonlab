@@ -1,0 +1,1 @@
+Reliable Simulation Counter: Rounds Completed {completed}; Current round {current}; The normal target is 5–15 without forcing a result.

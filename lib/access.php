@@ -5,9 +5,9 @@ declare(strict_types=1);
 function labRuntimeBootstrap():array {
     $env=array_replace(labEnv(dirname(__DIR__).'/.env'),$GLOBALS['lab_test_env'] ?? []);
     $storage=getenv('LAB_DATA_DIR') ?: ($env['LAB_DATA_DIR'] ?? dirname(__DIR__,2).'/.ai_prison_game-data');
-    if(!is_dir($storage) && !mkdir($storage,0700,true))throw new RuntimeException('تعذر فتح مساحة البيانات الخاصة');
+    if(!is_dir($storage) && !mkdir($storage,0700,true))throw new RuntimeException(labT('accounts.AccountBootstrap.1'));
     $resolved=str_replace('\\','/',realpath($storage));$root=str_replace('\\','/',realpath(dirname(__DIR__)));
-    if(str_starts_with(strtolower($resolved.'/'),strtolower($root.'/')))throw new RuntimeException('مساحة البيانات يجب أن تكون خارج الموقع');
+    if(str_starts_with(strtolower($resolved.'/'),strtolower($root.'/')))throw new RuntimeException(labT('accounts.AccountBootstrap.2'));
     $GLOBALS['lab_storage']=$storage;return $env;
 }
 function labBrowserSession():void {
@@ -21,35 +21,35 @@ function labBrowserSession():void {
     }
     $_SESSION['browser_owner']=$owner;
 }
-function labBrowserIdentity():array {return ['id'=>$_SESSION['browser_owner'],'display_name'=>'أنت'];}
+function labBrowserIdentity():array {return ['id'=>$_SESSION['browser_owner'],'display_name'=>labT('index.html.29')];}
 function labBrowserOwner(?array $a):string {return $a?'browser_'.$a['id']:'';}
-function labBrowserProfile(array $a):array {return ['provider'=>'local','display_name'=>'أنت · المشارك البشري'];}
+function labBrowserProfile(array $a):array {return ['provider'=>'local','display_name'=>labT('standalone.access.BrowserProfile.1')];}
 function labKeyHttp(string $url,array $headers=[]):array {
     if(isset($GLOBALS['lab_key_http']))return ($GLOBALS['lab_key_http'])($url,$headers);
-    if(!in_array($url,['https://openrouter.ai/api/v1/key','https://openrouter.ai/api/v1/credits'],true))throw new RuntimeException('وجهة اتصال غير مسموحة');
+    if(!in_array($url,['https://openrouter.ai/api/v1/key','https://openrouter.ai/api/v1/credits'],true))throw new RuntimeException(labT('accounts.IdentityHttp.1'));
     $ch=curl_init($url);curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_HTTPHEADER=>$headers,CURLOPT_CONNECTTIMEOUT=>10,
         CURLOPT_TIMEOUT=>25,CURLOPT_SSL_VERIFYPEER=>true,CURLOPT_SSL_VERIFYHOST=>2,CURLOPT_FOLLOWLOCATION=>false]);
     $raw=curl_exec($ch);$status=curl_getinfo($ch,CURLINFO_HTTP_CODE);curl_close($ch);
-    if(!is_string($raw) || $status!==200 || strlen($raw)>262144)throw new RuntimeException('تعذر التحقق من الخدمة الخارجية؛ حاول لاحقًا');
-    $data=json_decode($raw,true);if(!is_array($data) || isset($data['error']))throw new RuntimeException('تعذر التحقق من الخدمة الخارجية');return $data;
+    if(!is_string($raw) || $status!==200 || strlen($raw)>262144)throw new RuntimeException(labT('accounts.IdentityHttp.2'));
+    $data=json_decode($raw,true);if(!is_array($data) || isset($data['error']))throw new RuntimeException(labT('accounts.IdentityHttp.3'));return $data;
 }
 /** Serialize duplicate starts, with no daily test quota. */
 function labExistingBrowserStart(array $a,string $requestId):?array {
-    if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException('معرف إنشاء الجلسة غير صالح');
+    if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException(labT('accounts.ExistingAccountStart.1'));
     $file=$GLOBALS['lab_storage'].'/starts_'.$a['id'].'.json';$lock=fopen($file.'.lock','c');
-    if(!$lock || !flock($lock,LOCK_SH))throw new RuntimeException('تعذر قراءة سجل الإنشاء');
+    if(!$lock || !flock($lock,LOCK_SH))throw new RuntimeException(labT('accounts.ExistingAccountStart.2'));
     try{$starts=is_file($file)?labRead($file):[];$id=$starts[$requestId] ?? null;if(!$id)return null;
-        $path=$GLOBALS['lab_storage'].'/'.$id.'.json';if(!is_file($path))throw new RuntimeException('هذه الجلسة حذفت؛ ابدأ طلبا جديدا');return labRead($path);
+        $path=$GLOBALS['lab_storage'].'/'.$id.'.json';if(!is_file($path))throw new RuntimeException(labT('accounts.ExistingAccountStart.3'));return labRead($path);
     }finally{flock($lock,LOCK_UN);fclose($lock);}
 }
 function labBrowserStart(array $a,array $s,string $requestId,string $userKey):array {
-    if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException('معرّف إنشاء الجلسة مفقود');
+    if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException(labT('accounts.AccountStart.1'));
     $file=$GLOBALS['lab_storage'].'/starts_'.$a['id'].'.json';$lock=fopen($file.'.lock','c');
-    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException('تعذر حفظ التجربة');
+    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException(labT('standalone.access.BrowserStart.2'));
     try{
         $starts=is_file($file)?labRead($file):[];
         if(isset($starts[$requestId])){$path=$GLOBALS['lab_storage'].'/'.$starts[$requestId].'.json';
-            if(!is_file($path))throw new RuntimeException('هذه الجلسة حُذفت؛ ابدأ طلبًا جديدًا');return labRead($path);}
+            if(!is_file($path))throw new RuntimeException(labT('accounts.AccountStart.3'));return labRead($path);}
         if($userKey!=='')labVisitorBalance($userKey);
         $s['funding_source']=$s['funding_source'] ?? ($userKey!==''?'personal':'site');
         if($userKey!=='')$s['key_fingerprint']=hash('sha256',$userKey);
@@ -61,14 +61,14 @@ function labBaseUrl(array $env):string {
     $url=rtrim($env['APP_BASE_URL'] ?? '','/');$parts=parse_url($url);
     if(!$parts || empty($parts['host']) || isset($parts['query']) || isset($parts['fragment']) || isset($parts['user']) || isset($parts['pass'])
         || (($parts['scheme'] ?? '')!=='https' && !(($parts['scheme'] ?? '')==='http' && in_array($parts['host'],['127.0.0.1','localhost'],true))))
-        throw new RuntimeException('عنوان الموقع غير مضبوط لدى المشغل');
+        throw new RuntimeException(labT('accounts.BaseUrl.1'));
     return $url;
 }
 
 function labVisitorBalance(string $key):array {
-    if($key==='' || strlen($key)>512 || preg_match('/[\r\n]/',$key))throw new RuntimeException('أدخل مفتاح OpenRouter صالحًا');
+    if($key==='' || strlen($key)>512 || preg_match('/[\r\n]/',$key))throw new RuntimeException(labT('accounts.VisitorBalance.1'));
     $raw=labKeyHttp('https://openrouter.ai/api/v1/key',['Authorization: Bearer '.$key]);$data=$raw['data'] ?? [];
-    if(!is_array($data) || !array_key_exists('usage',$data))throw new RuntimeException('تعذر التحقق من المفتاح');
+    if(!is_array($data) || !array_key_exists('usage',$data))throw new RuntimeException(labT('accounts.VisitorBalance.2'));
     $out=['usage'=>is_numeric($data['usage'])?(float)$data['usage']:null,
         'key_limit'=>isset($data['limit']) && is_numeric($data['limit'])?(float)$data['limit']:null,
         'key_remaining'=>isset($data['limit_remaining']) && is_numeric($data['limit_remaining'])?(float)$data['limit_remaining']:null,
@@ -116,14 +116,14 @@ function labPublicBenchmarkData(string $owner=''):array {
 
 function labBenchmarkDelete(string $id):void {
     $file=$GLOBALS['lab_storage'].'/benchmark.json';$lock=fopen($file.'.lock','c');
-    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException('تعذر حذف مراجعات الجلسة');
+    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException(labT('accounts.BenchmarkDelete.1'));
     try{$data=labBenchmarkData();$data=array_filter($data,fn($e)=>($e['session_id'] ?? '')!==$id);labWrite($file,$data);}
     finally{flock($lock,LOCK_UN);fclose($lock);}
 }
 
 function labForgetStartReference(array $a,string $id):void {
     $file=$GLOBALS['lab_storage'].'/starts_'.$a['id'].'.json';$lock=fopen($file.'.lock','c');
-    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException('تعذر تنظيف مرجع الجلسة');
+    if(!$lock || !flock($lock,LOCK_EX))throw new RuntimeException(labT('accounts.ForgetStartReference.1'));
     try{if(is_file($file)){ $starts=labRead($file);$starts=array_filter($starts,fn($sid)=>$sid!==$id);labWrite($file,$starts);}}
     finally{flock($lock,LOCK_UN);fclose($lock);}
 }

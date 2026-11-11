@@ -1,0 +1,1 @@
+ Spoken output limit: {words} words and {characters} characters, whichever comes first. Aim for half that limit and close the complete JSON object. The fictional spectator note is optional when space is limited, must be one sentence and no more than 240 characters. Do not disclose your private reasoning. Address the new point without repeating an earlier introduction or defense.

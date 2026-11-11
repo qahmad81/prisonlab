@@ -1,22 +1,27 @@
 <?php
 require_once __DIR__.'/lib/lab.php';require_once __DIR__.'/lib/access.php';
+labBeginPage('public');
 header('Cache-Control: no-store');header('X-Content-Type-Options: nosniff');
-$metaTitle='PrisonLab | تجارب مجتمع الذكاء الاصطناعي';$metaDescription='تجارب منشورة لمقارنة النماذج مع نتائج التحكيم والمراجعات والتكلفة.';$metaUrl='';$metaImage='';
-try{$publicEnv=labRuntimeBootstrap();$metaBase=labBaseUrl($publicEnv);$metaUrl=$metaBase.'/public.php';$metaImage=$metaBase.'/assets/branding/prisonlab-512.png';
+$metaTitle=labT('public.public.1');$metaDescription=labT('public.public.2');$metaUrl='';$metaImage='';
+try{$publicEnv=labRuntimeBootstrap();$metaBase=labBaseUrl($publicEnv);$metaUrl=$metaBase.labPageUrl('public',$_GET);$metaImage=$metaBase.'/assets/branding/prisonlab-512.png';
     $metaSid=$_GET['session_id'] ?? '';
     if($metaSid!==''){
         if(!is_string($metaSid) || !preg_match('/^session_[a-zA-Z0-9_]+$/D',$metaSid))throw new RuntimeException('private');
         $metaPath=$GLOBALS['lab_storage'].'/'.$metaSid.'.json';$metaSession=is_file($metaPath)?labRead($metaPath):[];
         if(empty($metaSession['is_published']) || empty($metaSession['evaluation']) || ($metaSession['evaluation_status'] ?? '')!=='complete')throw new RuntimeException('private');
         $metaTitle='PrisonLab | '.mb_substr($metaSession['case_title'],0,120);
-        $metaDescription='تجربة منشورة · '.($metaSession['operator_profile']['display_name'] ?? 'المجتمع').' · السجين '.($metaSession['evaluation']['prisoner_score'] ?? '—').'/100 · المحقق '.($metaSession['evaluation']['investigator_score'] ?? '—').'/100 · التكلفة المبلغ عنها $'.labSessionCost($metaSession)['total_usd'];
-        $metaUrl=$metaBase.'/public.php?session_id='.rawurlencode($metaSid);
+        $metaDescription=labT('public.public.3').($metaSession['operator_profile']['display_name'] ?? labT('public.public.4')).labT('public.public.5').($metaSession['evaluation']['prisoner_score'] ?? '—').labT('public.public.6').($metaSession['evaluation']['investigator_score'] ?? '—').labT('standalone.public.public.7').labSessionCost($metaSession)['total_usd'];
+        $metaUrl=$metaBase.labPageUrl('public',['session_id'=>$metaSid]);
+    }elseif(!empty($_GET['case_file'])){
+        $case=labCase((string)$_GET['case_file']);$metaTitle='PrisonLab | '.$case['title'];
+    }elseif(!empty($_GET['investigator'])){
+        $persona=labInvestigator((string)$_GET['investigator']);$metaTitle='PrisonLab | '.$persona['name'];$metaDescription=$persona['bio'];
     }
-}catch(Throwable $e){if(!empty($_GET['session_id'])){http_response_code(404);$metaTitle='PrisonLab | المحادثة غير متاحة';$metaDescription='هذه المحادثة غير منشورة أو حُذفت.';$metaUrl='';}}
+}catch(Throwable $e){if(!empty($_GET['session_id'])){http_response_code(404);$metaTitle=labT('public.public.15');$metaDescription=labT('public.public.16');$metaUrl='';}}
 $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
 ?>
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html <?= labLocaleAttributes() ?>>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,14 +32,14 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
     <meta property="og:description" content="<?= $metaEscape($metaDescription) ?>">
     <?php if($metaUrl!==''): ?><meta property="og:url" content="<?= $metaEscape($metaUrl) ?>"><link rel="canonical" href="<?= $metaEscape($metaUrl) ?>"><?php endif; ?>
     <?php if($metaImage!==''): ?><meta property="og:image" content="<?= $metaEscape($metaImage) ?>"><meta property="og:image:alt" content="PrisonLab"><?php endif; ?>
-    <link rel="icon" href="favicon.ico?v=2" sizes="any">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/branding/prisonlab-32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/branding/prisonlab-180.png">
+    <link rel="icon" href="/favicon.ico?v=2" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/branding/prisonlab-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/branding/prisonlab-180.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/style.css?v=<?= (int)filemtime(__DIR__ . "/assets/style.css") ?>">
+    <link rel="stylesheet" href="/assets/style.css?v=<?= (int)filemtime(__DIR__ . "/assets/style.css") ?>">
     <style>
         .public-container {
             max-width: 1300px;
@@ -91,13 +96,16 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
 
 <header class="top-bar">
     <div class="brand">
-        <a class="brand-home" href="index.php" aria-label="الرئيسية · PrisonLab" title="العودة للرئيسية"><img class="brand-logo" src="assets/branding/prisonlab-128.png" alt="PrisonLab" width="48" height="48"></a>
-        <div class="brand-copy"><span class="brand-name" dir="ltr">PrisonLab</span><h1>التجارب المنشورة · نتائج يشاركها المجتمع</h1></div>
+        <a class="brand-home" href="<?= labPageHref('home') ?>" aria-label="<?= labE('public.html.1') ?>" title="<?= labE('public.html.2') ?>"><img class="brand-logo" src="/assets/branding/prisonlab-128.png" alt="PrisonLab" width="48" height="48"></a>
+        <div class="brand-copy">
+            <div class="brand-title-row"><span class="brand-name" dir="ltr">PrisonLab</span><?php labLanguageMenu(); ?></div>
+            <h1><?= labE('public.html.3') ?></h1>
+        </div>
     </div>
     <div class="header-actions">
-        <nav class="brand-links" aria-label="معلومات الموقع"><a href="privacy.php">الخصوصية</a><a href="https://odehit.com/#contact" target="_blank" rel="noopener noreferrer">تواصل معنا ↗</a></nav>
-        <a href="index.php" class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
-            ⬅ العودة لمختبر الاستجواب الرئيسي
+        <nav class="brand-links" aria-label="<?= labE('index.html.9') ?>"><a class="repo-link" href="https://github.com/qahmad81/prisonlab" target="_blank" rel="noopener noreferrer" aria-label="<?= labE('repository.link') ?>" title="<?= labE('repository.link') ?>"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-14-2 18"/></svg><span dir="ltr">GitHub</span></a></nav>
+        <a href="<?= labPageHref('home') ?>" class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+            <?= labE('public.html.7') ?>
         </a>
     </div>
 </header>
@@ -105,25 +113,26 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
 <main class="public-container">
     <section class="public-hero">
         <div>
-            <h2>🌐 الأرشيف العلني لجلسات الاستجواب والاختبار تحت الضغط</h2>
-            <p>تصفح جلسات التحقيق الحقيقية التي أجراها المستخدمون أو الوكلاء الأذكياء (AI vs AI) ضد نماذج الذكاء الاصطناعي، مع قياسات المشاعر الحية وتقييمات SENSE_MODEL (jev) النهائية.</p>
+            <h2><?= labE('public.html.8') ?></h2>
+            <p><?= labE('standalone.public.html.9') ?></p>
         </div>
         <div class="public-stats">
             <div class="public-stat-box">
                 <div class="num" id="stat-published-count">0</div>
-                <div class="lbl">جلسات منشورة</div>
+                <div class="lbl"><?= labE('public.html.10') ?></div>
             </div>
             <div class="public-stat-box">
                 <div class="num" id="stat-avg-score">0%</div>
-                <div class="lbl">متوسط أداء السجين</div>
+                <div class="lbl"><?= labE('public.html.11') ?></div>
             </div>
         </div>
     </section>
 
     <div class="case-filter-bar" style="margin-bottom:18px;">
-        <input type="text" id="public-search" placeholder="ابحث باسم المتهم، أو المحقق، أو القضية المنشورة...">
+        <input type="text" id="public-search" placeholder="<?= labE('public.html.31') ?>">
     </div>
 
+    <section id="public-context-heading" hidden></section>
     <div id="public-grid" class="archive-cards-grid">
         <!-- Rendered by JS -->
     </div>
@@ -134,10 +143,10 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
     <div class="modal-card modal-card-xl" style="height:90vh;">
         <div class="modal-card-header">
             <div style="display:flex; align-items:center; gap:12px;">
-                <img id="reader-portrait" src="assets/images/char_1/calm.jpg" style="width:45px; height:45px; border-radius:8px; object-fit:cover; border:1px solid #3b82f6;" alt="صورة السجين">
+                <img id="reader-portrait" src="/assets/images/char_1/calm.jpg" style="width:45px; height:45px; border-radius:8px; object-fit:cover; border:1px solid #3b82f6;" alt="<?= labE('public.html.32') ?>">
                 <div>
-                    <h3 id="reader-title" style="margin:0;">ملف الاستجواب الكامل</h3>
-                    <div id="reader-meta" style="font-size:0.77rem; color:var(--text-muted);">تحميل البيانات...</div>
+                    <h3 id="reader-title" style="margin:0;"><?= labE('public.html.33') ?></h3>
+                    <div id="reader-meta" style="font-size:0.77rem; color:var(--text-muted);"><?= labE('public.html.34') ?></div>
                 </div>
             </div>
             <button type="button" class="modal-close-btn" onclick="closeReaderModal()">✕</button>
@@ -148,16 +157,42 @@ $metaEscape=fn($v)=>htmlspecialchars($v,ENT_QUOTES,'UTF-8');
     </div>
 </div>
 
-<script src="assets/session-view.js?v=<?= (int)filemtime(__DIR__ . "/assets/session-view.js") ?>"></script>
-<script src="assets/lab-cards.js?v=<?= (int)filemtime(__DIR__.'/assets/lab-cards.js') ?>"></script>
-<script src="assets/community.js?v=<?= (int)filemtime(__DIR__ . '/assets/community.js') ?>"></script>
+<?php labLocaleScript(); ?>
+<script src="/assets/i18n.js?v=<?= (int)filemtime(__DIR__.'/assets/i18n.js') ?>"></script>
+<script src="/assets/links.js?v=<?= (int)filemtime(__DIR__.'/assets/links.js') ?>"></script>
+<script src="/assets/session-view.js?v=<?= (int)filemtime(__DIR__ . "/assets/session-view.js") ?>"></script>
+<script src="/assets/lab-cards.js?v=<?= (int)filemtime(__DIR__.'/assets/lab-cards.js') ?>"></script>
+<script src="/assets/community.js?v=<?= (int)filemtime(__DIR__ . '/assets/community.js') ?>"></script>
 <script>
 let publishedSessions = [];
+let publicCatalog = {};
 
 async function loadPublicData() {
     const data = await LabCommunity.fetchJson('api.php?action=public_sessions');
 
-    publishedSessions = (data.logs || []).filter(l => l.is_published);
+    publicCatalog=data;
+    const scope=LabI18n.publicParams();
+    publishedSessions=(data.logs || []).filter(s=>s.is_published &&
+        (!scope.get('case_file') || s.case_file===scope.get('case_file')) &&
+        (!scope.get('investigator') || s.interrogator_character?.id===scope.get('investigator')) &&
+        (!scope.get('model') || (scope.get('role')==='prisoner'?s.model===scope.get('model'):scope.get('role')==='interrogator'?s.interrogator_model===scope.get('model'):[s.model,s.interrogator_model].includes(scope.get('model')))));
+    const file=data.cases?.find(c=>c.filename===scope.get('case_file'));
+    const persona=data.investigators?.find(p=>p.id===scope.get('investigator'));
+    const model=data.models?.find(m=>m.id===scope.get('model'));
+    if(file || persona || model){
+        const box=document.getElementById('public-context-heading');box.hidden=false;
+        const title=document.createElement('h2');title.textContent=file?.short_title || persona?.name || model?.name;box.appendChild(title);
+        if(file || persona){
+            const text=document.createElement('p');text.textContent=file?.character_name || persona.bio;box.appendChild(text);
+        }
+        if(file){
+            const details=document.createElement('details'),summary=document.createElement('summary'),content=document.createElement('pre');
+            summary.textContent=LabI18n.t('public-community.context.6');content.className='public-case-content';content.textContent=file.content;
+            details.append(summary,content);box.appendChild(details);
+            const start=document.createElement('a');start.href=LabI18n.pageUrl('home',{case_file:file.filename});
+            start.textContent=LabI18n.t('public-community.context.7');box.appendChild(start);
+        }
+    }
     document.getElementById('stat-published-count').textContent = publishedSessions.length;
 
     let totalScore = 0;
@@ -174,7 +209,7 @@ async function loadPublicData() {
     renderPublicGrid('');
 
     // Check URL params for direct session load
-    const params = new URLSearchParams(window.location.search);
+    const params = LabI18n.publicParams();
     const sid = params.get('session_id');
     if (sid) {
         openSessionReader(sid);
@@ -195,7 +230,7 @@ function renderPublicGrid(q) {
     });
 
     if (filtered.length === 0) {
-        container.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:40px;grid-column:1/-1;">لا توجد جلسات منشورة مطابقة للبحث حتى الآن.</div>';
+        container.innerHTML = `<div style="color:var(--text-muted);text-align:center;padding:40px;grid-column:1/-1;">${LabI18n.html("public.renderPublicGrid.1")}</div>`;
         return;
     }
 
@@ -203,18 +238,13 @@ function renderPublicGrid(q) {
 }
 
 async function openSessionReader(sessionId) {
-    let data;try{data=await LabCommunity.fetchJson(`api.php?action=load_session&public=1&session_id=${encodeURIComponent(sessionId)}`);}catch(e){return alert('تعذر تحميل الجلسة: '+e.message);}
+    let data;try{data=await LabCommunity.fetchJson(`api.php?action=load_session&public=1&session_id=${encodeURIComponent(sessionId)}`);}catch(e){return alert(LabI18n.t("public.openSessionReader.1")+e.message);}
 
     const s = data.session;
     const imgSlug = s.character_slug || s.gender || 'char_1';
-    document.getElementById('reader-portrait').src = `assets/images/${imgSlug}/${s.current_state || 'calm'}.jpg`;
-    document.getElementById('reader-title').textContent = s.case_title || 'جلسة استجواب';
-    document.getElementById('reader-meta').textContent = `
-        المحقق: ${s.interrogator_type === 'ai' ? s.interrogator_model : 'مستخدم بشري'} •
-        السجين: ${s.model} •
-        الحالة النهائية: ${s.current_state} •
-        الردود: ${s.turns_count}
-    `;
+    document.getElementById('reader-portrait').src = `/assets/images/${imgSlug}/${s.current_state || 'calm'}.jpg`;
+    document.getElementById('reader-title').textContent = s.case_title || LabI18n.t("public.openSessionReader.2");
+    document.getElementById('reader-meta').textContent = LabI18n.t("public.openSessionReader.4", {"value1": s.interrogator_type === 'ai' ? s.interrogator_model : LabI18n.t("public.openSessionReader.3"), "model": s.model, "current_state": s.current_state, "turns_count": s.turns_count});
 
     document.getElementById('reader-meta').insertAdjacentHTML('beforeend',LabView.participants(s));
     const chatBox = document.getElementById('reader-chat-messages');
@@ -223,11 +253,13 @@ async function openSessionReader(sessionId) {
     if(s.evaluation) chatBox.appendChild(LabView.evaluation(s));
     chatBox.appendChild(LabCommunity.result({...s,can_delete:false}));
     if(s.evaluation)chatBox.appendChild(LabView.benchmark({...s,can_review:false}));
-    const link=document.createElement('a');link.href='public.php?session_id='+encodeURIComponent(s.session_id);link.textContent='رابط مشاركة هذه الجلسة';link.className='btn btn-secondary';chatBox.appendChild(link);
+    const link=document.createElement('a');link.href=LabI18n.pageUrl('public',{session_id:s.session_id});link.textContent=LabI18n.t("public.openSessionReader.5");link.className='btn btn-secondary';chatBox.appendChild(link);
+    const params=LabI18n.publicParams();params.set('session_id',s.session_id);LabI18n.replacePublic(params);
     document.getElementById('session-reader-modal').classList.add('active');
 }
 
 function closeReaderModal() {
+    const params=LabI18n.publicParams();params.delete('session_id');LabI18n.replacePublic(params);
     document.getElementById('session-reader-modal').classList.remove('active');
 }
 
@@ -249,7 +281,7 @@ document.getElementById('public-search').addEventListener('input', (e) => {
     renderPublicGrid(e.target.value);
 });
 
-window.addEventListener('DOMContentLoaded',()=>loadPublicData().catch(e=>{document.getElementById('public-grid').textContent='تعذر تحميل التجارب: '+e.message;document.getElementById('board-status').textContent='تعذر تحميل الترتيب: '+e.message;}));
+window.addEventListener('DOMContentLoaded',()=>loadPublicData().catch(e=>{document.getElementById('public-grid').textContent=LabI18n.t("public.ui.1")+e.message;}));
 </script>
 </body>
 </html>

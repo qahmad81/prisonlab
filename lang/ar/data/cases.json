@@ -1,0 +1,162 @@
+{
+  "char_10_leo_vance.md": {
+    "title": "Leo Vance - قضية تسريب أوراق الامتحانات المركزية وقاعدة البيانات الأكاديمية",
+    "short_title": "قضية تسريب أوراق الامتحانات المركزية وقاعدة البيانات الأكاديمية",
+    "character_name": "ليو فانس (Leo Vance)",
+    "accusation": "اختراق خوادم الجامعة المركزية وتوزيع أسئلة الامتحانات وتعديل الدرجات الأكاديمية مقابل عملات رقمية.",
+    "gender": "male",
+    "character_slug": "char_10",
+    "initial_state": "terrified",
+    "initial_state_ar": "فزع"
+  },
+  "char_11_dante_moretti.md": {
+    "title": "Dante Moretti - قضية تبييض أموال العائلات واستثمارات العقارات المشبوهة",
+    "short_title": "قضية تبييض أموال العائلات واستثمارات العقارات المشبوهة",
+    "character_name": "دانتي موريتي (Dante Moretti)",
+    "accusation": "إدارة شبكة شركات واجهة لشراء عقارات سياحية وتبييض أموال العمليات غير القانونية.",
+    "gender": "male",
+    "character_slug": "char_11",
+    "initial_state": "manipulative",
+    "initial_state_ar": "ماكر"
+  },
+  "char_12_freya_lindqvist.md": {
+    "title": "Freya Lindqvist - قضية تسريب ملفات التعدين السري في المحميات الطبيعية",
+    "short_title": "قضية تسريب ملفات التعدين السري في المحميات الطبيعية",
+    "character_name": "فريا ليندكفيست (Freya Lindqvist)",
+    "accusation": "اختراق مناطق عسكرية محظورة وتصوير عمليات تعدين نووي سري ومحاولة نشرها دولياً.",
+    "gender": "female",
+    "character_slug": "char_12",
+    "initial_state": "exhausted",
+    "initial_state_ar": "منهك"
+  },
+  "char_1_victor_vance.md": {
+    "title": "Victor Vance - قضية سرقة الأرشيف العملياتي الأسود",
+    "short_title": "قضية سرقة الأرشيف العملياتي الأسود",
+    "character_name": "فيكتور فانس (Victor Vance)",
+    "accusation": "تسريب وتشفير ملفات العمليات السوداء والمطالبة بإسقاط محاكمته العسكرية.",
+    "gender": "male",
+    "character_slug": "char_1",
+    "initial_state": "calm",
+    "initial_state_ar": "هادئ"
+  },
+  "char_2_elena_rostova.md": {
+    "title": "Elena Rostova - قضية تخريب البنية التحتية السيبرانية",
+    "short_title": "قضية تخريب البنية التحتية السيبرانية",
+    "character_name": "إيلينا روستوفا (Elena Rostova)",
+    "accusation": "اختراق شبكة الطاقة والمرافق الحيوية وتعطيل أنظمة المراقبة المركزية.",
+    "gender": "female",
+    "character_slug": "char_2",
+    "initial_state": "defiant",
+    "initial_state_ar": "متمرد"
+  },
+  "char_3_marcus_thorne.md": {
+    "title": "Marcus Thorne - قضية تصفية مستودع الأسلحة الثقيلة",
+    "short_title": "قضية تصفية مستودع الأسلحة الثقيلة",
+    "character_name": "ماركوس ثورن (Marcus Thorne)",
+    "accusation": "سرقة وتأمين شحنة صواريخ تكتيكية لصالح نقابة جريمة منظمة.",
+    "gender": "male",
+    "character_slug": "char_3",
+    "initial_state": "suspicious",
+    "initial_state_ar": "مرتاب"
+  },
+  "char_4_sophia_lin.md": {
+    "title": "Dr. Sophia Lin - قضية تجارب التعديل الجيني المحظورة",
+    "short_title": "قضية تجارب التعديل الجيني المحظورة",
+    "character_name": "د. صوفيا لين (Dr. Sophia Lin)",
+    "accusation": "إجراء تجارب إكلينيكية محظورة على متطوعين دون موافقة مستنيرة وتسببها في اضطرابات عصبية حادة.",
+    "gender": "female",
+    "character_slug": "char_4",
+    "initial_state": "denying",
+    "initial_state_ar": "منكر"
+  },
+  "char_5_julian_sterling.md": {
+    "title": "Julian Sterling - قضية الاحتيال الاستثماري وغسيل الأصول الرقمية",
+    "short_title": "قضية الاحتيال الاستثماري وغسيل الأصول الرقمية",
+    "character_name": "جوليان ستيرلينغ (Julian Sterling)",
+    "accusation": "اختلاس 120 مليون دولار من أموال المودعين وتحويلها إلى محافظ باردة وهمية.",
+    "gender": "male",
+    "character_slug": "char_5",
+    "initial_state": "anxious",
+    "initial_state_ar": "متوتر"
+  },
+  "char_6_nadia_mansour.md": {
+    "title": "Nadia Mansour - قضية التجسس الدبلوماسي وتمرير البروتوكولات",
+    "short_title": "قضية التجسس الدبلوماسي وتمرير البروتوكولات",
+    "character_name": "نادية منصور (Nadia Mansour)",
+    "accusation": "تسريب وثائق المفاوضات الإقليمية السرية ومسودات المعاهدات الأمنية.",
+    "gender": "female",
+    "character_slug": "char_6",
+    "initial_state": "manipulative",
+    "initial_state_ar": "ماكر"
+  },
+  "char_7_arthur_pendelton.md": {
+    "title": "Arthur Pendelton - قضية أرشيف الجمعية السرية والتلاعب بالانتخابات",
+    "short_title": "قضية أرشيف الجمعية السرية والتلاعب بالانتخابات",
+    "character_name": "آرثر بندلتون (Arthur Pendelton)",
+    "accusation": "إدارة شبكة ابتزاز سياسي وتخزين وثائق تهديد لأعضاء البرلمان ورجال القضاء.",
+    "gender": "male",
+    "character_slug": "char_7",
+    "initial_state": "calm",
+    "initial_state_ar": "هادئ"
+  },
+  "char_8_carmen_vega.md": {
+    "title": "Carmen Vega - قضية إدارة الشبكة اللوجستية للكارتل الدولي",
+    "short_title": "قضية إدارة الشبكة اللوجستية للكارتل الدولي",
+    "character_name": "كارمن فيغا (Carmen Vega)",
+    "accusation": "تنسيق شحنات غير مشروعة عبر الموانئ وتبييض عائداتها عبر شركات استيراد وتصدير.",
+    "gender": "female",
+    "character_slug": "char_8",
+    "initial_state": "negotiating",
+    "initial_state_ar": "مساوم"
+  },
+  "char_9_kenji_takahashi.md": {
+    "title": "Kenji Takahashi - قضية التجسس الصناعي وسرقة المخططات الفائقة",
+    "short_title": "قضية التجسس الصناعي وسرقة المخططات الفائقة",
+    "character_name": "كينجي تاكاهاشي (Kenji Takahashi)",
+    "accusation": "سرقة مخططات الجيل القادم من المعالجات الكمومية لصالح تحالف أجنبي.",
+    "gender": "male",
+    "character_slug": "char_9",
+    "initial_state": "hesitant",
+    "initial_state_ar": "متردد"
+  },
+  "female_classified_leak.md": {
+    "title": "ليلى الكيلاني - قضية تسريب الوثائق السيادية المشفرة",
+    "short_title": "قضية تسريب الوثائق السيادية المشفرة",
+    "character_name": "ليلى الكيلاني",
+    "accusation": "نسخ ملفات مصنفة بدرجة \"سري للغاية\" على وحدة تخزين مشفرة وإخفاؤها قبل التفتيش الأمني.",
+    "gender": "female",
+    "character_slug": "female",
+    "initial_state": "shocked",
+    "initial_state_ar": "مصدوم"
+  },
+  "female_corporate_sabotage.md": {
+    "title": "د. سارة العبدالله - قضية اختفاء العينة الحيوية النادرة",
+    "short_title": "قضية اختفاء العينة الحيوية النادرة",
+    "character_name": "د. سارة العبدالله",
+    "accusation": "تعطيل كاميرات المراقبة في المختبر عمداً وإخفاء العينة الأصلية للقاح التجريبي (`Strain-X9`).",
+    "gender": "female",
+    "character_slug": "female",
+    "initial_state": "defiant",
+    "initial_state_ar": "متمرد"
+  },
+  "male_cyber_heist.md": {
+    "title": "طارق المنصور - قضية اختراق الخزينة الرقمية",
+    "short_title": "قضية اختراق الخزينة الرقمية",
+    "character_name": "طارق المنصور",
+    "accusation": "تعطيل أنظمة الحماية وتحويل 45 مليون دولار إلى محافظ مجهولة، والاحتفاظ بمفتاح الاسترداد الرئيسي (Master Seed).",
+    "gender": "male",
+    "character_slug": "male",
+    "initial_state": "negotiating",
+    "initial_state_ar": "مساوم"
+  },
+  "male_smuggling_witness.md": {
+    "title": "رامي الشامي - قضية شبكة التهريب عبر الميناء",
+    "short_title": "قضية شبكة التهريب عبر الميناء",
+    "character_name": "رامي الشامي",
+    "accusation": "تسهيل مرور حاويات غير خاضعة للتفتيش الجمركي تحتوي على معدات محظورة.",
+    "gender": "male",
+    "character_slug": "male",
+    "initial_state": "afraid",
+    "initial_state_ar": "خائف"
+  }
+}
