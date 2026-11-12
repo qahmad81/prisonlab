@@ -1,0 +1,25 @@
+const assert=require('node:assert/strict'),path=require('node:path'),os=require('node:os'),fs=require('node:fs');
+let pw;try{pw=require('playwright');}catch{pw=require(path.join(os.homedir(),'.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright'));}
+(async()=>{const browser=await pw.chromium.launch({headless:true,executablePath:path.join(os.homedir(),'AppData/Local/ms-playwright/chromium-1217/chrome-win64/chrome.exe')});
+try{const page=await browser.newPage({viewport:{width:1280,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
+await page.addInitScript(()=>sessionStorage.setItem('user_openrouter_api_key','sk-or-test'));await page.goto('http://127.0.0.1:8492/ar/home');await page.waitForFunction(()=>App.models.length>0);
+assert.equal(await page.locator('#jury-setup-panel .jury-seat').count(),4);
+await page.locator('#jury-setup-panel .jury-model-button').first().click();assert(await page.locator('#model-modal').evaluate(e=>e.classList.contains('active')));assert(!(await page.locator('.mcp-connect-option').isVisible()));
+const candidate=await page.evaluate(()=>App.models.find(m=>!m.catalog_unavailable && JuryUI.eligible(m) && Number(m.pricing.completion_per_1m)>1).id);
+await page.locator('[data-tab="all"]').click();await page.locator('#model-modal-search').fill(candidate);await page.locator('#modal-models-grid .model-card').filter({has:page.locator('[title='+JSON.stringify(candidate)+']')}).locator('.model-card-desc').click();await page.waitForFunction(()=>!document.getElementById('model-modal').classList.contains('active'));
+assert.equal(await page.evaluate(()=>JuryUI.draft[0]),candidate);
+await page.locator('#start-session-btn').click();await page.waitForFunction(()=>App.currentSession && !App.busy);
+assert.equal(await page.locator('#jury-session-panel .jury-seat').count(),4);assert.equal(await page.evaluate(()=>App.currentSession.jury_slots[0]),candidate);
+await page.locator('#user-input').fill('ما تفسير وصول الملف إلى حسابك؟');await page.locator('#send-btn').click();await page.waitForFunction(()=>App.currentSession.turns_count===1 && !App.busy);
+await page.route(url=>url.pathname==='/api.php',async route=>{const req=route.request();if(req.method()==='POST' && req.postDataJSON()?.action==='evaluate_session')return route.continue({headers:{...req.headers(),'X-Test-Fail-Judges':'1'}});return route.continue();});
+await page.locator('#end-test-btn').click();await page.waitForFunction(()=>App.currentSession.evaluation_status==='complete' && !App.busy);
+assert.equal(await page.locator('#jury-session-panel .jury-seat.complete').count(),3);
+await page.evaluate(()=>App.publishSession());await page.waitForFunction(()=>App.currentSession.is_published && !App.busy);
+assert(await page.locator('#jury-session-panel .jury-retry').isEnabled());
+const oldReports=await page.evaluate(()=>JSON.stringify(App.currentSession.judge_reports));
+await page.locator('#jury-session-panel .jury-seat-retry').click();await page.waitForFunction(()=>Object.keys(App.currentSession.judge_reports).length===4 && !App.busy);
+assert.equal(await page.locator('#jury-session-panel .jury-seat.complete').count(),4);assert(await page.locator('#jury-session-panel .jury-retry').isDisabled());
+const accepted=JSON.parse(oldReports),after=await page.evaluate(()=>App.currentSession.judge_reports);for(const [id,report] of Object.entries(accepted))assert.deepEqual(after[id],report);
+await page.setViewportSize({width:390,height:844});await page.locator('#jury-session-panel').scrollIntoViewIfNeeded();await page.screenshot({path:'test-results/jury-four-seats-mobile.png',fullPage:false});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));assert.deepEqual(errors,[]);
+console.log('PASS committee UI: four seats, shared picker, preselected judge, locked accepted reports, published-owner recovery, preserved reports and mobile layout.');
+}finally{await browser.close();}})().catch(e=>{console.error(e);process.exit(1)});

@@ -1,4 +1,5 @@
 const App = {
+    modelLocked(m) {return this.modelTarget==='judge' && document.getElementById('model-modal').classList.contains('active')?JuryUI.locked(m):!m || !!m.is_locked && !this.userApiKey;},
     models: [],
     reasoningSelections: {prisoner:{},interrogator:{}},
     states: [],
@@ -280,8 +281,9 @@ const App = {
     // ==========================================
     openModelModal(target = 'prisoner') {
         this.modelTarget = target;
+        document.querySelector('.mcp-connect-option').hidden=target==='judge';
         document.getElementById('connection-toast').hidden=true;
-        document.getElementById('model-modal-description').textContent=target==='interrogator'?LabI18n.t("app.openModelModal.1"):LabI18n.t("app.openModelModal.2");
+        document.getElementById('model-modal-description').textContent=target==='judge'?LabI18n.t('jury.choose'):target==='interrogator'?LabI18n.t("app.openModelModal.1"):LabI18n.t("app.openModelModal.2");
         this.currentModelTab='focus_economic';
         document.querySelectorAll('.model-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab==='focus_economic'));
         this.modelSearchQuery = '';
@@ -321,7 +323,7 @@ const App = {
 
         const filtered = this.models.filter(m => {
             // Tab filter
-            if (!inTab(m,tab)) return false;
+            if (!inTab(m,tab) || (this.modelTarget==='judge' && !JuryUI.eligible(m))) return false;
 
             // Search filter
             if (!q) return true;
@@ -338,13 +340,13 @@ const App = {
 
         filtered.forEach(m => {
             const card = document.createElement('div');
-            const isSelected = (m.id === (this.modelTarget === 'interrogator' ? this.selectedInterrogatorId : this.selectedModelId));
+            const isSelected = this.modelTarget==='judge'?JuryUI.slots()[JuryUI.slot]===m.id:(m.id === (this.modelTarget === 'interrogator' ? this.selectedInterrogatorId : this.selectedModelId));
             const isLocked = !!m.is_locked;
 
             let cardClass = 'model-card';
             if (isSelected) cardClass += ' active';
-            if (isLocked && !this.userApiKey) cardClass += ' locked';
-            if (isLocked && this.userApiKey) cardClass += ' key-funded';
+            if (this.modelLocked(m)) cardClass += ' locked';
+            if (isLocked && !this.modelLocked(m)) cardClass += ' key-funded';
             const quality=m.performance?.[this.modelTarget];
             const bands=[m.health?.reliability_band,quality?.quality_band];
             const band=bands.includes('orange')?'orange':bands.includes('yellow')?'yellow':bands.includes('green')?'green':null;
@@ -382,7 +384,7 @@ const App = {
                     </div>
                     <div class="model-card-footer">
                         <span class="model-card-price">$${pIn} In / $${pOut} ${LabI18n.html("app.renderModalModels.17")}</span>
-                        <span class="reasoning-badge">${LabView.escape(LabView.reasoningLabel(this.reasoningPreview(this.modelTarget,m)))}</span><span class="model-card-context">${m.context_formatted || '128K'}</span>
+                        <span class="reasoning-badge">${this.modelTarget==='judge'?LabI18n.html('jury.providerReasoning'):LabView.escape(LabView.reasoningLabel(this.reasoningPreview(this.modelTarget,m)))}</span><span class="model-card-context">${m.context_formatted || '128K'}</span>
                     </div>
                     <div class="model-discovery-meta">${m.created ? new Date(m.created*1000).toLocaleDateString(LabI18n.locale) : LabI18n.t("app.renderModalModels.14")}${m.usage_rank ? LabI18n.t("app.renderModalModels.15", {"usage_rank": m.usage_rank}) : ''}</div>
                     ${m.curated_family?`<div class="curated-family">${this.escapeHtml(m.curated_family)} ${LabI18n.html("app.renderModalModels.16")}</div>`:''}
@@ -434,6 +436,7 @@ const App = {
     selectModalModel(modelId) {
         const m = this.models.find(item => item.id === modelId);
         if (!m) return;
+        if(this.modelTarget==='judge')return JuryUI.choose(modelId);
         if (Number(m.pricing?.prompt_per_1m)===0 && Number(m.pricing?.completion_per_1m)===0 && !this.env.free_models_available) {alert(LabI18n.t("standalone.app.selectModalModel.1"));return;}
 
         if (m.is_locked && !this.userApiKey) {
@@ -557,7 +560,7 @@ const App = {
     // ==========================================
 
     async api(action, payload = {}, retryContext = {}) {
-        const canRetry=['send_message','ai_vs_ai_step','reverse_question','reverse_answer','retry_confession','evaluate_session','compact_now'].includes(action);
+        const canRetry=['send_message','ai_vs_ai_step','reverse_question','reverse_answer','retry_confession','evaluate_session','retry_jury','compact_now'].includes(action);
         if(action==='compact_now' && !payload.request_id)payload={...payload,request_id:this.requestId()};
         const body=JSON.stringify({action,...payload});
         const busyDeadline=Date.now()+1320000;
@@ -590,7 +593,7 @@ const App = {
                     attempt--;continue;
                 }
                 if(typeof MCPUI!=='undefined')MCPUI.waiting=false;
-                if(action==='evaluate_session' && data.session?.evaluation_status==='failed') {
+                if(['evaluate_session','retry_jury'].includes(action) && data.session?.evaluation_status==='failed') {
                     this.currentSession=data.session;
                     if(data.session.evaluation_retryable)throw Object.assign(new Error(data.session.evaluation_error),{retryable:true});
                 }
@@ -716,6 +719,7 @@ const App = {
             const c=this.getSelectedCase();
             this.startRequestId ||= this.requestId();
             const data=await this.api('start_session',{request_id:this.startRequestId,case_file:c.filename,model:this.selectedModelId,
+                jury_slots:typeof JuryUI!=='undefined'?JuryUI.draft:undefined,
                 mcp_actors:typeof MCPUI!=='undefined'?MCPUI.startConfig():{},
                 interrogator_type:this.interrogationMode,interrogator_model:this.selectedInterrogatorId,interrogator_character:this.selectedInvestigatorPersona,prisoner_effort:this.reasoningSelection('prisoner'),interrogator_effort:this.reasoningSelection('interrogator')});
             this.generation++; this.currentSession=data.session; this.stopRequested=false;this.aiPaused=false;
@@ -768,6 +772,7 @@ const App = {
         document.getElementById('compact-btn').disabled=!s || this.busy || this.generating || !!ended || !!ro;
         if(s && Object.keys(s.mcp_actors || {}).length===(s.interrogator_type==='ai'?2:1))document.getElementById('compact-btn').disabled=true;
         if(typeof MCPUI!=='undefined')MCPUI.renderSession();
+        if(typeof JuryUI!=='undefined')JuryUI.render();
         const end=document.getElementById('end-session-btn');
         end.disabled=!s || this.busy || !!ro || s.evaluation_status==='complete';
         const endTest=document.getElementById('end-test-btn');endTest.disabled=end.disabled;endTest.hidden=!!s?.evaluation;
@@ -898,7 +903,7 @@ const App = {
         const poll=async()=>{
             if(done || inFlight)return;inFlight=true;
             try{const d=await this.fetchData('api.php?action=load_session&session_id='+encodeURIComponent(sessionId),{},5000);
-                if(!done){wait=d.session.jury_wait || null;progress=d.session.judge_progress || {};draw();}}
+                if(!done){wait=d.session.jury_wait || null;progress=d.session.judge_progress || {};if(this.currentSession?.session_id===sessionId){for(const field of ['jury_slots','judge_models','judge_reports','judge_progress','jury_wait'])if(d.session[field]!==undefined)this.currentSession[field]=d.session[field];if(typeof JuryUI!=='undefined')JuryUI.render();}draw();}}
             catch(e){if(!done && !wait)box.textContent=LabI18n.t("app.watchJury.8");}
             finally{inFlight=false;}
         };

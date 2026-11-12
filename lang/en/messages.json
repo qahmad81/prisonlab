@@ -381,5 +381,15 @@
   "standalone.privacy.html.18": "Contact",
   "standalone.privacy.html.19": "Contact the operator of your installation for privacy requests. For questions about the original project,",
   "standalone.privacy.html.20": "contact Odeh IT",
-  "standalone.privacy.html.21": ". Keep passwords and API keys out of messages."
+  "standalone.privacy.html.21": ". Keep passwords and API keys out of messages.",
+  "jury.selection.invalid": "Choose four committee slots using available OpenRouter models.",
+  "jury.selection.budget": "Each judge’s input and output price per million tokens must fit the funder’s cap.",
+  "jury.selection.actor": "An actor model cannot judge its own test.",
+  "jury.selection.duplicate": "Choose a different model for each slot; aliases of the same model cannot be repeated.",
+  "jury.selection.complete": "This slot has an accepted report. Only incomplete slots can be changed.",
+  "jury.retry.request": "Invalid jury retry request ID.",
+  "jury.retry.ended": "Complete a round and end the investigation before retrying judging.",
+  "jury.retry.rubric": "This historical evaluation uses a different rubric. Its reports cannot be mixed with the current rubric.",
+  "jury.retry.full": "No selected slot is missing a report. Accepted reports are preserved.",
+  "jury.retry.finalize": "New reports are waiting for JEV finalization. Finish the pending review before changing the committee."
 }

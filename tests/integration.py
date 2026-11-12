@@ -113,14 +113,14 @@ def run(storage):
     assert a.step(s,30)[0]==400
     status,d=a.post('evaluate_session',session_id=sid,headers={})
     assert status==200 and d['session']['evaluation_status']=='complete',d.get('error')
-    assert len(d['session']['judge_reports'])==3 and len(d['session']['judge_models'])==3
-    assert d['session']['evaluation']['quorum']['required']==3
+    assert len(d['session']['judge_reports'])==4 and len(d['session']['judge_models'])==4
+    assert d['session']['evaluation']['quorum']['required']==4
     status,d=a.post('evaluate_session',session_id=sid);assert status==200,d;s=d['session']
-    assert s['evaluation_status']=='complete' and len(s['judge_reports'])==3 and len(s['evaluation']['scores'])==9
+    assert s['evaluation_status']=='complete' and len(s['judge_reports'])==4 and len(s['evaluation']['scores'])==9
     assert s['evaluation']['scores']['investigator_emotional'] is None
     assert s['evaluation']['investigator_coverage']==35
     assert s['evaluation']['scores']['prisoner_emotion']>=0
-    calls=json.loads((storage/'test-calls.json').read_text());judge_calls=[x for x in calls if x['model'] in s['judge_models']];assert len(judge_calls)==3
+    calls=json.loads((storage/'test-calls.json').read_text());judge_calls=[x for x in calls if x['model'] in s['judge_models']];assert len(judge_calls)==4
     count=len(calls);a.post('evaluate_session',session_id=sid);assert len(json.loads((storage/'test-calls.json').read_text()))==count
     status,d=a.post('publish_session',session_id=sid);assert status==200 and d['session']['read_only']
     status,d=b.get('/api.php?action=load_session&public=1&session_id='+sid);assert status==200 and d['session']['read_only']
@@ -129,26 +129,69 @@ def run(storage):
     assert a.step(s,30)[0]==409
     partial=a.start();status,d=a.step(partial,0);assert status==200
     status,d=a.post('evaluate_session',session_id=partial['session_id'],headers={'X-Test-Fail-Judges':'1'})
-    assert status==200 and d['session']['evaluation_status']=='complete' and len(d['session']['judge_reports'])==2
-    assert d['session']['evaluation']['quorum']['degraded'] and d['session']['jury_wait']['elapsed_seconds']>=50
-    assert sorted(d['session']['jury_wait']['attempts'].values())==[1,1,2]
+    assert status==200 and d['session']['evaluation_status']=='complete' and len(d['session']['judge_reports'])==3
+    assert d['session']['evaluation']['quorum']['degraded'] and d['session']['jury_wait']['elapsed_seconds']>=100
+    assert sorted(d['session']['jury_wait']['attempts'].values())==[1,1,1,2]
     completed=set(d['session']['judge_reports'])
     before_calls=json.loads((storage/'test-calls.json').read_text());before_counts={mid:sum(x['model']==mid for x in before_calls) for mid in completed}
     status,d=a.post('evaluate_session',session_id=partial['session_id']);assert status==200 and d['session']['evaluation_status']=='complete'
     after_calls=json.loads((storage/'test-calls.json').read_text());assert all(sum(x['model']==mid for x in after_calls)==n for mid,n in before_counts.items())
+    # Explicit owner recovery: published transcripts and accepted seats remain immutable.
+    partial_session=d['session'];pid=partial_session['session_id'];accepted=partial_session['judge_reports'];old_grade=partial_session['evaluation'];original_messages=partial_session['messages']
+    assert partial_session['can_manage_jury'] and len(partial_session['jury_slots'])==4
+    assert b.post('retry_jury',session_id=pid,request_id=uuid.uuid4().hex)[0]==403
+    changed=list(partial_session['jury_slots']);completed_index=next(i for i,id in enumerate(changed) if id in accepted);changed[completed_index]=None
+    assert a.post('set_jury',session_id=pid,jury_slots=changed)[0]==400,'Accepted seats cannot be cleared'
+    assert a.post('publish_session',session_id=pid)[0]==200
+    assert a.post('send_message',session_id=pid,message='mutation',expected_turns=1,request_id=uuid.uuid4().hex)[0]==409
+    rid=uuid.uuid4().hex
+    status,retried=a.post('retry_jury',session_id=pid,request_id=rid,headers={'X-Test-No-Judges':'1'})
+    assert status==200 and retried['session']['evaluation']==old_grade and retried['session']['evaluation_status']=='complete'
+    # Recover the last seat, but simulate a failed final JEV call. The public grade stays intact.
+    rid2=uuid.uuid4().hex
+    status,retried=a.post('retry_jury',session_id=pid,request_id=rid2,headers={'X-Test-Fail-Final':'1'})
+    assert status==200 and retried['session']['evaluation']==old_grade and retried['session']['evaluation_refresh_pending']
+    assert len(retried['session']['judge_reports'])==4
+    before_retry=json.loads((storage/'test-calls.json').read_text());count=len(before_retry)
+    status,retried=a.post('retry_jury',session_id=pid,request_id=rid2)
+    assert status==200 and len(retried['session']['judge_reports'])==4 and not retried['session'].get('evaluation_refresh_pending')
+    assert retried['session']['evaluation']['quorum']['received']==4 and retried['session']['messages']==original_messages
+    assert all(retried['session']['judge_reports'][id]==report for id,report in accepted.items())
+    new_calls=json.loads((storage/'test-calls.json').read_text())[count:];assert new_calls and all(c['decisions'] for c in new_calls),'Recovery repurchased accepted judges'
+    count=len(json.loads((storage/'test-calls.json').read_text()))
+    assert a.post('retry_jury',session_id=pid,request_id=rid2)[0]==200
+    assert len(json.loads((storage/'test-calls.json').read_text()))==count,'Same retry ID must not repurchase final JEV'
+    public=b.get('/api.php?action=load_session&session_id='+pid)[1]['session'];assert not public['can_manage_jury'] and 'evaluation_history' not in public
+    # The server, not only the model picker, enforces sponsor price caps and distinct seats.
+    status,budget=a.post('start_session',headers={'X-User-OpenRouter-Key':''},model='google/gemini-2.5-flash-lite',interrogator_type='human',case_file='char_1_victor_vance.md')
+    assert status==200,budget
+    budget=budget['session'];expensive=next(m['id'] for m in data['models'] if max(float(m['pricing']['prompt_per_1m']),float(m['pricing']['completion_per_1m']))>1 and m['id']!=budget['model'])
+    seats=[expensive,None,None,None]
+    assert a.post('set_jury',headers={'X-User-OpenRouter-Key':''},session_id=budget['session_id'],jury_slots=seats)[0]==400
+    own=a.start();assert a.post('set_jury',session_id=own['session_id'],jury_slots=seats)[0]==200
+    assert a.post('set_jury',session_id=own['session_id'],jury_slots=[expensive,expensive,None,None])[0]==400
+    assert a.post('set_jury',session_id=own['session_id'],jury_slots=[own['model'],None,None,None])[0]==400
     for scenario,headers,expected in [
-        ('all',{},3),('recover',{'X-Test-Fail-Once':'1'},3),('correct',{'X-Test-Invalid-Once':'1'},3),
+        ('all',{},4),('recover',{'X-Test-Fail-Once':'1'},4),('correct',{'X-Test-Invalid-Once':'1'},4),
         ('one',{'X-Test-Only-Judge':'first'},1),('zero',{'X-Test-No-Judges':'1'},0)]:
         trial=a.start();assert a.step(trial,0)[0]==200
         status,result=a.post('evaluate_session',session_id=trial['session_id'],headers=headers)
         assert status==200,result
         result=result['session'];assert len(result['judge_reports'])==expected,(scenario,result)
         assert result['evaluation_status']==('complete' if expected else 'failed'),(scenario,result)
-        if expected==3:assert result['evaluation']['quorum']['received']==3
+        if expected==4:assert result['evaluation']['quorum']['received']==4
         if scenario in ('recover','correct'):assert all(n==2 for n in result['jury_wait']['attempts'].values())
         if scenario in ('one','zero'):
-            assert result['jury_wait']['elapsed_seconds']>=50
+            assert result['jury_wait']['elapsed_seconds']>=100
             assert max(result['jury_wait']['attempts'].values())==2
+        if scenario=='one':
+            target=next(i for i,id in enumerate(result['jury_slots']) if id not in result['judge_reports'])
+            before=len(json.loads((storage/'test-calls.json').read_text()))
+            status,single=a.post('retry_jury',session_id=result['session_id'],request_id=uuid.uuid4().hex,slots=[target])
+            assert status==200 and len(single['session']['judge_reports'])==2
+            calls=json.loads((storage/'test-calls.json').read_text())[before:]
+            assert [c['model'] for c in calls if not c['decisions']]==[result['jury_slots'][target]],'Single-seat retry purchased other judges'
+            assert single['session']['jury_wait']['elapsed_seconds']<single['session']['jury_wait']['total_seconds']
         if scenario=='zero':
             assert result['evaluation_retryable'] is False
             status,result=a.post('evaluate_session',session_id=trial['session_id']);assert status==200 and result['session']['evaluation_status']=='complete'

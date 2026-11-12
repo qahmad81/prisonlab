@@ -18,6 +18,7 @@ function respond(array $data, int $status = 200): never {
 }
 function publicSession(array $s, string $owner): array {
     $s['can_delete']=hash_equals($s['owner_id'] ?? '',$owner);
+    $s['can_manage_jury']=$s['can_delete'];$s['jury_price_cap']=($s['funding_source'] ?? '')==='personal'?null:1.;$s['jury_slots']=labJurySlots($s);
     $s['cost']=labSessionCost($s);
     $s['can_review']=hash_equals($s['owner_id'] ?? '',$owner) && !empty($s['is_ended']) && labTurns($s)>0;
     $s['user_reviews']=labSessionReviews($s);
@@ -26,7 +27,7 @@ function publicSession(array $s, string $owner): array {
     if($s['read_only'] || !empty($s['is_ended']))unset($s['awaiting_question']);
     if (!$s['read_only'] && isset($s['pending_turn']['text'])) $s['pending_question'] = $s['pending_turn']['text'];
     $s['turns_count'] = labTurns($s); $s['max_turns'] = LAB_MAX_TURNS;
-    unset($s['owner_id'], $s['processed_requests'], $s['pending_turn'], $s['judge_invalid_reports'],$s['key_fingerprint']);
+    unset($s['owner_id'], $s['processed_requests'], $s['pending_turn'], $s['judge_invalid_reports'],$s['key_fingerprint'],$s['jury_retry_requests'],$s['evaluation_history']);
     $stripThinking = function(array $value) use (&$stripThinking): array {
         foreach ($value as $key => $item) {
             if (in_array($key,['inner_thought','reasoning','reasoning_content'],true)) {unset($value[$key]);continue;}
@@ -160,6 +161,8 @@ try {
         foreach(labActorModels($s) as $actorId)foreach($models as $actor)if($actor['id']===$actorId)$s['actor_output_prices'][$actorId]=(float)$actor['pricing']['completion_per_1m'];
         foreach($mcp as $actor)$s['actor_output_prices'][$actor['id']]=0;
         $s['jury_preview']=labJuryPolicy($s,$models);
+        $s['funding_source'] ??= $userKey!==''?'personal':'site';
+        labSetJury($s,$body['jury_slots'] ?? [null,null,null,null],$models,true);
         $s=labBrowserStart($visitor,$s,(string)($body['request_id'] ?? ''),$userKey);
         respond(['ok'=>true,'session'=>publicSession($s,$owner)]);
     }
@@ -177,7 +180,7 @@ try {
         if($owns){$probe=fopen($path.'.lock','c');if($probe){$processing=!flock($probe,LOCK_EX|LOCK_NB);if(!$processing)flock($probe,LOCK_UN);fclose($probe);}}
         respond(['ok'=>true,'processing'=>$processing,'session'=>publicSession($s,$owner)]);
     }
-    if (!in_array($action,['mcp_gate','send_message','ai_vs_ai_step','reverse_question','reverse_answer','retry_confession','evaluate_session','publish_session','submit_review','compact_now','delete_session'],true))
+    if (!in_array($action,['set_jury','retry_jury','mcp_gate','send_message','ai_vs_ai_step','reverse_question','reverse_answer','retry_confession','evaluate_session','publish_session','submit_review','compact_now','delete_session'],true))
         respond(['ok'=>false,'error'=>labT('api.summary.26')],404);
     $lock = fopen($path . '.lock', 'c');
     if (!$lock || !flock($lock, LOCK_EX | LOCK_NB)) {
@@ -202,7 +205,7 @@ try {
             labBenchmarkDelete($id);labForgetStartReference($visitor,$id);labMcpDelete($s);if(!unlink($path))throw new RuntimeException(labT('api.summary.31'));
             respond(['ok'=>true,'deleted'=>true,'session_id'=>$id]);
         }
-        if (!empty($s['is_published']) && $action!=='submit_review') respond(['ok'=>false,'error'=>labT('api.summary.32')],409);
+        if (!empty($s['is_published']) && !in_array($action,['submit_review','set_jury','retry_jury'],true)) respond(['ok'=>false,'error'=>labT('api.summary.32')],409);
         if(!in_array($action,['publish_session','submit_review'],true)) {
             if(($s['funding_source'] ?? '')==='personal') {
                 if($userKey==='' || !hash_equals($s['key_fingerprint'] ?? '',hash('sha256',$userKey)))throw new RuntimeException(labT('api.summary.34'));
@@ -213,7 +216,15 @@ try {
         $statesData=labLanguageJson('data/states.json')['states'];
         $save = function(array $value) use ($path): void { labWrite($path,$value); };
         $GLOBALS['lab_checkpoint'] = $save;
-        if($action==='submit_review') {
+        if($action==='set_jury') {
+            labSetJury($s,$body['jury_slots'] ?? null,labMarketPrices($models));$save($s);
+        } elseif($action==='retry_jury') {
+            $rid=(string)($body['request_id'] ?? '');
+            if(labRetryJury($s,$rid,$models,$body['slots'] ?? null)){
+                $save($s);labEvaluate($s,$key,$models,$save);
+                if(($s['evaluation_status'] ?? '')==='complete' && empty($s['evaluation_refresh_pending'])){foreach($s['jury_retry_requests'] as &$state)$state='complete';unset($state);$save($s);}
+            }
+        } elseif($action==='submit_review') {
             $role=$body['role'] ?? '';$rating=$body['rating'] ?? null;$text=$body['text'] ?? null;
             if(empty($s['is_ended']) || labTurns($s)<1)throw new RuntimeException(labT('api.summary.36'));
             if(!isset(labActorModels($s)[$role]) || !is_int($rating) || $rating<1 || $rating>5 || !is_string($text) || mb_strlen(trim($text))<3 || mb_strlen($text)>2000)
