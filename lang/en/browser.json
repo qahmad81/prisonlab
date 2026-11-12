@@ -425,5 +425,9 @@
   "session.slideUp": "Slide Up",
   "jury.unavailable": "This model is unavailable in the current catalog.",
   "jury.priceError": "The model exceeds the judging cap: ${cap} per million input or output tokens.",
-  "jury.distinctError": "This model is a test actor or already occupies another committee slot."
+  "jury.distinctError": "This model is a test actor or already occupies another committee slot.",
+  "jury.invalidWait": "Enter a whole-number wait from 1 to 900 seconds.",
+  "jury.wait": "Wait:",
+  "jury.seconds": "seconds",
+  "jury.waitHint": "Timeout for this attempt only: 1–900 seconds."
 }

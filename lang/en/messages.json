@@ -393,5 +393,6 @@
   "jury.retry.full": "No selected slot is missing a report. Accepted reports are preserved.",
   "jury.retry.finalize": "New reports are waiting for JEV finalization. Finish the pending review before changing the committee.",
   "session.slideDown": "Slide Down",
-  "session.slideUp": "Slide Up"
+  "session.slideUp": "Slide Up",
+  "jury.invalidWait": "Enter a whole-number wait from 1 to 900 seconds."
 }

@@ -751,7 +751,7 @@ const App = {
             this.setInterrogationMode(d.session.interrogator_type);
             if (d.session.pending_question && d.session.interrogator_type === 'human') document.getElementById('user-input').value = d.session.pending_question;
             this.renderSelectedCaseSummary();this.renderSelectedModelSummary();this.renderActiveSession();this.closeArchiveModal();
-            this.notify(d.session.read_only?LabI18n.t("app.loadSession.2"):LabI18n.t("app.loadSession.3"));
+            document.getElementById('session-notice').textContent='';
         } catch(e) {this.notify(e.message,true);}
     },
     toggleSessionDetails(){this.sessionDetailsExpanded=!this.sessionDetailsExpanded;this.updateControls();},

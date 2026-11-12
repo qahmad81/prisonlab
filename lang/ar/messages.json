@@ -393,5 +393,6 @@
   "jury.retry.full": "لا توجد خانات مختارة ينقصها تقرير؛ التقارير المكتملة محفوظة.",
   "jury.retry.finalize": "وصلت تقارير جديدة وتبقى اعتماد JEV؛ أكمل إعادة التحكيم أولًا قبل تغيير اللجنة.",
   "session.slideDown": "Slide Down",
-  "session.slideUp": "Slide Up"
+  "session.slideUp": "Slide Up",
+  "jury.invalidWait": "أدخل مدة انتظار صحيحة من 1 إلى 900 ثانية."
 }
