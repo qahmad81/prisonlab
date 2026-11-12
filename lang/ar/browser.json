@@ -515,5 +515,8 @@
   "jury.retrySeat": "إعادة محاولة هذا المحكم",
   "archive.testDate": "تاريخ الاختبار",
   "session.slideDown": "Slide Down",
-  "session.slideUp": "Slide Up"
+  "session.slideUp": "Slide Up",
+  "jury.unavailable": "هذا النموذج غير متاح في الكتالوج الحالي.",
+  "jury.priceError": "سعر النموذج يتجاوز حد التحكيم: ${cap} لكل مليون توكن إدخال أو إخراج.",
+  "jury.distinctError": "هذا النموذج مشارك في التحقيق أو موجود بالفعل في خانة أخرى من اللجنة."
 }

@@ -22,7 +22,7 @@ function publicSession(array $s, string $owner): array {
     $s['can_manage_jury']=$s['can_delete'];
     $cap=$s['actor_price_cap_at_start'] ?? 1.;
     if(!empty($s['sponsor_id']))$cap=labSponsorLocked(fn($v)=>$v['sponsors'][$s['sponsor_id']]['price_cap'] ?? $cap);
-    $s['jury_price_cap']=($s['funding_source'] ?? '')==='personal'?null:$cap;
+    $s['jury_price_cap']=labJuryCap($s,(float)$cap);
     $s['jury_slots']=labJurySlots($s);
     $s['cost']=labSessionCost($s);$s['rankings']=labRankings($s);
     $s['can_review']=hash_equals($s['owner_id'] ?? '',$owner) && !empty($s['is_ended']) && labTurns($s)>0;

@@ -32,12 +32,20 @@ def run(storage):
     assert c.init()['quota']['remaining']==3,'Donor quota consumed the site quota'
     assert start(c,sb['id'],priced,key='sk-or-personal-does-not-bypass')[0]==400
     status,d=start(c,sb['id'],free);assert status==200,d;zero=d['session']
+    assert zero['jury_price_cap']==1
+    qwen='qwen/qwen3.8-flash'
+    status,d=c.post('set_jury',session_id=zero['session_id'],jury_slots=[qwen,None,None,None]);assert status==200,d
     before=len(json.loads((storage/'test-calls.json').read_text())) if (storage/'test-calls.json').exists() else 0
     for turn in range(4):
         status,d=c.post('send_message',session_id=zero['session_id'],request_id=uuid.uuid4().hex,expected_turns=turn,message='ما تفسير هذه الواقعة؟');assert status==200,d
     status,d=c.post('compact_now',session_id=zero['session_id']);assert status==200,d
     assert any(u['purpose']=='compaction' for u in d['session']['usage'])
-    status,d=c.post('evaluate_session',session_id=zero['session_id']);assert status==200,d
+    # A paid economic judge on the zero-actor-price sponsor can fail, then recover on that same key.
+    req=urllib.request.Request(BASE+'/api.php',data=json.dumps(dict(action='evaluate_session',session_id=zero['session_id'])).encode(),headers={'Content-Type':'application/json','X-CSRF-Token':c.csrf,'X-Test-Fail-Model':qwen})
+    with c.http.open(req) as response:d=json.load(response)
+    assert d['session']['evaluation_status']=='failed' and not d['session']['judge_reports']
+    status,d=c.post('retry_jury',session_id=zero['session_id'],request_id=uuid.uuid4().hex,slots=[0]);assert status==200,d
+    assert list(d['session']['judge_reports'])==[qwen]
     graded=d['session'];calls=json.loads((storage/'test-calls.json').read_text())[before:]
     assert graded['evaluation_status']=='complete'
     assert all(x['test_key_hash']==hashlib.sha256(b'sk-or-sponsor-b').hexdigest() for x in calls),'Actor or support funding changed'

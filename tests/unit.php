@@ -63,6 +63,10 @@ $js['judge_reports']['b/expensive']=['rubric_version'=>LAB_VERSION];$js['funding
 labSetJury($js,['b/expensive','a/judge',null,null],array_values(array_filter($jc,fn($m)=>$m['id']!=='b/expensive')));
 check(isset($js['judge_reports']['b/expensive']),'retired accepted report removed');
 $js['actor_price_cap_at_start']=0;
+check(labJuryCap($js)===1.0,'free-only actors must retain funded economic judging');
+labSetJury($js,['b/expensive','a/judge',null,null],$jc);
+check($js['judge_models'][1]==='a/judge','economic judge incorrectly blocked by zero actor cap');
+check(labJuryCap($js,.2)===.2,'positive sponsor cap was widened');
 labSetJury($js,['b/expensive','c/free',null,null],$jc);check($js['judge_models'][1]==='c/free','zero-budget judge rejected');
 $profiles=labInvestigators();check(count($profiles)===10,'missing investigator profiles');
 $easy=labInvestigatorReasoning($profiles[0],['supported_parameters'=>['reasoning'],'reasoning'=>['supported_efforts'=>['high','low','none']]]);

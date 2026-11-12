@@ -2,14 +2,15 @@
 const JuryUI={
     draft:[null,null,null,null],context:'setup',slot:0,retryIds:{},
     slots(){return this.context==='session'?(App.currentSession?.jury_slots || [null,null,null,null]):this.draft;},
-    cap(){return this.context==='session'?(App.currentSession?.jury_price_cap ?? Infinity):(typeof App.fundingCap==='function'?App.fundingCap():App.userApiKey?Infinity:1);},
+    fundingCap(context){const cap=context==='session'?(App.currentSession?.jury_price_cap ?? Infinity):(typeof App.fundingCap==='function'?App.fundingCap():App.userApiKey?Infinity:1);return cap===0?1:cap;},
+    cap(){return this.fundingCap(this.context);},
     locked(m){return !m || !!m.catalog_unavailable || Math.max(Number(m.pricing?.prompt_per_1m ?? Infinity),Number(m.pricing?.completion_per_1m ?? Infinity))>this.cap();},
     eligible(m){const s=this.context==='session'?App.currentSession:null;
         const ids=s?[s.model,s.interrogator_model]:[App.interrogationMode==='reverse'?'':App.selectedModelId,App.interrogationMode==='human'?'':App.selectedInterrogatorId];
         return !ids.includes(m.id) && !ids.some(id=>m.canonical_slug && App.models.find(a=>a.id===id)?.canonical_slug===m.canonical_slug) && !this.slots().some((id,i)=>i!==this.slot && id && (id===m.id || (m.canonical_slug && App.models.find(a=>a.id===id)?.canonical_slug===m.canonical_slug)));
     },
     open(slot,context){this.slot=slot;this.context=context;App.openModelModal('judge');},
-    async choose(id){if(App.busy || App.generating)return;const m=App.models.find(m=>m.id===id);if(id && (this.locked(m) || !this.eligible(m)))return App.notify(LabI18n.t('jury.budget'),true);
+    async choose(id){if(App.busy || App.generating)return;const m=App.models.find(m=>m.id===id);if(id && (!m || m.catalog_unavailable))return App.notify(LabI18n.t('jury.unavailable'),true);if(id && this.locked(m))return App.notify(LabI18n.t('jury.priceError',{cap:this.cap()}),true);if(id && !this.eligible(m))return App.notify(LabI18n.t('jury.distinctError'),true);
         const slots=[...this.slots()];slots[this.slot]=id;
         if(this.context==='setup'){this.draft=slots;App.startRequestId=null;App.closeModelModal();this.render();return;}
         const sid=App.currentSession?.session_id;App.busy=true;App.updateControls();
@@ -26,7 +27,7 @@ const JuryUI={
             if(s?.is_ended && canEdit && id && !report){const retry=document.createElement('button');retry.type='button';retry.className='text-button jury-seat-retry';retry.textContent=LabI18n.t('jury.retrySeat');retry.disabled=App.busy || App.generating;retry.onclick=()=>this.retry(i);seat.append(retry);}
             grid.append(seat);
         });
-        const note=document.createElement('p');note.className='jury-controls-note';const cap=s?s.jury_price_cap:(typeof App.fundingCap==='function'?App.fundingCap():App.userApiKey?null:1);note.textContent=cap==null || !Number.isFinite(cap)?LabI18n.t('jury.unlimited'):LabI18n.t('jury.cap',{cap});box.replaceChildren(heading,grid,note);
+        const note=document.createElement('p');note.className='jury-controls-note';const cap=this.fundingCap(context);note.textContent=cap==null || !Number.isFinite(cap)?LabI18n.t('jury.unlimited'):LabI18n.t('jury.cap',{cap});box.replaceChildren(heading,grid,note);
         if(s?.is_ended && s.can_manage_jury){const retry=document.createElement('button');retry.type='button';retry.className='btn btn-secondary jury-retry';retry.textContent=LabI18n.t('jury.retry');retry.disabled=App.busy || App.generating || !s.turns_count || (!s.evaluation_refresh_pending && !slots.some(id=>id && !s.judge_reports?.[id]));retry.onclick=()=>this.retry();box.append(retry);}
     }},
     async retry(slot=null){const s=App.currentSession;if(!s?.can_manage_jury || App.busy || App.generating)return;App.busy=true;App.updateControls();const stop=App.watchJury(s.session_id);const rid=this.retryIds[s.session_id] ||= App.requestId();
