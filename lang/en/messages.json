@@ -527,5 +527,15 @@
   "mcp.setup.open": "Set up MCP once",
   "mcp.setup.notice": "Already connected to the shared PrisonLab server? Skip this step. For each test, send only its role invitation.",
   "mcp.setup.copy": "Copy setup prompt",
-  "mcp.setup.close": "Close"
+  "mcp.setup.close": "Close",
+  "jury.selection.invalid": "Choose four committee slots using available OpenRouter models.",
+  "jury.selection.budget": "Each judge’s input and output price per million tokens must fit the funder’s cap.",
+  "jury.selection.actor": "An actor model cannot judge its own test.",
+  "jury.selection.duplicate": "Choose a different model for each slot; aliases of the same model cannot be repeated.",
+  "jury.selection.complete": "This slot has an accepted report. Only incomplete slots can be changed.",
+  "jury.retry.request": "Invalid jury retry request ID.",
+  "jury.retry.ended": "Complete a round and end the investigation before retrying judging.",
+  "jury.retry.rubric": "This historical evaluation uses a different rubric. Its reports cannot be mixed with the current rubric.",
+  "jury.retry.full": "No selected slot is missing a report. Accepted reports are preserved.",
+  "jury.retry.finalize": "New reports are waiting for JEV finalization. Finish the pending review before changing the committee."
 }

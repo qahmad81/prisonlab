@@ -12,7 +12,7 @@ REPORT={'scores':dict.fromkeys(AXES,70),'summary':'Local parallel test','inciden
         'evidence':[{'criterion':k,'message_id':'a1','analysis':'Test evidence'} for k in AXES],
         'opportunities':{k:{'observed':False} for k in AXES if k in ['investigator_logic','investigator_emotional','investigator_moral']}}
 
-def scenario(name,seconds=50):
+def scenario(name,seconds=100):
     calls=Counter()
     class Handler(BaseHTTPRequestHandler):
         def log_message(self,*args):pass
@@ -24,7 +24,7 @@ def scenario(name,seconds=50):
             if (name=='one' and model!='judge1') or name=='zero':
                 self.send_response(503);self.end_headers();return
             delay=.1
-            if name=='two' and model=='judge3':delay=8
+            if name=='two' and model in ('judge3','judge4'):delay=8
             time.sleep(delay)
             response={'choices':[{'message':{'content':json.dumps(REPORT)},'finish_reason':'stop'}],
                       'usage':{'completion_tokens':100}}
@@ -43,8 +43,8 @@ def scenario(name,seconds=50):
                 assert len(s['judge_reports'])==1 and calls['judge1']==1 and calls['judge2']==0 and calls['judge3']==0,(name,s)
                 assert s['judge_failures']['judge2']['type']=='funding' and s['judge_failures']['judge3']['type']=='funding'
             elif name in ('all','recover'):
-                assert len(s['judge_reports'])==3,(name,s)
-                assert s['jury_wait']['elapsed_seconds']<seconds
+                assert len(s['judge_reports'])==4,(name,s)
+                assert 30<=s['jury_wait']['elapsed_seconds']<seconds
             elif name=='two':
                 assert len(s['judge_reports'])==2,(name,s)
                 assert s['judge_progress']['judge3']['status']=='cancelled_deadline'
@@ -52,11 +52,11 @@ def scenario(name,seconds=50):
                 assert all(n==1 for n in calls.values()),'Live requests must not be retried'
             else:
                 assert len(s['judge_reports'])==(0 if name=='zero' else 1) and s['jury_wait']['elapsed_seconds']>=seconds
-                assert all(calls[k]==2 for k in ['judge2','judge3'])
+                assert all(calls[k]==2 for k in ['judge2','judge3','judge4'])
                 if name=='one':assert calls['judge1']==1
             if name=='recover':assert all(n==2 for n in calls.values())
             print('PASS parallel jury:',name)
     finally:server.shutdown();server.server_close()
 
 for name in ['all','two','recover','one','zero','budget']:scenario(name)
-for seconds in [80,180]:scenario('one',seconds)
+for seconds in [180,300]:scenario('one',seconds)

@@ -70,7 +70,7 @@ try{
     await page.route(url=>url.pathname==='/api.php' && url.searchParams.get('session_id')==='countdown-fixture',route=>route.fulfill({json:{ok:true,session:{jury_wait:{tier:'medium',total_seconds:80,deadline_at:fixtureDeadline,phase:'reviewing'},judge_progress:{one:{status:'complete'}}}}}));
     await page.evaluate(()=>{window.stopCountdownFixture=App.watchJury('countdown-fixture');});
     await page.waitForSelector('.jury-countdown');
-    assert((await page.locator('#jury-live-status').innerText()).includes('1/3'));
+    assert((await page.locator('#jury-live-status').innerText()).includes('1/4'));
     await page.waitForFunction(()=>document.querySelector('.jury-countdown')?.dataset.remaining==='1');
     await page.screenshot({path:'test-results/jury-countdown.png',fullPage:true});
     await page.evaluate(()=>window.stopCountdownFixture());

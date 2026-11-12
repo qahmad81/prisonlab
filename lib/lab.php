@@ -446,29 +446,29 @@ function labJuryPolicy(array $s,array $catalog):array {
     }
     $tier=$sum<2?'economic':($sum<10?'medium':'professional');
     $policy=labModelPolicy()['jury'][$tier];
-    return ['version'=>1,'tier'=>$tier,'label_ar'=>labT('jury.tier.' . $tier),'seconds'=>$policy['seconds'],'output_price_sum'=>round($sum,6)];
+    return ['version'=>2,'tier'=>$tier,'label_ar'=>labT('jury.tier.' . $tier),'seconds'=>$policy['seconds'],'output_price_sum'=>round($sum,6)];
 }
 
 function labPanel(array $s,array $catalog):array {
     $tier=labJuryPolicy($s,$catalog)['tier'];$pool=labModelPolicy()['jury'][$tier]['models'];
     $byId=array_column($catalog,null,'id');$actors=array_values(labActorModels($s));
-    $pool=array_values(array_filter($pool,function($id)use($byId,$actors){
-        if(in_array($id,$actors,true))return false;
-        try{labModel($id,array_values($byId),true);}catch(Throwable){return false;}
-        foreach($actors as $actor)if(!empty($byId[$id]['canonical_slug']) && $byId[$id]['canonical_slug']===($byId[$actor]['canonical_slug'] ?? null))return false;
-        return true;
-    }));
+    $eligible=function($id)use($s,$byId){try{$m=labJuryModel($s,$id,array_values($byId));foreach($s['jury_excluded_models'] ?? [] as $reserved)if($id===$reserved || (!empty($m['canonical_slug']) && $m['canonical_slug']===($byId[$reserved]['canonical_slug'] ?? null)))return false;return true;}catch(Throwable){return false;}};
+    $pool=array_values(array_filter($pool,$eligible));$preferred=array_fill_keys($pool,true);
+    // Low sponsor caps may exclude the curated tier: use eligible text models as a fallback.
+    if(count($pool)<4)foreach(array_keys($byId) as $id)if(!in_array($id,$pool,true) && $eligible($id))$pool[]=$id;
     // Random panels stay within the operator-approved pool, with distinct publishers.
     shuffle($pool);
     if($tier!=='professional') {
         $file=($GLOBALS['lab_storage'] ?? '').'/model-health.json';$health=is_file($file)?labRead($file):[];
         $reliability=function($id)use($health){$e=$health[$id] ?? [];$t=$e['totals'] ?? labHealthTotals($e['samples'] ?? []);
             return (($t['successes'] ?? 0)+2)/(($t['successes'] ?? 0)+($t['failures'] ?? 0)+4);};
-        usort($pool,fn($a,$b)=>$reliability($b)<=>$reliability($a));
+        usort($pool,fn($a,$b)=>(isset($preferred[$b])<=>isset($preferred[$a])) ?: ($reliability($b)<=>$reliability($a)));
     }
+    if($tier==='professional')usort($pool,fn($a,$b)=>isset($preferred[$b])<=>isset($preferred[$a]));
     $panel=[];$publishers=[];
     foreach($pool as $id){$publisher=explode('/',ltrim($id,'~'))[0];if(in_array($publisher,$publishers,true))continue;
-        $panel[]=$id;$publishers[]=$publisher;if(count($panel)===3)return $panel;}
+        $panel[]=$id;$publishers[]=$publisher;if(count($panel)===4)return $panel;}
+    if($panel)return $panel;
     throw new RuntimeException(labT('lab.Panel.1'));
 }
 
@@ -482,36 +482,31 @@ function labJudgeMessages(array $s):array {
 }
 
 function labEvaluate(array &$s, string $key, array $catalog, callable $save): void {
-    if (!empty($s['evaluation']) && ($s['evaluation_status'] ?? '') === 'complete') {labBenchmarkSave($s);return;}
+    if (!empty($s['evaluation']) && ($s['evaluation_status'] ?? '') === 'complete' && empty($s['evaluation_refresh_pending'])) {labBenchmarkSave($s);return;}
     if (labTurns($s) < 1) throw new RuntimeException(labT('lab.Evaluate.1'));
     $s['is_ended'] = true; $s['end_reason'] ??= 'manual'; $s['evaluation_status'] = 'running'; $save($s);
     try {
         $catalog = labMarketPrices($catalog);
-        if(($s['jury_policy']['version'] ?? 0)!==1 || count($s['judge_models'] ?? [])!==3) {
-            if(!empty($s['judge_reports']))$s['archived_judge_reports'][]=['policy'=>'legacy','reports'=>$s['judge_reports']];
-            $s['judge_reports']=[];$s['judge_progress']=[];unset($s['evaluation_quorum']);
-            $s['jury_policy']=labJuryPolicy($s,$catalog);$s['judge_models']=labPanel($s,$catalog);
-            $s['judge_price_caps']=[];
-        }
+        labPrepareJury($s,$catalog);
         $panel=$s['judge_models'];
-        foreach($panel as $id){$m=labModel($id,$catalog,true);
+        foreach($panel as $id){if(isset($s['judge_reports'][$id]) || (!empty($s['evaluation_refresh_pending']) && !in_array($id,$s['evaluation_retry_models'] ?? $panel,true)))continue;$m=labJuryModel($s,$id,$catalog);
             $caps=['prompt'=>(float)$m['pricing']['prompt_per_1m'],'completion'=>(float)$m['pricing']['completion_per_1m']];
             $prior=$s['judge_price_caps'][$id] ?? $caps;
             if($caps['prompt']>$prior['prompt']+.000001 || $caps['completion']>$prior['completion']+.000001)throw new RuntimeException(labT('lab.Evaluate.2'));
             $s['judge_price_caps'][$id]=$caps;
         }
-        foreach($s['judge_reports'] as $id=>$report)if(($report['rubric_version'] ?? '')!==LAB_VERSION) {
-            $s['archived_judge_reports'][]=['model'=>$id,'report'=>$report];unset($s['judge_reports'][$id],$s['judge_progress'][$id],$s['evaluation_quorum']);
-        }
+        foreach($s['judge_reports'] as $report)if(($report['rubric_version'] ?? '')!==LAB_VERSION)throw new RuntimeException(labT('jury.retry.rubric'));
+        $beforeReports=count($s['judge_reports']);
         $jobs=[];
-        foreach($panel as $id)if(!isset($s['judge_reports'][$id]))$jobs[]=['model'=>$id,'payload'=>labJudgePayload($s,$id,labJudgeMessages($s))];
+        foreach($panel as $id)if(!isset($s['judge_reports'][$id]) && (empty($s['evaluation_refresh_pending']) || in_array($id,$s['evaluation_retry_models'] ?? $panel,true)))$jobs[]=['model'=>$id,'payload'=>labJudgePayload($s,$id,labJudgeMessages($s))];
         $verifyAll=!empty($GLOBALS['lab_verify_all_judges']);
         if(empty($s['evaluation_quorum']) || count($s['judge_reports'])<1)labJuryWave($s,$jobs,$key,$save,$verifyAll);
         $received=count($s['judge_reports']);
         if($received<1)throw new LabProviderException(labT('lab.Evaluate.3'),false);
-        $degraded=$received<3;
-        $s['evaluation_quorum']=['required'=>$degraded?1:3,'preferred'=>3,'invited'=>count($panel),'received'=>$received,
+        $degraded=$received<4;
+        $s['evaluation_quorum']=['required'=>$degraded?1:4,'preferred'=>4,'invited'=>count($panel),'received'=>$received,
             'degraded'=>$degraded,'stop_reason'=>$s['jury_wait']['stop_reason'] ?? 'saved_reports'];
+        if(!empty($s['evaluation_refresh_pending']) && !empty($s['evaluation']) && $received===($s['evaluation_refresh_report_count'] ?? $beforeReports)){$s['evaluation_status']='complete';unset($s['evaluation_refresh_pending'],$s['evaluation_refresh_report_count'],$s['evaluation_retry_models']);$save($s);return;}
         $questions = [];
         foreach (labRubric() as $id => $description) $questions[$id] = labScale(labPrompt('lab.Evaluate.4') . ' ' . $description);
         $candidates=labIncidentCandidates($s);
@@ -568,10 +563,10 @@ function labEvaluate(array &$s, string $key, array $catalog, callable $save): vo
             'detection_tested'=>$tested,'investigator_coverage'=>round($weight*100),'investigator_effective_weights'=>array_map(fn($w)=>round(100*$w/$weight,2),array_filter($investigatorWeights,fn($id)=>$scores[$id]!==null,ARRAY_FILTER_USE_KEY)),
             'judge_models' => array_keys($s['judge_reports']), 'invited_judge_models'=>$panel, 'quorum'=>$s['evaluation_quorum'], 'raw_answers' => $r['answers'], 'grade_ar' => labT('lab.Evaluate.18'),
             'verdict_summary' => labT('lab.Evaluate.19')];
-        $s['evaluation_status'] = 'complete'; unset($s['evaluation_error']);
+        $s['evaluation_status'] = 'complete'; unset($s['evaluation_error'],$s['evaluation_refresh_pending'],$s['evaluation_refresh_report_count'],$s['evaluation_retry_models']);
         labBenchmarkSave($s);
     } catch (Throwable $e) {
-        $s['evaluation_status'] = 'failed'; $s['evaluation_error'] = $e->getMessage();
+        $s['evaluation_status'] = !empty($s['evaluation_refresh_pending']) && !empty($s['evaluation'])?'complete':'failed'; $s['evaluation_error'] = $e->getMessage();
         $s['evaluation_retryable'] = $e instanceof LabProviderException && $e->retryable;
     }
     $s['updated_at'] = gmdate('c'); $save($s);

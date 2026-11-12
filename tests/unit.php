@@ -11,7 +11,8 @@ check(labPageUrl('public',['model'=>'~z-ai/glm-flash-latest','view'=>'leaderboar
 check(labParsePagePath('/en/public/model/mistralai/mistral-small-2603%3Abatch')['params']['model']==='mistralai/mistral-small-2603:batch','batch model route must preserve its suffix');
 foreach(['/en/public/case_file/foo%2Fbar','/en/home/extra/a','/en/public/unknown/foo','/en/public/session/foo/bar'] as $path)
     check(labParsePagePath($path)===null,'invalid public path accepted');
-check(labJuryStop(3,12)==='all_reports','three reports must finish immediately');
+check(labJuryStop(4,12)===null,'whole panel must wait for the first 30-second check');
+check(labJuryStop(4,30)==='all_reports','whole panel should finish at a scheduled check');
 
 // Distinct credentials and zero provider caps are enforced per actor, not per session.
 $GLOBALS['lab_catalog_models']=[
@@ -38,15 +39,31 @@ try { labChat($routeSession,'prisoner','test/free',[],'fixture-paid'); throw new
 catch (RuntimeException $e) { check(str_contains($e->getMessage(),'المجانية'),'wrong missing free key error'); }
 unset($GLOBALS['lab_catalog_models'],$GLOBALS['lab_user_key'],$GLOBALS['lab_transport']);
 
-foreach([50,80,180] as $seconds){
+foreach([100,180,300] as $seconds){
     check(labJuryStop(2,$seconds-.01,$seconds)===null,'partial jury ended before deadline');
     foreach([0,1,2] as $n)check(labJuryStop($n,$seconds,$seconds)==='deadline','tier deadline incorrect');
 }
-foreach([[1.99,'economic',50],[2,'medium',80],[9.99,'medium',80],[10,'professional',180],[60,'professional',180]] as [$price,$tier,$seconds]){
+foreach([[1.99,'economic',100],[2,'medium',180],[9.99,'medium',180],[10,'professional',300],[60,'professional',300]] as [$price,$tier,$seconds]){
     $session=['interrogator_type'=>'ai','model'=>'test/a','interrogator_model'=>'test/b'];
     $catalog=[['id'=>'test/a','pricing'=>['completion_per_1m'=>$price/2]],['id'=>'test/b','pricing'=>['completion_per_1m'=>$price/2]]];
     $policy=labJuryPolicy($session,$catalog);check($policy['tier']===$tier && $policy['seconds']===$seconds,'output sum tier boundary wrong');
 }
+
+// Aliases cannot occupy separate seats, accepted reports survive catalog retirement and cap changes.
+$jc=[['id'=>'test/actor','pricing'=>['prompt_per_1m'=>0,'completion_per_1m'=>.2]],
+ ['id'=>'a/judge','canonical_slug'=>'same-model','pricing'=>['prompt_per_1m'=>1,'completion_per_1m'=>1]],
+ ['id'=>'~a/latest','canonical_slug'=>'same-model','pricing'=>['prompt_per_1m'=>1,'completion_per_1m'=>1]],
+ ['id'=>'b/expensive','pricing'=>['prompt_per_1m'=>2,'completion_per_1m'=>3]],
+ ['id'=>'c/free','pricing'=>['prompt_per_1m'=>0,'completion_per_1m'=>0]]];
+$js=['interrogator_type'=>'human','model'=>'test/actor','judge_reports'=>[],'funding_source'=>'site'];
+try{labSetJury($js,['a/judge','~a/latest',null,null],$jc);check(false,'alias duplicated');}catch(RuntimeException $e){check($e->getMessage()===labT('jury.selection.duplicate'),'wrong duplicate error');}
+try{labSetJury($js,['b/expensive',null,null,null],$jc);check(false,'budget bypass');}catch(RuntimeException $e){check($e->getMessage()===labT('jury.selection.budget'),'wrong budget error');}
+$js['funding_source']='personal';labSetJury($js,['b/expensive',null,null,null],$jc);check($js['judge_models']===['b/expensive'],'personal price ceiling remained');
+$js['judge_reports']['b/expensive']=['rubric_version'=>LAB_VERSION];$js['funding_source']='site';
+labSetJury($js,['b/expensive','a/judge',null,null],array_values(array_filter($jc,fn($m)=>$m['id']!=='b/expensive')));
+check(isset($js['judge_reports']['b/expensive']),'retired accepted report removed');
+$js['actor_price_cap_at_start']=0;
+labSetJury($js,['b/expensive','c/free',null,null],$jc);check($js['judge_models'][1]==='c/free','zero-budget judge rejected');
 $profiles=labInvestigators();check(count($profiles)===10,'missing investigator profiles');
 $easy=labInvestigatorReasoning($profiles[0],['supported_parameters'=>['reasoning'],'reasoning'=>['supported_efforts'=>['high','low','none']]]);
 check($easy['effort']==='none','easy investigator thinking not minimized');

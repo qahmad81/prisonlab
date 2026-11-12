@@ -1,6 +1,74 @@
 <?php
 declare(strict_types=1);
 
+/** Funding is resolved server-side before any panel mutation or paid evaluation. */
+function labJuryCap(array $s):?float {
+    if(($s['funding_source'] ?? '')==='personal')return null;
+    return (float)($GLOBALS['lab_actor_price_cap'] ?? $s['actor_price_cap_at_start'] ?? 1.);
+}
+function labJuryModel(array $s,string $id,array $catalog):array {
+    if(str_starts_with($id,'mcp/'))throw new RuntimeException(labT('jury.selection.invalid'));
+    $m=labModel($id,$catalog,true);$cap=labJuryCap($s);
+    if(!empty($m['catalog_unavailable']) || (isset($m['architecture']['output_modalities']) && !in_array('text',$m['architecture']['output_modalities'],true)))throw new RuntimeException(labT('jury.selection.invalid'));
+    foreach(['prompt_per_1m','completion_per_1m'] as $field){$price=$m['pricing'][$field] ?? null;
+        if(!is_numeric($price) || $price<0 || ($cap!==null && $price>$cap))throw new RuntimeException(labT('jury.selection.budget'));
+    }
+    $byId=array_column($catalog,null,'id');
+    foreach(labActorModels($s) as $actor)if($id===$actor || (!empty($m['canonical_slug']) && $m['canonical_slug']===($byId[$actor]['canonical_slug'] ?? null)))throw new RuntimeException(labT('jury.selection.actor'));
+    return $m;
+}
+/** Preserve accepted reports, including historical three-seat panels. */
+function labJurySlots(array $s):array {return array_pad(array_slice($s['jury_slots'] ?? $s['judge_models'] ?? [],0,4),4,null);}
+function labSetJury(array &$s,mixed $input,array $catalog,bool $fill=false):void {
+    if(!is_array($input) || !array_is_list($input) || count($input)!==4)throw new RuntimeException(labT('jury.selection.invalid'));
+    $selected=[];$slugs=[];$old=labJurySlots($s);
+    foreach($old as $i=>$id)if($id!==null && isset($s['judge_reports'][$id]) && $input[$i]!==$id)throw new RuntimeException(labT('jury.selection.complete'));
+    foreach($input as $id){if($id===null)continue;if(!is_string($id))throw new RuntimeException(labT('jury.selection.invalid'));
+        $m=isset($s['judge_reports'][$id])?(array_column($catalog,null,'id')[$id] ?? ['id'=>$id]):labJuryModel($s,$id,$catalog);$slug=$m['canonical_slug'] ?? $id;
+        if(in_array($id,$selected,true) || in_array($slug,$slugs,true))throw new RuntimeException(labT('jury.selection.duplicate'));
+        $selected[]=$id;$slugs[]=$slug;
+    }
+    if($fill){$defaults=in_array(null,$input,true)?labPanel($s+['jury_excluded_models'=>$selected],$catalog):[];foreach($input as &$id)if($id===null){foreach($defaults as $candidate)if(!in_array($candidate,$input,true)){$id=$candidate;break;}}unset($id);labSetJury($s,$input,$catalog,false);return;}
+    if(!empty($s['evaluation_refresh_pending'])){
+        if(count($s['judge_reports'])>($s['evaluation_refresh_report_count'] ?? 0))throw new RuntimeException(labT('jury.retry.finalize'));
+        unset($s['evaluation_refresh_pending'],$s['evaluation_refresh_report_count'],$s['evaluation_retry_models']);
+        foreach($s['jury_retry_requests'] ?? [] as $rid=>$state)$s['jury_retry_requests'][$rid]='complete';
+    }
+    $s['jury_slots']=$input;$s['judge_models']=array_values(array_filter($input,fn($id)=>$id!==null));
+    foreach(['judge_progress','judge_failures','judge_invalid_reports','judge_price_caps'] as $field)foreach(array_keys($s[$field] ?? []) as $id)if(!in_array($id,$s['judge_models'],true))unset($s[$field][$id]);
+    $s['jury_policy']=labJuryPolicy($s,$catalog);
+}
+function labPrepareJury(array &$s,array $catalog):void {
+    if(!empty($s['judge_models'])){
+        $s['jury_slots']=labJurySlots($s);
+        $s['jury_policy']=labJuryPolicy($s,$catalog);
+        return;
+    }
+    if(isset($s['jury_slots']))throw new RuntimeException(labT('jury.selection.invalid'));
+    labSetJury($s,[null,null,null,null],$catalog,true);
+}
+/** Explicit recovery never discards a successful report or silently changes a historical grade. */
+function labRetryJury(array &$s,string $requestId,array $catalog,mixed $slots=null):bool {
+    if(!preg_match('/^[a-zA-Z0-9_-]{8,100}$/D',$requestId))throw new RuntimeException(labT('jury.retry.request'));
+    $prior=$s['jury_retry_requests'][$requestId] ?? null;
+    if($prior==='complete')return false;
+    if($prior==='running')return true;
+    if(!empty($s['evaluation_refresh_pending'])){$s['jury_retry_requests'][$requestId]='running';return true;}
+    if(labTurns($s)<1 || empty($s['is_ended']))throw new RuntimeException(labT('jury.retry.ended'));
+    if(!empty($s['evaluation']) && ($s['evaluation']['rubric_version'] ?? '')!==LAB_VERSION)throw new RuntimeException(labT('jury.retry.rubric'));
+    labPrepareJury($s,$catalog);
+    $missing=array_values(array_diff($s['judge_models'],array_keys($s['judge_reports'] ?? [])));
+    if($slots!==null){
+        if(!is_array($slots) || !array_is_list($slots) || !$slots || count($slots)>4)throw new RuntimeException(labT('jury.selection.invalid'));
+        $targets=[];foreach($slots as $slot){if(!is_int($slot) || $slot<0 || $slot>3)throw new RuntimeException(labT('jury.selection.invalid'));$id=$s['jury_slots'][$slot];if(!$id || !in_array($id,$missing,true))throw new RuntimeException(labT('jury.selection.complete'));$targets[]=$id;}
+        $missing=array_values(array_unique($targets));
+    }
+    if(!$missing)throw new RuntimeException(labT('jury.retry.full'));
+    if(!empty($s['evaluation']))$s['evaluation_history'][]=['evaluation'=>$s['evaluation'],'quorum'=>$s['evaluation_quorum'] ?? null,'jury_wait'=>$s['jury_wait'] ?? null,'requested_at'=>gmdate('c'),'request_id'=>$requestId];
+    $s['jury_retry_requests'][$requestId]='running';$s['evaluation_refresh_pending']=true;$s['evaluation_retry_models']=$missing;$s['evaluation_refresh_report_count']=count($s['judge_reports'] ?? []);unset($s['evaluation_quorum']);
+    return true;
+}
+
 function labJuryResult(array &$s,array $job,?array $response,string $error,float $elapsed,?float $firstByte,?string $existingCall,callable $save):void {
     $id=$job['model'];$tokens=(int)($response['usage']['completion_tokens'] ?? 0);
     $attempt=$s['judge_progress'][$id]['attempt'] ?? 1;
@@ -29,8 +97,8 @@ function labJuryResult(array &$s,array $job,?array $response,string $error,float
 function labJuryNow():float {return isset($GLOBALS['lab_jury_clock']) ? ($GLOBALS['lab_jury_clock'])() : microtime(true);}
 
 /** Finish early only when the whole panel has reported; otherwise use its hard deadline. */
-function labJuryStop(int $reports,float $elapsed,int $seconds=50,int $invited=3):?string {
-    if($reports>=$invited)return 'all_reports';
+function labJuryStop(int $reports,float $elapsed,int $seconds=100,int $invited=4):?string {
+    if($reports>=$invited && $elapsed>=30)return 'all_reports';
     return $elapsed>=$seconds?'deadline':null;
 }
 
@@ -50,8 +118,9 @@ function labJuryWave(array &$s,array $jobs,string $key,callable $save,bool $veri
     $mock=isset($GLOBALS['lab_transport']);
     if(!$mock && $key==='')throw new RuntimeException(labT('jury.JuryWave.1'));
     $multi=$mock?null:curl_multi_init();$active=[];$attempts=[];$byModel=[];
-    $started=labJuryNow();$reason=null;$seconds=(int)($s['jury_policy']['seconds'] ?? 50);
-    $s['jury_wait']=['total_seconds'=>$seconds,'phase'=>'reviewing','started_at'=>gmdate('c'),'deadline_at'=>microtime(true)+$seconds,'tier'=>$s['jury_policy']['tier'] ?? 'economic'];
+    $expected=count($s['judge_reports'])+count($jobs);
+    $started=labJuryNow();$reason=null;$nextCheck=30.;$seconds=(int)($s['jury_policy']['seconds'] ?? 100);
+    $s['jury_wait']=['total_seconds'=>$seconds,'phase'=>'reviewing','started_at'=>gmdate('c'),'deadline_at'=>microtime(true)+$seconds,'tier'=>$s['jury_policy']['tier'] ?? 'economic','check_interval_seconds'=>30];
     $launch=function(array $job)use(&$s,&$active,&$attempts,$multi,$mock,$key,$started,$seconds):void {
         $id=$job['model'];
         try {if(function_exists('labGuardFunding'))labGuardFunding($key);}
@@ -99,7 +168,7 @@ function labJuryWave(array &$s,array $jobs,string $key,callable $save,bool $veri
             }
             }
             $elapsed=labJuryNow()-$started;
-            $reason=labJuryStop(count($s['judge_reports']),$elapsed,$seconds,count($s['judge_models'] ?? $byModel));
+            if($elapsed>=$nextCheck || $elapsed>=$seconds){$reason=labJuryStop(count($s['judge_reports']),$elapsed,$seconds,$expected);$nextCheck=(floor($elapsed/30)+1)*30;}
             if($reason!==null)break;
             if($elapsed<$seconds) {
                 $live=array_column(array_column($active,'job'),'model');

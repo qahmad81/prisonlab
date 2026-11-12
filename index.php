@@ -99,6 +99,7 @@
                 </div>
             </article>
             <div id="reverse-role-brief" class="reverse-role-brief" hidden><?= labE('index.html.36') ?></div>
+            <section id="jury-setup-panel" class="jury-controls"></section>
             <button type="button" id="start-session-btn" class="btn btn-primary" style="margin-top:6px;"><?= labE('index.html.37') ?></button>
 
             <hr style="border-color: var(--border); margin: 16px 0;">
@@ -158,6 +159,7 @@
 
         <button type="button" id="end-test-btn" class="end-test-button" onclick="App.endAndEvaluateSession()" disabled><?= labE('index.html.57') ?></button>
         <div id="session-notice" class="session-notice" role="status" aria-live="polite"></div>
+        <section id="jury-session-panel" class="jury-controls" hidden></section>
         <div id="jury-live-status" class="jury-live-status" hidden></div>
         <details id="mcp-session-panel" class="memory-panel mcp-session-panel" hidden><summary><?= labE('index.html.58') ?></summary><p><?= labE('index.html.59') ?></p><button type="button" class="btn btn-secondary mcp-setup-open" onclick="MCPUI.setup()">⚙ <?= labE('mcp.setup.open') ?></button><p class="mcp-setup-notice"><?= labE('mcp.setup.notice') ?></p><div id="mcp-gates"></div><p id="mcp-wait-state" role="status"></p><button id="mcp-pause-btn" type="button" class="btn btn-secondary" onclick="MCPUI.pauseRequested=true" hidden><?= labE('index.html.60') ?></button></details>
         <details id="memory-notes" class="memory-panel" hidden></details>
@@ -399,6 +401,7 @@
 <script src="/assets/session-view.js?v=<?= (int)filemtime(__DIR__ . "/assets/session-view.js") ?>"></script>
 <script src="/assets/community.js?v=<?= (int)filemtime(__DIR__ . '/assets/community.js') ?>"></script>
 <script src="/assets/lab-cards.js?v=<?= (int)filemtime(__DIR__.'/assets/lab-cards.js') ?>"></script>
+<script src="/assets/jury-ui.js?v=<?= (int)filemtime(__DIR__ . "/assets/jury-ui.js") ?>"></script>
 <script src="/assets/app.js?v=<?= (int)filemtime(__DIR__ . "/assets/app.js") ?>"></script>
 <script src="/assets/mcp.js?v=<?= (int)filemtime(__DIR__.'/assets/mcp.js') ?>"></script>
 </body>
