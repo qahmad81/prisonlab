@@ -90,7 +90,7 @@ try {
             if (($s['owner_id'] ?? '') === $owner) $logs[] = summary($s);
             if (!empty($s['is_published']) && !empty($s['evaluation'])) $published[] = summary($s);
         }
-        foreach (['logs','published'] as $var) usort($$var, fn($a,$b)=>strcmp($b['updated_at'],$a['updated_at']));
+        foreach (['logs','published'] as $var) usort($$var, fn($a,$b)=>strcmp($b['created_at'] ?? $b['updated_at'],$a['created_at'] ?? $a['updated_at']) ?: strcmp($b['session_id'],$a['session_id']));
         if ($action === 'public_sessions') respond(['ok'=>true,'logs'=>$published,'cases'=>labCases(),
             'investigators'=>labInvestigators(),'models'=>array_map(fn($m)=>['id'=>$m['id'],'name'=>$m['name']],$models)]);
         $processedModels = [];

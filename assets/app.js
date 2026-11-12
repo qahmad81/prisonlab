@@ -27,6 +27,7 @@ const App = {
     interrogationMode: 'human',
     selectedInterrogatorId: '',
     modelTarget: 'prisoner',
+    sessionDetailsExpanded:false,
     busy: false,
     generation: 0,
     generating: false,
@@ -722,7 +723,7 @@ const App = {
                 jury_slots:typeof JuryUI!=='undefined'?JuryUI.draft:undefined,
                 mcp_actors:typeof MCPUI!=='undefined'?MCPUI.startConfig():{},
                 interrogator_type:this.interrogationMode,interrogator_model:this.selectedInterrogatorId,interrogator_character:this.selectedInvestigatorPersona,prisoner_effort:this.reasoningSelection('prisoner'),interrogator_effort:this.reasoningSelection('interrogator')});
-            this.generation++; this.currentSession=data.session; this.stopRequested=false;this.aiPaused=false;
+            this.generation++;this.sessionDetailsExpanded=false; this.currentSession=data.session; this.stopRequested=false;this.aiPaused=false;
             if(typeof MCPUI!=='undefined')await MCPUI.started(data.session);
             this.startRequestId=null;this.renderAccount();
             this.renderActiveSession(); await this.reloadLogsOnly(); this.notify(LabI18n.t("app.startNewSession.1"));
@@ -740,7 +741,7 @@ const App = {
         try {
             const d=await (await fetch(LabI18n.api('api.php?action=load_session&session_id='+encodeURIComponent(id)))).json();
             if(!d.ok) throw Error(d.error);
-            this.currentSession=d.session;this.generation++;this.currentCharacterSlug=d.session.character_slug;
+            this.currentSession=d.session;this.sessionDetailsExpanded=false;this.generation++;this.currentCharacterSlug=d.session.character_slug;
             if(typeof MCPUI!=='undefined')MCPUI.selections=structuredClone(d.session.mcp_actors || {});
             this.aiPaused=d.session.interrogator_type==='ai' && !d.session.is_ended;
             this.currentGender=d.session.gender;this.selectedModelId=d.session.model;
@@ -753,6 +754,7 @@ const App = {
             this.notify(d.session.read_only?LabI18n.t("app.loadSession.2"):LabI18n.t("app.loadSession.3"));
         } catch(e) {this.notify(e.message,true);}
     },
+    toggleSessionDetails(){this.sessionDetailsExpanded=!this.sessionDetailsExpanded;this.updateControls();},
     updateControls() {
         const s=this.currentSession, ai=s?.interrogator_type==='ai', reverse=s?.interrogator_type==='reverse', ended=s?.is_ended, ro=s?.read_only;
         document.getElementById('start-session-btn').disabled=this.busy || this.generating;
@@ -762,6 +764,9 @@ const App = {
         document.getElementById('human-input-bar').style.display=ai?'none':'';
         document.getElementById('human-tactics-bar').style.display=ai || reverse?'none':'';
         document.getElementById('ai-vs-ai-controls').style.display=ai?'':'none';
+        const lower=document.getElementById('session-lower-content'),toggle=document.getElementById('session-details-toggle');
+        lower.hidden=!!ai && !this.sessionDetailsExpanded;lower.classList.toggle('ai-session-details',!!ai);
+        toggle.setAttribute('aria-expanded',String(!lower.hidden));toggle.title=LabI18n.t(lower.hidden?'session.slideDown':'session.slideUp');toggle.setAttribute('aria-label',toggle.title);toggle.classList.toggle('expanded',!lower.hidden);
         const waiting=reverse && !s?.awaiting_question?.sense;
         document.getElementById('send-btn').disabled=this.busy || !!ended || !!ro || !!waiting;
         document.getElementById('user-input').disabled=this.busy || !!ended || !!ro || !!waiting;
@@ -953,7 +958,7 @@ const App = {
     renderArchive() {
         const box=document.getElementById('archive-modal-grid');box.replaceChildren();
         const q=document.getElementById('archive-modal-search').value.trim().toLowerCase();
-        const logs=(this.archiveMode==='public'?this.publishedLogs:this.logs).filter(s=>[s.case_title,s.model,s.interrogator_model].join(' ').toLowerCase().includes(q));
+        const logs=(this.archiveMode==='public'?this.publishedLogs:this.logs).filter(s=>[s.case_title,s.model,s.interrogator_model].join(' ').toLowerCase().includes(q)).sort((a,b)=>(Date.parse(b.created_at || b.published_at || b.updated_at) || 0)-(Date.parse(a.created_at || a.published_at || a.updated_at) || 0) || String(b.session_id).localeCompare(String(a.session_id)));
         if(!logs.length){box.textContent=LabI18n.t("app.renderArchive.1");return;}
         for(const s of logs){
             const compact=LabCards.card(s,{open:id=>this.loadSession(id)});box.appendChild(compact);

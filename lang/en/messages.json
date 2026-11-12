@@ -391,5 +391,7 @@
   "jury.retry.ended": "Complete a round and end the investigation before retrying judging.",
   "jury.retry.rubric": "This historical evaluation uses a different rubric. Its reports cannot be mixed with the current rubric.",
   "jury.retry.full": "No selected slot is missing a report. Accepted reports are preserved.",
-  "jury.retry.finalize": "New reports are waiting for JEV finalization. Finish the pending review before changing the committee."
+  "jury.retry.finalize": "New reports are waiting for JEV finalization. Finish the pending review before changing the committee.",
+  "session.slideDown": "Slide Down",
+  "session.slideUp": "Slide Up"
 }

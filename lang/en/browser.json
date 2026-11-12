@@ -419,5 +419,8 @@
   "jury.retry": "Retry incomplete slots and update evaluation",
   "jury.finished": "Judging review finished; successful reports are preserved.",
   "jury.providerReasoning": "Judging: provider default",
-  "jury.retrySeat": "Retry this judge"
+  "jury.retrySeat": "Retry this judge",
+  "archive.testDate": "Test date",
+  "session.slideDown": "Slide Down",
+  "session.slideUp": "Slide Up"
 }
