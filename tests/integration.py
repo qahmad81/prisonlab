@@ -185,6 +185,11 @@ def run(storage):
     assert a.post('retry_jury',session_id=pid,request_id=rid2)[0]==200
     assert len(json.loads((storage/'test-calls.json').read_text()))==count,'Same retry ID must not repurchase final JEV'
     public=b.get('/api.php?action=load_session&session_id='+pid)[1]['session'];assert not public['can_manage_jury'] and 'evaluation_history' not in public
+    # Reject invalid per-attempt deadlines before issuing any provider request.
+    for invalid in [0,901,1.5,'100',True]:
+        before=len(json.loads((storage/'test-calls.json').read_text()))
+        assert a.post('retry_jury',session_id=pid,request_id=uuid.uuid4().hex,timeout_seconds=invalid)[0]==400
+        assert len(json.loads((storage/'test-calls.json').read_text()))==before
     # The server, not only the model picker, enforces sponsor price caps and distinct seats.
     status,budget=a.post('start_session',headers={'X-User-OpenRouter-Key':''},model='google/gemini-2.5-flash-lite',interrogator_type='human',case_file='char_1_victor_vance.md')
     assert status==200,budget
@@ -210,14 +215,22 @@ def run(storage):
         if scenario=='one':
             target=next(i for i,id in enumerate(result['jury_slots']) if id not in result['judge_reports'])
             before=len(json.loads((storage/'test-calls.json').read_text()))
-            status,single=a.post('retry_jury',session_id=result['session_id'],request_id=uuid.uuid4().hex,slots=[target])
+            status,single=a.post('retry_jury',session_id=result['session_id'],request_id=uuid.uuid4().hex,slots=[target],timeout_seconds=41)
             assert status==200 and len(single['session']['judge_reports'])==2
+            assert single['session']['jury_wait']['total_seconds']==41
             calls=json.loads((storage/'test-calls.json').read_text())[before:]
             assert [c['model'] for c in calls if not c['decisions']]==[result['jury_slots'][target]],'Single-seat retry purchased other judges'
             assert single['session']['jury_wait']['elapsed_seconds']<single['session']['jury_wait']['total_seconds']
         if scenario=='zero':
             assert result['evaluation_retryable'] is False
-            status,result=a.post('evaluate_session',session_id=trial['session_id']);assert status==200 and result['session']['evaluation_status']=='complete'
+            empty_retry=uuid.uuid4().hex
+            status,empty=a.post('retry_jury',session_id=trial['session_id'],request_id=empty_retry,timeout_seconds=2,headers={'X-Test-No-Judges':'1'})
+            assert status==200 and empty['session']['evaluation_status']=='failed' and not empty['session'].get('evaluation_refresh_pending')
+            before=len(json.loads((storage/'test-calls.json').read_text()))
+            assert a.post('retry_jury',session_id=trial['session_id'],request_id=empty_retry,timeout_seconds=2)[0]==200
+            assert len(json.loads((storage/'test-calls.json').read_text()))==before
+            status,result=a.post('retry_jury',session_id=trial['session_id'],request_id=uuid.uuid4().hex,timeout_seconds=43)
+            assert status==200 and result['session']['evaluation_status']=='complete' and result['session']['jury_wait']['total_seconds']==43
     final_retry=a.start();assert a.step(final_retry,0)[0]==200
     status,result=a.post('evaluate_session',session_id=final_retry['session_id'],headers={'X-Test-Only-Judge':'first','X-Test-Fail-Final':'1'})
     assert status==200 and result['session']['evaluation_status']=='failed' and len(result['session']['judge_reports'])==1

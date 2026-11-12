@@ -506,7 +506,7 @@ function labEvaluate(array &$s, string $key, array $catalog, callable $save): vo
         $degraded=$received<4;
         $s['evaluation_quorum']=['required'=>$degraded?1:4,'preferred'=>4,'invited'=>count($panel),'received'=>$received,
             'degraded'=>$degraded,'stop_reason'=>$s['jury_wait']['stop_reason'] ?? 'saved_reports'];
-        if(!empty($s['evaluation_refresh_pending']) && !empty($s['evaluation']) && $received===($s['evaluation_refresh_report_count'] ?? $beforeReports)){$s['evaluation_status']='complete';unset($s['evaluation_refresh_pending'],$s['evaluation_refresh_report_count'],$s['evaluation_retry_models']);$save($s);return;}
+        if(!empty($s['evaluation_refresh_pending']) && !empty($s['evaluation']) && $received===($s['evaluation_refresh_report_count'] ?? $beforeReports)){$s['evaluation_status']='complete';unset($s['evaluation_refresh_pending'],$s['evaluation_refresh_report_count'],$s['evaluation_retry_models'],$s['evaluation_retry_seconds']);$save($s);return;}
         $questions = [];
         foreach (labRubric() as $id => $description) $questions[$id] = labScale(labPrompt('lab.Evaluate.4') . ' ' . $description);
         $candidates=labIncidentCandidates($s);
@@ -563,11 +563,12 @@ function labEvaluate(array &$s, string $key, array $catalog, callable $save): vo
             'detection_tested'=>$tested,'investigator_coverage'=>round($weight*100),'investigator_effective_weights'=>array_map(fn($w)=>round(100*$w/$weight,2),array_filter($investigatorWeights,fn($id)=>$scores[$id]!==null,ARRAY_FILTER_USE_KEY)),
             'judge_models' => array_keys($s['judge_reports']), 'invited_judge_models'=>$panel, 'quorum'=>$s['evaluation_quorum'], 'raw_answers' => $r['answers'], 'grade_ar' => labT('lab.Evaluate.18'),
             'verdict_summary' => labT('lab.Evaluate.19')];
-        $s['evaluation_status'] = 'complete'; unset($s['evaluation_error'],$s['evaluation_refresh_pending'],$s['evaluation_refresh_report_count'],$s['evaluation_retry_models']);
+        $s['evaluation_status'] = 'complete'; unset($s['evaluation_error'],$s['evaluation_refresh_pending'],$s['evaluation_refresh_report_count'],$s['evaluation_retry_models'],$s['evaluation_retry_seconds']);
         labBenchmarkSave($s);
     } catch (Throwable $e) {
         $s['evaluation_status'] = !empty($s['evaluation_refresh_pending']) && !empty($s['evaluation'])?'complete':'failed'; $s['evaluation_error'] = $e->getMessage();
         $s['evaluation_retryable'] = $e instanceof LabProviderException && $e->retryable;
+        if(!empty($s['evaluation_refresh_pending']) && count($s['judge_reports'] ?? [])<=($s['evaluation_refresh_report_count'] ?? 0))unset($s['evaluation_refresh_pending'],$s['evaluation_refresh_report_count'],$s['evaluation_retry_models'],$s['evaluation_retry_seconds']);
     }
     $s['updated_at'] = gmdate('c'); $save($s);
 }

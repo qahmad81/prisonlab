@@ -291,9 +291,9 @@ try {
             labSetJury($s,$body['jury_slots'] ?? null,labMarketPrices($models));$save($s);
         } elseif($action==='retry_jury') {
             $rid=(string)($body['request_id'] ?? '');
-            if(labRetryJury($s,$rid,$models,$body['slots'] ?? null)){
+            if(labRetryJury($s,$rid,$models,$body['slots'] ?? null,$body['timeout_seconds'] ?? null)){
                 $save($s);labEvaluate($s,$key,$models,$save);
-                if(($s['evaluation_status'] ?? '')==='complete' && empty($s['evaluation_refresh_pending'])){foreach($s['jury_retry_requests'] as &$state)$state='complete';unset($state);$save($s);}
+                if(empty($s['evaluation_refresh_pending'])){foreach($s['jury_retry_requests'] as &$state)$state='complete';unset($state);$save($s);}
             }
         } elseif($action==='submit_review') {
             $role=$body['role'] ?? '';$rating=$body['rating'] ?? null;$text=$body['text'] ?? null;

@@ -18,8 +18,11 @@ assert.equal(await page.locator('#jury-session-panel .jury-seat.complete').count
 await page.evaluate(()=>App.publishSession());await page.waitForFunction(()=>App.currentSession.is_published && !App.busy);
 assert(await page.locator('#jury-session-panel .jury-retry').isEnabled());
 const oldReports=await page.evaluate(()=>JSON.stringify(App.currentSession.judge_reports));
-await page.locator('#jury-session-panel .jury-seat-retry').click();await page.waitForFunction(()=>Object.keys(App.currentSession.judge_reports).length===4 && !App.busy);
-assert.equal(await page.locator('#jury-session-panel .jury-seat.complete').count(),4);assert(await page.locator('#jury-session-panel .jury-retry').isDisabled());
+await page.setViewportSize({width:390,height:844});await page.locator('#jury-session-panel').scrollIntoViewIfNeeded();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));await page.screenshot({path:'test-results/jury-retry-timeout-mobile.png'});await page.setViewportSize({width:1280,height:1000});
+const seconds=page.locator('#jury-session-panel .jury-seat .jury-wait-seconds');assert.equal(await seconds.inputValue(),'100');
+await seconds.fill('37');const request=page.waitForRequest(req=>req.method()==='POST' && req.url().includes('/api.php') && req.postDataJSON()?.action==='retry_jury');
+await page.locator('#jury-session-panel .jury-seat-retry').click();assert.equal((await request).postDataJSON().timeout_seconds,37);await page.waitForFunction(()=>Object.keys(App.currentSession.judge_reports).length===4 && !App.busy);
+assert.equal(await page.evaluate(()=>App.currentSession.jury_wait.total_seconds),37);assert.equal(await page.locator('#jury-session-panel .jury-seat.complete').count(),4);assert(await page.locator('#jury-session-panel .jury-retry').isDisabled());
 const accepted=JSON.parse(oldReports),after=await page.evaluate(()=>App.currentSession.judge_reports);for(const [id,report] of Object.entries(accepted))assert.deepEqual(after[id],report);
 await page.setViewportSize({width:390,height:844});await page.locator('#jury-session-panel').scrollIntoViewIfNeeded();await page.screenshot({path:'test-results/jury-four-seats-mobile.png',fullPage:false});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));assert.deepEqual(errors,[]);
 console.log('PASS committee UI: four seats, shared picker, preselected judge, locked accepted reports, published-owner recovery, preserved reports and mobile layout.');
