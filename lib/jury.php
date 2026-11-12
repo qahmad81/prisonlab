@@ -2,9 +2,11 @@
 declare(strict_types=1);
 
 /** Funding is resolved server-side before any panel mutation or paid evaluation. */
-function labJuryCap(array $s):?float {
+function labJuryCap(array $s,?float $fundingCap=null):?float {
     if(($s['funding_source'] ?? '')==='personal')return null;
-    return (float)($GLOBALS['lab_actor_price_cap'] ?? $s['actor_price_cap_at_start'] ?? 1.);
+    $cap=$fundingCap ?? (float)($GLOBALS['lab_actor_price_cap'] ?? $s['actor_price_cap_at_start'] ?? 1.);
+    // Zero restricts dialogue actors to free models; funded support stages retain their $1 cap.
+    return $cap===0.0?1.0:$cap;
 }
 function labJuryModel(array $s,string $id,array $catalog):array {
     if(str_starts_with($id,'mcp/'))throw new RuntimeException(labT('jury.selection.invalid'));

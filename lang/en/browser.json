@@ -422,5 +422,8 @@
   "jury.retrySeat": "Retry this judge",
   "archive.testDate": "Test date",
   "session.slideDown": "Slide Down",
-  "session.slideUp": "Slide Up"
+  "session.slideUp": "Slide Up",
+  "jury.unavailable": "This model is unavailable in the current catalog.",
+  "jury.priceError": "The model exceeds the judging cap: ${cap} per million input or output tokens.",
+  "jury.distinctError": "This model is a test actor or already occupies another committee slot."
 }
