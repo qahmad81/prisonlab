@@ -144,11 +144,13 @@
                     <span class="ai-pulse-dot"></span>
                     <span style="font-size:0.86rem; font-weight:700; color:#38bdf8;"><?= labE('index.html.49') ?></span>
                     <span id="ai-turn-counter" style="font-size:0.8rem; color:#cbd5e1;"><?= labE('index.html.50') ?></span>
+                    <button id="session-details-toggle" class="session-details-toggle" type="button" title="<?= labE('session.slideDown') ?>" aria-label="<?= labE('session.slideDown') ?>" aria-controls="session-lower-content" aria-expanded="false" onclick="App.toggleSessionDetails()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
                 </div>
                 <button type="button" id="resume-investigation-btn" class="btn btn-resume" onclick="App.resumeInvestigation()" hidden><?= labE('index.html.51') ?></button>
             </div>
         </div>
 
+        <div id="session-lower-content" class="session-lower-content">
         <div class="quick-tactics" id="human-tactics-bar">
             <span class="tactic-chip" data-prompt="<?= htmlspecialchars(labPrompt('tactic.1'), ENT_QUOTES, 'UTF-8') ?>"><?= labE('index.html.52') ?></span>
             <span class="tactic-chip" data-prompt="<?= htmlspecialchars(labPrompt('tactic.2'), ENT_QUOTES, 'UTF-8') ?>"><?= labE('index.html.53') ?></span>
@@ -169,6 +171,7 @@
             <textarea id="user-input" placeholder="<?= labE('index.html.61') ?>"></textarea>
             <button type="button" id="send-btn" class="btn btn-primary" style="width:auto; min-width:170px; height:54px;"><?= labE('index.html.62') ?></button>
         </div>
+        </div><!-- session-lower-content -->
     </section>
 
     <!-- العمود الأيسر: الكاميرا الحية ومؤشرات المشاعر والحالات الـ 20 -->

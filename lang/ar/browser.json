@@ -512,5 +512,8 @@
   "jury.retry": "إعادة محاولة الخانات غير المكتملة وتحديث التقييم",
   "jury.finished": "انتهت مراجعة التحكيم؛ التقارير الناجحة محفوظة.",
   "jury.providerReasoning": "التحكيم: إعداد المزود الافتراضي",
-  "jury.retrySeat": "إعادة محاولة هذا المحكم"
+  "jury.retrySeat": "إعادة محاولة هذا المحكم",
+  "archive.testDate": "تاريخ الاختبار",
+  "session.slideDown": "Slide Down",
+  "session.slideUp": "Slide Up"
 }
