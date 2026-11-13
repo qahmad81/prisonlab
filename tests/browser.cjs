@@ -19,6 +19,7 @@ if(!chrome && process.platform==='win32') {
         page.on('dialog',dialog=>dialog.accept());
         const errors=[];page.on('pageerror',e=>errors.push(e.message));
         const base=process.env.TEST_BASE_URL || 'http://127.0.0.1:8492';
+        await require('./setup-preferences.cjs')(browser,base);
         await page.goto(base+'/en/public/case_file/char_10_leo_vance?case_file=char_1_victor_vance.md');
         await page.waitForSelector('#public-context-heading h2');
         assert.equal(await page.locator('html').getAttribute('dir'),'ltr');

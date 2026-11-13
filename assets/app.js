@@ -38,6 +38,46 @@ const App = {
     generating: false,
     stopRequested: false,
 
+    // Only setup preferences belong in durable browser storage, never credentials or sessions.
+    saveSetupPreferences() {
+        if(!this.setupPreferencesReady)return;
+        try {
+            const mcp={};
+            for(const role of ['prisoner','interrogator']) {
+                const v=typeof MCPUI!=='undefined'?MCPUI.selections[role]:null;
+                if(v)mcp[role]={name:v.name,effort:v.effort};
+            }
+            localStorage.setItem('prisonlab.setup.v1',JSON.stringify({
+                version:1,caseFile:this.selectedCaseFilename,investigator:this.selectedInvestigatorPersona,
+                mode:this.interrogationMode,prisonerModel:this.selectedModelId,interrogatorModel:this.selectedInterrogatorId,
+                reasoning:this.reasoningSelections,mcp
+            }));
+        } catch { /* Storage may be disabled or full; setup must remain usable. */ }
+    },
+    restoreSetupPreferences() {
+        try {
+            const v=JSON.parse(localStorage.getItem('prisonlab.setup.v1'));
+            if(!v || v.version!==1)return;
+            const c=this.cases.find(c=>c.filename===v.caseFile);
+            if(c){this.selectedCaseFilename=c.filename;this.previewCaseFilename=c.filename;this.setCaseCharacter(c);}
+            if(this.investigators.some(p=>p.id===v.investigator))this.selectedInvestigatorPersona=v.investigator;
+            if(['human','ai','reverse'].includes(v.mode))this.interrogationMode=v.mode;
+            for(const [role,key,field] of [['prisoner','prisonerModel','selectedModelId'],['interrogator','interrogatorModel','selectedInterrogatorId']]) {
+                if(this.models.some(m=>m.id===v[key] && !m.catalog_unavailable))this[field]=v[key];
+                this.reasoningSelections[role]={};
+                for(const m of this.models) {
+                    const effort=v.reasoning?.[role]?.[m.id];
+                    if(effort==='auto' || m.reasoning_capabilities?.efforts?.includes(effort))this.reasoningSelections[role][m.id]=effort;
+                }
+                const actor=v.mcp?.[role];
+                if(typeof MCPUI!=='undefined' && typeof actor?.name==='string' && actor.name.trim().length>=2 && actor.name.length<=100 &&
+                    ['unknown','none','minimal','low','medium','high','xhigh','max','highest'].includes(actor.effort)) {
+                    MCPUI.selections[role]={name:actor.name.trim(),effort:actor.effort};
+                }
+            }
+        } catch { /* Ignore corrupt or inaccessible browser preferences. */ }
+    },
+
     async fetchData(url,options={},timeoutMs=30000) {
         const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
         try{const response=await fetch(LabI18n.api(url),{...options,signal:controller.signal});const data=await response.json();
@@ -103,6 +143,7 @@ const App = {
         }
 
         this.selectedInterrogatorId = focusPreferred?.id || this.selectedModelId;
+        this.restoreSetupPreferences();
         this.renderSelectedCaseSummary();
         this.renderSelectedModelSummary();
         this.setInterrogationMode(this.interrogationMode);
@@ -111,6 +152,8 @@ const App = {
         this.updateControls();
         const linkedCase=new URL(location.href).searchParams.get('case_file');if(linkedCase && this.cases.some(c=>c.filename===linkedCase)){this.selectedCaseFilename=linkedCase;this.renderSelectedCaseSummary();}
         this.renderAccount();SponsorUI.render();if(new URL(location.href).searchParams.get('sponsors')==='1')SponsorUI.open();if(this.participantProfile && this.userApiKey)this.refreshKeyBalance();
+        this.setupPreferencesReady=true;
+        this.saveSetupPreferences();
         document.getElementById('archive-modal-search').addEventListener('input', () => this.renderArchive());
         document.getElementById('model-sort').addEventListener('change',e=>{this.modelSort=e.target.value;this.renderModalModels();});
         document.querySelectorAll('.modal-overlay').forEach(el => el.addEventListener('click', e => {if(e.target === el) el.classList.remove('active');}));
@@ -269,6 +312,7 @@ const App = {
             this.setCaseCharacter(c);
             this.renderSelectedCaseSummary();
         }
+        this.saveSetupPreferences();
         this.closeCaseModal();
     },
 
@@ -458,6 +502,7 @@ const App = {
         if(typeof MCPUI!=='undefined')delete MCPUI.selections[this.modelTarget];
         this.renderSelectedModelSummary();
         this.renderInterrogatorSummary();
+        this.saveSetupPreferences();
         this.closeModelModal();
     },
 
@@ -648,7 +693,7 @@ const App = {
             const b=document.createElement('button');b.type='button';b.className='reasoning-option';b.dataset.effort=choice;
             b.textContent=choice==='auto'?LabI18n.t("app.openReasoningModal.1"):LabView.reasoningNames[choice];
             b.setAttribute('aria-pressed',String(this.reasoningSelection(role)===choice));
-            b.addEventListener('click',()=>{this.reasoningSelections[role][id]=choice;this.startRequestId=null;this.renderSelectedModelSummary();this.renderInterrogatorSummary();this.closeReasoningModal();});box.appendChild(b);
+            b.addEventListener('click',()=>{this.reasoningSelections[role][id]=choice;this.saveSetupPreferences();this.startRequestId=null;this.renderSelectedModelSummary();this.renderInterrogatorSummary();this.closeReasoningModal();});box.appendChild(b);
         }
         document.getElementById('connection-toast').hidden=true;
         const modal=document.getElementById('reasoning-modal');
@@ -662,12 +707,13 @@ const App = {
         const toast=document.getElementById('connection-toast');toast.textContent=text;toast.hidden=false;toast.classList.toggle('is-error',error);
         clearTimeout(this.noticeTimer);if(!error)this.noticeTimer=setTimeout(()=>{toast.hidden=true;},6000);
     },
-    setInterrogationMode(mode) {
+    setInterrogationMode(mode, persist=true) {
         this.interrogationMode=mode;
         for(const id of ['human','ai','reverse']) {
             const button=document.getElementById('mode-btn-'+id);
             button.classList.toggle('active',id===mode);button.setAttribute('aria-pressed',String(id===mode));
         }
+        if(persist)this.saveSetupPreferences();
         const humanPrisoner=mode==='reverse',humanInvestigator=mode==='human';
         document.getElementById('interrogator-model-group').hidden=humanInvestigator;
         document.getElementById('interrogator-persona-group').hidden=humanInvestigator;
@@ -713,7 +759,7 @@ const App = {
             const card=document.createElement('article');card.className='investigator-card';
             card.innerHTML=`${LabView.investigatorAvatar(p,'profile-portrait')}<div class="investigator-file"><span class="investigator-rank">${String(p.number).padStart(2,'0')} ${LabI18n.html("app.openInvestigatorModal.8")} ${p.level}/10 · ${this.escapeHtml(p.level_ar)}</span><h3 dir="ltr">${this.escapeHtml(p.name)}</h3><p>${p.age} ${LabI18n.html("app.openInvestigatorModal.9")} ${p.years_experience} ${LabI18n.html("app.openInvestigatorModal.10")}</p><strong>${this.escapeHtml(p.specialty)}</strong><p>${this.escapeHtml(p.bio)}</p><p>${this.escapeHtml(p.style)}</p><div class="investigator-skills">${p.skills.map(s=>`<span>${this.escapeHtml(s)}</span>`).join('')}</div><details><summary>${LabI18n.html("app.openInvestigatorModal.11")}</summary><p>${this.escapeHtml(p.limits)}</p><p>${this.escapeHtml(p.instructions)}</p><small>${LabI18n.html("app.openInvestigatorModal.12")} ${this.escapeHtml(({none:LabI18n.t("app.openInvestigatorModal.1"),low:LabI18n.t("app.openInvestigatorModal.2"),medium:LabI18n.t("app.openInvestigatorModal.3"),high:LabI18n.t("app.openInvestigatorModal.4"),highest:LabI18n.t("app.openInvestigatorModal.5")})[p.thinking])} ${LabI18n.html("app.openInvestigatorModal.13")}</small></details><button type="button" class="btn btn-secondary" data-investigator-id="${p.id}">${p.id===this.selectedInvestigatorPersona?LabI18n.t("app.openInvestigatorModal.6"):LabI18n.t("app.openInvestigatorModal.7")}</button></div>`;
             const faces=document.createElement('details');faces.innerHTML=`<summary>${LabI18n.html("app.openInvestigatorModal.14")}</summary><div class="investigator-expressions">`+Object.entries(LabView.investigatorExpressions).map(([id,name])=>`<figure>${LabView.investigatorAvatar(p,'',id)}<figcaption>${name}</figcaption></figure>`).join('')+'</div>';card.querySelector('.investigator-file').insertBefore(faces,card.querySelector('button'));
-            card.querySelector('button').addEventListener('click',()=>{this.selectedInvestigatorPersona=p.id;this.renderInterrogatorSummary();document.getElementById('investigator-profile-modal').classList.remove('active');});
+            card.querySelector('button').addEventListener('click',()=>{this.selectedInvestigatorPersona=p.id;this.saveSetupPreferences();this.renderInterrogatorSummary();document.getElementById('investigator-profile-modal').classList.remove('active');});
             box.appendChild(card);
         }
         document.getElementById('investigator-profile-modal').classList.add('active');
@@ -727,6 +773,7 @@ const App = {
         if(this.currentSession?.is_ended && this.currentSession.evaluation_status==='pending')await this.endAndEvaluateSession();
     },
     async startNewSession() {
+        this.saveSetupPreferences();
         if(!this.participantProfile){location.href=LabI18n.login();return;}
         if (this.busy || this.generating) return;
         this.busy=true; this.updateControls();
@@ -762,7 +809,7 @@ const App = {
             this.renderStatesGallery(d.session.current_state);
             this.selectedInterrogatorId=d.session.interrogator_model;this.selectedCaseFilename=d.session.case_file;
             this.selectedInvestigatorPersona=d.session.interrogator_character?.id || 'ethan_cole';
-            this.setInterrogationMode(d.session.interrogator_type);
+            this.setInterrogationMode(d.session.interrogator_type,false);
             if (d.session.pending_question && d.session.interrogator_type === 'human') document.getElementById('user-input').value = d.session.pending_question;
             this.renderSelectedCaseSummary();this.renderSelectedModelSummary();this.renderActiveSession();this.closeArchiveModal();
             document.getElementById('session-notice').textContent='';

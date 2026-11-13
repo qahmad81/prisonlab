@@ -26,7 +26,7 @@ const MCPUI={
     save(event){
         event.preventDefault();const name=document.getElementById('mcp-name').value.trim(),effort=document.getElementById('mcp-effort').value;
         if(name.length<2 || name.length>100)return;
-        this.selections[App.modelTarget]={name,effort};App.startRequestId=null;
+        this.selections[App.modelTarget]={name,effort};App.saveSetupPreferences();App.startRequestId=null;
         this.close();
         App.renderSelectedModelSummary();App.renderInterrogatorSummary();
     },
