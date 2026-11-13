@@ -15,9 +15,19 @@ try{
         assert.equal(url.searchParams.get('scope'),'openid profile');redirect.searchParams.set('state',url.searchParams.get('state'));redirect.searchParams.set('code','alice');
         await route.fulfill({status:302,headers:{Location:redirect.href},body:''});
     });
-    await page.locator('#account-controls a').click();
+    const guestSetup=await page.evaluate(()=>{
+        App.previewCaseFilename=App.cases[1].filename;App.confirmSelectedCase();
+        App.openInvestigatorModal();document.querySelectorAll('#investigator-profile-grid button[data-investigator-id]')[1].click();
+        MCPUI.configure('prisoner');document.getElementById('mcp-name').value='Guest local model';
+        document.getElementById('mcp-effort').value='medium';MCPUI.save({preventDefault(){}});
+        return {caseFile:App.selectedCaseFilename,investigator:App.selectedInvestigatorPersona,model:App.selectedModelId};
+    });
+    await page.locator('#start-session-btn').click();
     try{await page.waitForFunction(()=>typeof App!=='undefined' && App.participantProfile?.provider==='linkedin',{},{timeout:12000});}
     catch(e){console.error('MOCK LOGIN DEBUG',page.url(),(await page.locator('body').innerText()).slice(0,1600));throw e;}
+    assert.deepEqual(await page.evaluate(()=>({caseFile:App.selectedCaseFilename,investigator:App.selectedInvestigatorPersona,model:App.selectedModelId})),guestSetup);
+    assert.deepEqual(await page.evaluate(()=>MCPUI.selections.prisoner),{name:'Guest local model',effort:'medium'});
+    assert.equal(await page.evaluate(()=>App.currentSession),null,'Returning from login must not start a paid test automatically');
     assert.equal(await page.locator('#interrogator-human-card strong').innerText(),'Test Operator <safe>');
     assert.equal(await page.locator('#account-controls img').count(),0,'Untrusted profile text must not become markup');
     assert.equal(await page.evaluate(()=>App.logs.length),2);
