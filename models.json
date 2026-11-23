@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-02T10:19:54.253477+00:00",
-  "count": 457,
+  "updated_at": "2026-11-23 22:29:27 UTC",
+  "count": 473,
   "models": [
     {
       "provider_slug": "aion-labs",
@@ -2465,6 +2465,56 @@
       "catalog_unavailable": true
     },
     {
+      "id": "baidu/ernie-5.5-flash-preview:free",
+      "created": 1794333533,
+      "canonical_slug": "baidu/ernie-5.5-flash-preview-20261110",
+      "top_provider": {
+        "context_length": 1024000,
+        "max_completion_tokens": 921600,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "Baidu: ERNIE-5.5-Flash-Preview (free)",
+      "description": "ERNIE 5.5 Flash Preview is the latest foundation model in the ERNIE family, with comprehensive improvements in coding, agentic capabilities, knowledge work, and deep research. It has 280 billion total...",
+      "context_length": 1024000,
+      "provider_slug": "baidu",
+      "pricing": {
+        "prompt_per_token": "0",
+        "completion_per_token": "0",
+        "prompt_per_1m": 0.0,
+        "completion_per_1m": 0.0
+      },
+      "architecture": {
+        "modality": "text->text",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": true,
+        "default_enabled": true,
+        "supported_efforts": [
+          "high"
+        ],
+        "default_effort": "high"
+      }
+    },
+    {
       "provider_slug": "bytedance-seed",
       "usage_rank": null,
       "usage_tokens_7d": 0,
@@ -3836,10 +3886,10 @@
       "description": "DeepSeek V4 Pro is a large-scale Mixture-of-Experts model from DeepSeek with 1.6T total parameters and 49B activated parameters, supporting a 1M-token context window. It is designed for advanced reasoning, coding,...",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.0000016",
-        "completion_per_token": "0.0000032",
-        "prompt_per_1m": 1.6,
-        "completion_per_1m": 3.2
+        "prompt_per_token": "9E-7",
+        "completion_per_token": "0.0000015",
+        "prompt_per_1m": 0.9,
+        "completion_per_1m": 1.5
       },
       "architecture": {
         "modality": "text->text",
@@ -3900,10 +3950,10 @@
       "description": "DeepSeek V4 Pro 0813 is a large-scale mixture-of-experts model from DeepSeek. This is the GA release of DeepSeek V4 Pro.",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.000000115",
-        "completion_per_token": "0.000004",
-        "prompt_per_1m": 0.115,
-        "completion_per_1m": 4.0
+        "prompt_per_token": "1.11E-7",
+        "completion_per_token": "0.00000444",
+        "prompt_per_1m": 0.111,
+        "completion_per_1m": 4.44
       },
       "architecture": {
         "modality": "text->text",
@@ -4098,10 +4148,10 @@
       "description": "DeepSeek V4.1 Flash 1017 is the October 17, 2026 snapshot of DeepSeek V4.1 Flash, served by DeepSeek under the `deepseek-flash` API model name. V4.1 Flash is a sparse mixture-of-experts model...",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.00000015",
-        "completion_per_token": "0.0000006",
-        "prompt_per_1m": 0.15,
-        "completion_per_1m": 0.6
+        "prompt_per_token": "3E-8",
+        "completion_per_token": "2E-7",
+        "prompt_per_1m": 0.03,
+        "completion_per_1m": 0.2
       },
       "architecture": {
         "modality": "text+image->text",
@@ -5834,6 +5884,179 @@
       }
     },
     {
+      "id": "google/gemini-4-carbon",
+      "created": 1794326871,
+      "canonical_slug": "google/gemini-4-carbon-20261110",
+      "top_provider": {
+        "context_length": 1048576,
+        "max_completion_tokens": 943718,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "Google: Gemini 4 Carbon",
+      "description": "Gemini 4 Carbon is a frontier Gemini 4 model from Google for coding, agentic and complex reasoning work. It takes text, image, audio, video and file input, supports long decode...",
+      "context_length": 1048576,
+      "provider_slug": "google",
+      "pricing": {
+        "prompt_per_token": "0.000002",
+        "completion_per_token": "0.00001",
+        "prompt_per_1m": 2.0,
+        "completion_per_1m": 10.0
+      },
+      "architecture": {
+        "modality": "text+image+file+audio+video->text",
+        "input_modalities": [
+          "audio",
+          "file",
+          "image",
+          "text",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": true,
+        "supported_efforts": [
+          "high",
+          "medium",
+          "low"
+        ],
+        "default_effort": "medium"
+      }
+    },
+    {
+      "id": "google/gemini-4-hydrogen",
+      "created": 1794506460,
+      "canonical_slug": "google/gemini-4-hydrogen-20261112",
+      "top_provider": {
+        "context_length": 1048576,
+        "max_completion_tokens": 943718,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "Google: Gemini 4 Hydrogen",
+      "description": "Gemini 4 Hydrogen is the high-efficiency workhorse model of the Gemini 4 family from Google, built for high-throughput agentic workflows, coding and multi-model routing at lower cost and latency than...",
+      "context_length": 1048576,
+      "provider_slug": "google",
+      "pricing": {
+        "prompt_per_token": "0.0000015",
+        "completion_per_token": "0.0000075",
+        "prompt_per_1m": 1.5,
+        "completion_per_1m": 7.5
+      },
+      "architecture": {
+        "modality": "text+image+file+audio+video->text",
+        "input_modalities": [
+          "audio",
+          "file",
+          "image",
+          "text",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": true,
+        "supported_efforts": [
+          "xhigh",
+          "high",
+          "medium",
+          "low"
+        ],
+        "default_effort": "medium"
+      }
+    },
+    {
+      "id": "google/gemini-4-neon",
+      "created": 1795006977,
+      "canonical_slug": "google/gemini-4-neon-20261118",
+      "top_provider": {
+        "context_length": 1048576,
+        "max_completion_tokens": 943718,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "Google: Gemini 4 Neon",
+      "description": "Gemini 4 Neon is a fast, mid-priced model in the Gemini 4 family from Google, built for coding and agentic work. It is suited for repository and terminal coding, web...",
+      "context_length": 1048576,
+      "provider_slug": "google",
+      "pricing": {
+        "prompt_per_token": "0.000003",
+        "completion_per_token": "0.000015",
+        "prompt_per_1m": 3.0,
+        "completion_per_1m": 15.0
+      },
+      "architecture": {
+        "modality": "text+image+file+audio+video->text",
+        "input_modalities": [
+          "audio",
+          "file",
+          "image",
+          "text",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": true,
+        "supported_efforts": [
+          "xhigh",
+          "high",
+          "medium",
+          "low"
+        ],
+        "default_effort": "medium"
+      }
+    },
+    {
       "provider_slug": "google",
       "usage_rank": null,
       "usage_tokens_7d": 0,
@@ -6869,6 +7092,57 @@
       }
     },
     {
+      "id": "inclusionai/ling-3.2-flash:free",
+      "created": 1794591958,
+      "canonical_slug": "inclusionai/ling-3.2-flash-20261113",
+      "top_provider": {
+        "context_length": 1048576,
+        "max_completion_tokens": 262144,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "inclusionAI: Ling 3.2 Flash (free)",
+      "description": "Ling 3.2 Flash is a hybrid reasoning model from inclusionAI that accepts text and image input, with a 1M-token context window and up to 200 images per request. Thinking can...",
+      "context_length": 1048576,
+      "provider_slug": "inclusionai",
+      "pricing": {
+        "prompt_per_token": "0",
+        "completion_per_token": "0",
+        "prompt_per_1m": 0.0,
+        "completion_per_1m": 0.0
+      },
+      "architecture": {
+        "modality": "text+image->text",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "max_tokens",
+        "presence_penalty",
+        "reasoning",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true
+      }
+    },
+    {
       "provider_slug": "inference-net",
       "usage_rank": null,
       "usage_tokens_7d": 0,
@@ -6961,6 +7235,56 @@
         "top_k",
         "top_p"
       ]
+    },
+    {
+      "id": "kt/midm-k-3.0-pro",
+      "created": 1793897701,
+      "canonical_slug": "kt/midm-k-3.0-pro",
+      "top_provider": {
+        "context_length": 261795,
+        "max_completion_tokens": 235615,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "KT: Mi:dm K 3.0 Pro",
+      "description": "Mi:dm K 3.0 Pro is a Mixture-of-Experts reasoning model from KT, with 120B total and 12B active parameters. It uses a hybrid architecture that mixes Mamba, MoE and attention layers.",
+      "context_length": 261795,
+      "provider_slug": "kt",
+      "pricing": {
+        "prompt_per_token": "0.0000002",
+        "completion_per_token": "0.0000008",
+        "prompt_per_1m": 0.2,
+        "completion_per_1m": 0.8
+      },
+      "architecture": {
+        "modality": "text->text",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logprobs",
+        "max_tokens",
+        "presence_penalty",
+        "reasoning",
+        "repetition_penalty",
+        "response_format",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": false
+      }
     },
     {
       "id": "liquid/lfm-2.5-2.6b",
@@ -7120,6 +7444,60 @@
         "tools",
         "top_k",
         "top_logprobs"
+      ],
+      "reasoning": {
+        "mandatory": true
+      }
+    },
+    {
+      "id": "liquid/lfm-3-1.7b:free",
+      "created": 1794009477,
+      "canonical_slug": "liquid/lfm-3-1.7b-20261106",
+      "top_provider": {
+        "context_length": 262144,
+        "max_completion_tokens": 8192,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "LiquidAI: LFM3-1.7B (free)",
+      "description": "A compact 1.7B-parameter text model with a 256K-token context, post-trained for agents, tool calling, and structured outputs. It reasons before it answers. Prompts and outputs may be retained and used...",
+      "context_length": 262144,
+      "provider_slug": "liquid",
+      "pricing": {
+        "prompt_per_token": "0",
+        "completion_per_token": "0",
+        "prompt_per_1m": 0.0,
+        "completion_per_1m": 0.0
+      },
+      "architecture": {
+        "modality": "text->text",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logprobs",
+        "max_completion_tokens",
+        "max_tokens",
+        "min_p",
+        "presence_penalty",
+        "reasoning",
+        "repetition_penalty",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
       ],
       "reasoning": {
         "mandatory": true
@@ -7668,6 +8046,67 @@
         "top_k",
         "top_p"
       ]
+    },
+    {
+      "id": "meta/muse-ember",
+      "created": 1794247648,
+      "canonical_slug": "meta/muse-ember-20261109",
+      "top_provider": {
+        "context_length": 1048576,
+        "max_completion_tokens": 943718,
+        "is_moderated": true
+      },
+      "expiration_date": null,
+      "name": "Meta: Muse Ember",
+      "description": "Muse Ember is the smallest and most efficient model from Meta that’s designed for complex reasoning execution and the work agents repeat all day: tool calls, coding agent subtasks, routing,...",
+      "context_length": 1048576,
+      "provider_slug": "meta",
+      "pricing": {
+        "prompt_per_token": "0.0000001",
+        "completion_per_token": "0.0000005",
+        "prompt_per_1m": 0.1,
+        "completion_per_1m": 0.5
+      },
+      "architecture": {
+        "modality": "text+image+file+audio+video->text",
+        "input_modalities": [
+          "text",
+          "image",
+          "video",
+          "file",
+          "audio"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "repetition_penalty",
+        "response_format",
+        "seed",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": true,
+        "supported_efforts": [
+          "max",
+          "xhigh",
+          "high",
+          "medium",
+          "low",
+          "minimal"
+        ],
+        "default_effort": "max"
+      }
     },
     {
       "provider_slug": "meta",
@@ -10853,6 +11292,60 @@
           "high",
           "medium",
           "none"
+        ],
+        "default_effort": "high"
+      }
+    },
+    {
+      "id": "nex-agi/nex-n2.6",
+      "created": 1794282379,
+      "canonical_slug": "nex-agi/nex-n2.6-20261110",
+      "top_provider": {
+        "context_length": 262144,
+        "max_completion_tokens": 235929,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "Nex AGI: Nex-N2.6",
+      "description": "Nex-N2.6 is an agentic model from Nex AGI, built on [GLM-5.3-Flash](https://huggingface.co/zai-org/GLM-5.3-Flash-BF16) with about 321B parameters. It is suited for computer use, coding, and long-horizon tasks that involve tools. Compared with...",
+      "context_length": 262144,
+      "provider_slug": "nex-agi",
+      "pricing": {
+        "prompt_per_token": "0.00000012",
+        "completion_per_token": "0.0000004",
+        "prompt_per_1m": 0.12,
+        "completion_per_1m": 0.4
+      },
+      "architecture": {
+        "modality": "text+image->text",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "logprobs",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": true,
+        "supported_efforts": [
+          "high",
+          "medium"
         ],
         "default_effort": "high"
       }
@@ -16835,6 +17328,63 @@
       }
     },
     {
+      "id": "openai/gpt-6.2-sol",
+      "created": 1794938371,
+      "canonical_slug": "openai/gpt-6.2-sol-20261117",
+      "top_provider": {
+        "context_length": 1050000,
+        "max_completion_tokens": 128000,
+        "is_moderated": true
+      },
+      "expiration_date": null,
+      "name": "OpenAI: GPT-6.2 Sol",
+      "description": "GPT-6.2 Sol is an upgrade to GPT-6.1 Sol from OpenAI, positioned below the flagship GPT-6.2 Astra in the GPT-6.2 series. It is an efficient, versatile model for everyday work, suited...",
+      "context_length": 1050000,
+      "provider_slug": "openai",
+      "pricing": {
+        "prompt_per_token": "0.000002",
+        "completion_per_token": "0.00001",
+        "prompt_per_1m": 2.0,
+        "completion_per_1m": 10.0
+      },
+      "architecture": {
+        "modality": "text+image+file->text",
+        "input_modalities": [
+          "file",
+          "image",
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_completion_tokens",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "seed",
+        "structured_outputs",
+        "tool_choice",
+        "tools",
+        "verbosity"
+      ],
+      "reasoning": {
+        "mandatory": true,
+        "default_enabled": true,
+        "supported_efforts": [
+          "max",
+          "xhigh",
+          "high",
+          "medium",
+          "low"
+        ],
+        "default_effort": "medium"
+      }
+    },
+    {
       "provider_slug": "openai",
       "usage_rank": 44,
       "usage_tokens_7d": 543985321004,
@@ -17796,6 +18346,72 @@
         "completion_per_token": "0.0000005",
         "prompt_per_1m": 0.05,
         "completion_per_1m": 0.5
+      }
+    },
+    {
+      "id": "particle-ai/particle-1:free",
+      "created": 1793207893,
+      "canonical_slug": "particle-ai/particle-1-20261027",
+      "top_provider": {
+        "context_length": 1048576,
+        "max_completion_tokens": 131072,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "Particle AI: Particle-1 (free)",
+      "description": "Particle-1 is a token-efficient agentic coding model from Particle AI, post-trained on DeepSeek V4.1 Flash. It is suited for software engineering work such as terminal workflows, codebase changes, and data...",
+      "context_length": 1048576,
+      "provider_slug": "particle-ai",
+      "pricing": {
+        "prompt_per_token": "0",
+        "completion_per_token": "0",
+        "prompt_per_1m": 0.0,
+        "completion_per_1m": 0.0
+      },
+      "architecture": {
+        "modality": "text+image->text",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logprobs",
+        "max_tokens",
+        "min_p",
+        "presence_penalty",
+        "reasoning",
+        "reasoning_effort",
+        "repetition_penalty",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true,
+        "supported_efforts": [
+          "max",
+          "xhigh",
+          "high",
+          "medium",
+          "low",
+          "minimal",
+          "none"
+        ],
+        "default_effort": "high"
       }
     },
     {
@@ -20465,10 +21081,10 @@
       "description": "Qwen3.8 27B is an open-weight dense vision-language model from Qwen. It is suited for coding, professional workflows, research, multimodal interaction, and long-running agent tasks, with flexible thinking that can be...",
       "context_length": 1024000,
       "pricing": {
-        "prompt_per_token": "0.00000015",
-        "completion_per_token": "0.000001875",
-        "prompt_per_1m": 0.15,
-        "completion_per_1m": 1.875
+        "prompt_per_token": "3.5E-8",
+        "completion_per_token": "0.0000015",
+        "prompt_per_1m": 0.035,
+        "completion_per_1m": 1.5
       },
       "architecture": {
         "modality": "text+image+video->text",
@@ -20759,6 +21375,68 @@
         "mandatory": false,
         "default_enabled": true,
         "supports_max_tokens": true
+      }
+    },
+    {
+      "id": "qwen/qwen4-max",
+      "created": 1794795526,
+      "canonical_slug": "qwen/qwen4-max-20261115",
+      "top_provider": {
+        "context_length": 1000000,
+        "max_completion_tokens": 131072,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "Qwen: Qwen4 Max",
+      "description": "Qwen4 Max is the flagship model in Alibaba's Qwen4 series. It accepts text, image, and video input and returns text, with a 1M-token context window and reasoning enabled by default....",
+      "context_length": 1000000,
+      "provider_slug": "qwen",
+      "pricing": {
+        "prompt_per_token": "0.000001425",
+        "completion_per_token": "0.000004275",
+        "prompt_per_1m": 1.425,
+        "completion_per_1m": 4.275
+      },
+      "architecture": {
+        "modality": "text+image+video->text",
+        "input_modalities": [
+          "text",
+          "image",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logprobs",
+        "max_tokens",
+        "presence_penalty",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true,
+        "supported_efforts": [
+          "xhigh",
+          "high",
+          "low",
+          "none"
+        ],
+        "default_effort": "high"
       }
     },
     {
@@ -21101,6 +21779,61 @@
         "top_logprobs",
         "top_p"
       ]
+    },
+    {
+      "id": "ricursiveai/ripple-65b-preview",
+      "created": 1793818990,
+      "canonical_slug": "ricursiveai/ripple-65b-preview-20261104",
+      "top_provider": {
+        "context_length": 1048576,
+        "max_completion_tokens": 131072,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "Ricursive: Ripple 65B Preview",
+      "description": "Ripple-65B-Preview by ricursiveAI, a 65B model with native tool calling, served in BF16.",
+      "context_length": 1048576,
+      "provider_slug": "ricursiveai",
+      "pricing": {
+        "prompt_per_token": "0.0000001",
+        "completion_per_token": "0.0000003",
+        "prompt_per_1m": 0.1,
+        "completion_per_1m": 0.3
+      },
+      "architecture": {
+        "modality": "text->text",
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logit_bias",
+        "logprobs",
+        "max_tokens",
+        "min_p",
+        "presence_penalty",
+        "reasoning",
+        "repetition_penalty",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": false
+      }
     },
     {
       "provider_slug": "sakana",
@@ -22397,6 +23130,53 @@
       }
     },
     {
+      "id": "tencent/hy4-flash",
+      "created": 1794838706,
+      "canonical_slug": "tencent/hy4-flash-20261116",
+      "top_provider": {
+        "context_length": 1048576,
+        "max_completion_tokens": 65536,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "Tencent: Hy4 flash",
+      "description": "Hy4 flash is a cost-efficient variant of [Hy4](https://openrouter.ai/tencent/hy4) from Tencent, served with roughly a quarter of the flagship's parameter count for lower latency and cost. It targets code assistance, agent...",
+      "context_length": 1048576,
+      "provider_slug": "tencent",
+      "pricing": {
+        "prompt_per_token": "0.000000035",
+        "completion_per_token": "0.0000001405",
+        "prompt_per_1m": 0.035,
+        "completion_per_1m": 0.1405
+      },
+      "architecture": {
+        "modality": "text+image->text",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "include_reasoning",
+        "max_completion_tokens",
+        "max_tokens",
+        "reasoning",
+        "response_format",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true
+      }
+    },
+    {
       "provider_slug": "tencent",
       "usage_rank": 5,
       "usage_tokens_7d": 8157744160293,
@@ -22725,6 +23505,137 @@
           "low",
           "minimal",
           "none"
+        ],
+        "default_effort": "high"
+      }
+    },
+    {
+      "id": "thinkingmachines/inkling-2-mini",
+      "created": 1795227585,
+      "canonical_slug": "thinkingmachines/inkling-2-mini-20261120",
+      "top_provider": {
+        "context_length": 1048576,
+        "max_completion_tokens": 65536,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "Thinking Machines: Inkling 2 Mini",
+      "description": "Inkling 2 Mini is an open-weight multimodal looped transformer from Thinking Machines Lab, with 3.4B active parameters out of 26.4B total (MoE). Its middle layers run three times with shared...",
+      "context_length": 1048576,
+      "provider_slug": "thinkingmachines",
+      "pricing": {
+        "prompt_per_token": "0.000000075",
+        "completion_per_token": "0.0000003",
+        "prompt_per_1m": 0.075,
+        "completion_per_1m": 0.3
+      },
+      "architecture": {
+        "modality": "text+image->text",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logprobs",
+        "max_completion_tokens",
+        "max_tokens",
+        "min_p",
+        "presence_penalty",
+        "reasoning",
+        "reasoning_effort",
+        "repetition_penalty",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true,
+        "supported_efforts": [
+          "max",
+          "high",
+          "medium",
+          "low",
+          "minimal",
+          "none"
+        ],
+        "default_effort": "high"
+      }
+    },
+    {
+      "id": "thinkingmachines/inkling-2-small",
+      "created": 1794261847,
+      "canonical_slug": "thinkingmachines/inkling-2-small-20261107",
+      "top_provider": {
+        "context_length": 1048576,
+        "max_completion_tokens": 943718,
+        "is_moderated": false
+      },
+      "expiration_date": null,
+      "name": "Thinking Machines: Inkling 2 Small",
+      "description": "Inkling 2 Small is an open-weight multimodal mixture-of-experts reasoning model from Thinking Machines Lab, with 17B active parameters out of 594B total. It is the first model in the second...",
+      "context_length": 1048576,
+      "provider_slug": "thinkingmachines",
+      "pricing": {
+        "prompt_per_token": "0.0000003",
+        "completion_per_token": "0.000001",
+        "prompt_per_1m": 0.3,
+        "completion_per_1m": 1.0
+      },
+      "architecture": {
+        "modality": "text+image->text",
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ]
+      },
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logit_bias",
+        "logprobs",
+        "max_tokens",
+        "min_p",
+        "presence_penalty",
+        "reasoning",
+        "reasoning_effort",
+        "repetition_penalty",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": true,
+        "default_enabled": true,
+        "supported_efforts": [
+          "max",
+          "high",
+          "medium",
+          "low",
+          "minimal"
         ],
         "default_effort": "high"
       }
@@ -24428,10 +25339,10 @@
       "description": "GLM-5.3-Prime is the high-speed variant of Z.ai's GLM-5.3, inheriting its full capabilities while delivering 1.5–2× the output throughput through inference acceleration. It supports text input and output with a 1M-token...",
       "context_length": 1000000,
       "pricing": {
-        "prompt_per_token": "0.0000028",
-        "completion_per_token": "0.0000088",
-        "prompt_per_1m": 2.8,
-        "completion_per_1m": 8.8
+        "prompt_per_token": "0.00000168",
+        "completion_per_token": "0.00000528",
+        "prompt_per_1m": 1.68,
+        "completion_per_1m": 5.28
       },
       "architecture": {
         "modality": "text->text",
@@ -24537,10 +25448,10 @@
       "description": "This model always redirects to the latest model in the GLM Flash family.",
       "context_length": 1048576,
       "pricing": {
-        "prompt_per_token": "0.0000000285",
-        "completion_per_token": "0.0000000923",
-        "prompt_per_1m": 0.0285,
-        "completion_per_1m": 0.0923
+        "prompt_per_token": "3.56E-8",
+        "completion_per_token": "8.15E-8",
+        "prompt_per_1m": 0.0356,
+        "completion_per_1m": 0.0815
       },
       "architecture": {
         "modality": "text+image+video->text",
