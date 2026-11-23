@@ -148,6 +148,14 @@ $curated=labCurated($fakeCatalog);
 check($curated['focus_economic'][0]['id']==='openai/gpt-6-luna','older popular generation displaced current economic release');
 check(count($curated['focus_medium'])===0,'GPT must be absent from medium shortlist');
 check($curated['focus_high'][0]['id']==='openai/gpt-6.1-sol','approved high GPT selection incorrect');
+$market=labRead(dirname(__DIR__).'/models.json')['models'];
+$marketById=[];foreach($market as $model)$marketById[$model['id']]=$model;
+foreach(['inclusionai/ling-3.2-flash:free','baidu/ernie-5.5-flash-preview:free','liquid/lfm-3-1.7b:free','particle-ai/particle-1:free'] as $id) {
+    check(isset($marketById[$id]) && (float)$marketById[$id]['pricing']['prompt_per_token']===0.0 && (float)$marketById[$id]['pricing']['completion_per_token']===0.0,'approved free model missing or has nonzero token price');
+}
+$economicIds=array_column(labCurated($market)['focus_economic'],'id');
+foreach(['thinkingmachines/inkling-2-mini','tencent/hy4-flash'] as $id)
+    check(in_array($id,$economicIds,true),'approved economic candidate missing from shortlist');
 foreach([0=>'green',9=>'green',10=>'yellow',29=>'yellow',30=>'orange',100=>'orange'] as $fail=>$band) {
     $samples=[];for($i=0;$i<100;$i++)$samples[]=['ok'=>$i>=$fail,'retryable'=>true,'seconds'=>1,'output_tokens'=>100,'first_byte_ms'=>100,'at'=>gmdate('c')];
     $h=labHealth(['context_length'=>128000],$samples);check($h['reliability_band']===$band,'failure-rate color boundary incorrect');

@@ -3,11 +3,15 @@
     "focus_economic": {
       "z-ai": "~z-ai/glm-flash-latest",
       "google": "google/gemini-2.5-flash-lite",
-      "mistralai": "mistralai/mistral-small-2603:batch"
+      "mistralai": "mistralai/mistral-small-2603:batch",
+      "thinkingmachines": "thinkingmachines/inkling-2-mini",
+      "tencent": "tencent/hy4-flash"
     },
     "focus_high": {
       "openai": "openai/gpt-6.1-sol",
-      "moonshotai": "moonshotai/kimi-k3.1-pro"
+      "moonshotai": "moonshotai/kimi-k3.1-pro",
+      "google": "google/gemini-4-argon",
+      "qwen": "qwen/qwen3.8-max-prime"
     },
     "focus_medium": {
       "moonshotai": "moonshotai/kimi-k3",
